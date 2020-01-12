@@ -420,8 +420,8 @@ namespace Phases.Controls
                 public int Message;
                 public WParam(IntPtr wParam)
                 {
-                    Value = wParam.ToInt32() >> 16;
-                    Message = wParam.ToInt32() & 0xFFFF;
+                    Value = (int)wParam.ToInt64() >> 16;
+                    Message = (int)wParam.ToInt64() & 0xFFFF;
                 }
 
                 public WParam(int msg, int value)

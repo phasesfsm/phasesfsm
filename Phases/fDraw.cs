@@ -1352,15 +1352,15 @@ namespace Phases
 
         private void fDraw_ResizeEnd(object sender, EventArgs e)
         {
-            Properties.Settings.Default.WindowSize = Size;
+            //Properties.Settings.Default.WindowSize = Size;
         }
 
         private void fDraw_Resize(object sender, EventArgs e)
         {
-            if(WindowState != Properties.Settings.Default.WindowState && WindowState != FormWindowState.Minimized)
+            /*if(WindowState != Properties.Settings.Default.WindowState && WindowState != FormWindowState.Minimized)
             {
                 Properties.Settings.Default.WindowState = WindowState;
-            }
+            }*/
         }
 
         private void pBox_SizeChanged(object sender, EventArgs e)
@@ -1370,7 +1370,7 @@ namespace Phases
 
         private void fDraw_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Properties.Settings.Default.Save();
+            //Properties.Settings.Default.Save();
         }
 
         private void tvObjects_AfterSelect(object sender, TreeViewEventArgs e)
