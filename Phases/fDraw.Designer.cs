@@ -1614,7 +1614,7 @@
             // 
             this.splitContainer5.Panel2.Controls.Add(this.dgVariables);
             this.splitContainer5.Size = new System.Drawing.Size(225, 398);
-            this.splitContainer5.SplitterDistance = 174;
+            this.splitContainer5.SplitterDistance = 173;
             this.splitContainer5.TabIndex = 0;
             // 
             // dgEntradas
@@ -1634,7 +1634,7 @@
             this.dgEntradas.Location = new System.Drawing.Point(0, 0);
             this.dgEntradas.Name = "dgEntradas";
             this.dgEntradas.RowHeadersVisible = false;
-            this.dgEntradas.Size = new System.Drawing.Size(225, 174);
+            this.dgEntradas.Size = new System.Drawing.Size(225, 173);
             this.dgEntradas.TabIndex = 0;
             this.dgEntradas.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEntradas_CellValueChanged);
             this.dgEntradas.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgEntradas_CurrentCellDirtyStateChanged);
@@ -1691,7 +1691,7 @@
             this.dgVariables.Name = "dgVariables";
             this.dgVariables.ReadOnly = true;
             this.dgVariables.RowHeadersVisible = false;
-            this.dgVariables.Size = new System.Drawing.Size(225, 220);
+            this.dgVariables.Size = new System.Drawing.Size(225, 221);
             this.dgVariables.TabIndex = 1;
             this.dgVariables.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgVariables_CurrentCellDirtyStateChanged);
             // 
@@ -2129,12 +2129,12 @@
             // 
             // pShadow
             // 
-            this.pShadow.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.pShadow.BackColor = System.Drawing.Color.DarkGray;
             this.pShadow.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pShadow.Location = new System.Drawing.Point(3, 1);
+            this.pShadow.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pShadow.Location = new System.Drawing.Point(0, 0);
             this.pShadow.Name = "pShadow";
-            this.pShadow.Size = new System.Drawing.Size(256, 175);
+            this.pShadow.Size = new System.Drawing.Size(262, 178);
             this.pShadow.TabIndex = 4;
             this.pShadow.TabStop = false;
             this.pShadow.Paint += new System.Windows.Forms.PaintEventHandler(this.pShadow_Paint);
