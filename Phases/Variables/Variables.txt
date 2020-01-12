@@ -1,0 +1,157 @@
+﻿Variables:
+
+- (I) Inputs
+	- Boolean
+	- Event
+	- Trigger (to flags)
+		- To Boolean
+		- To FlipFlop
+		- To Counter
+
+- (O) Outputs
+	- Boolean
+	- Events
+
+- (P) Flags
+	- Boolean
+	- FlipFlop
+	- Counters
+
+********** Inputs **********
+
+		Any external variable that can affect the machine behavior.
+		
+	+++ Boolean +++
+	To receive true or false.
+	
+		> Setting a boolean input:
+
+		* General function style
+			Machine.SetInput((inputsEnum)InputName, (bool)value);
+			
+		* Specific function style
+			Machine.SetInputName((bool)value);
+			
+		* Member style
+			Machine.Inputs.InputName = (bool)value;
+	
+	+++ Event +++
+	To receive a signal directly to the state machine.
+	
+		> Sending an event input:
+
+		* General function style
+			Machine.SendEvent((eventsEnum)EventName);
+			
+		* Specific function style
+			Machine.SendEventName();
+			
+	+++ Trigger +++
+	Input signal to trigger a flag change, it could not change the state machine directly.
+	
+		> Sending a trigger input:
+
+		* General function style
+			Machine.SendTrigger((eventsEnum)TriggerName);
+			
+		* Specific function style
+			Machine.SendTriggerName();
+			
+		> Kinds of triggers
+		
+		* To Boolean:	Changes a boolean flag to one desired state. This is like a event with memory.
+		* To FlipFlop:	Toggles a boolean flag with every signal received.
+		* To Counter:	Increments or decrements a counter flag.
+	
+********** Outputs **********
+
+		Variables to send out the state machine results.
+	
+	+++ Boolean +++
+	Boolean variable, generates an output only when the output value changes.
+
+		> Catching an output:
+	
+		* General function style using callbacks
+			void ReceiveOutput((outputsEnum)OutputName, (bool)value) { ... }
+			
+		* Specific function style using callbacks
+			void Receive_OutputName((bool)value) { ... }
+
+		* General member style interfacing outputs class
+			void Machine::Outputs((outputsEnum)OutputName, (bool)value) { ... }
+			
+		* Specific member style interfacing outputs class
+			void MachineOutputs::OutputName((bool)value) { ... }
+
+	+++ Event +++
+	Generates an output signal.
+
+		> Catching an output:
+
+		* General function style using callbacks
+			void ReceiveEvent((eventsEnum)EventName) { ... }
+			
+		* Specific function style using callbacks
+			void Receive_EventName() { ... }
+			
+		* Member style interfacing outputs class
+			void MachineEvents::EventName() { ... }
+	
+********** Flags **********
+
+		Internal variable to save certainly values for taking decisions in the machine, flags could be changed by the machine or by a trigger input.
+		
+	+++ Boolean +++
+	Only can take true or false values.
+	
+		> Conditions ussage.
+
+			* Getting the value: BooleanFlag
+
+		> Outputs ussage.
+
+			* Setting the value: BooleanFlag
+
+			* Clearing the value: !BooleanFlag
+
+	+++ FlipFlop +++
+	Toggles it own value with user access or a trigger.
+	
+		> Conditions ussage.
+
+			* Getting the value: FlipFlopFlag
+
+		> Outputs ussage.
+
+			* Toggling the value: FlipFlopFlag or !FlipFlopFlag
+
+	+++ Counter +++
+	Stores a count that could be incremented or decremented by the machine or by a trigger.
+	
+		> Conditions ussage.
+
+			* Getting if counter is diferent of 0: CounterFlag
+
+			* Getting if counter is 0: !CounterFlag
+
+			* Getting if counter value is the maximum: 'CounterFlag
+
+			* Getting if counter value is the minimum: .CounterFlag
+
+			* Getting if counter value is value: CounterFlag=value
+
+		> Outputs ussage.
+
+			* Incrementing the count: CounterFlag+
+
+			* Decrementing the count: CounterFlag-
+
+			* Clearing the count: !CounterFlag
+
+			* Setting the count: CounterFlag=value
+
+			* Setting the count to maximum value: 'CounterFlag
+
+			* Setting the count to minumum value: .CounterFlag
+		

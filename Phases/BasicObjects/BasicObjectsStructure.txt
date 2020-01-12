@@ -1,0 +1,30 @@
+Basic objects
+
+Object
+ |
+ |
+ |-Transition (State)
+ |
+ |-State (List<Transition>)
+    |
+	|-Ma (List<Transition>, List<State>)
+	
+*BasicObject:
+	- string Name
+
+	*BasicTransition:
+		- BasicState Pointing;
+		P- List<DrawableObjects> TransitionObjects;
+		P- string Condition;
+		P- string Output;
+
+	*BasicState:
+		- List<BasicTransition> OutTransitions;
+		P- State Correspondent;
+		P- string InOutput;
+		P- string OutOutput;
+
+		*BasicMachine:
+			- List<State> SubStates;
+
+	

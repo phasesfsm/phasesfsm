@@ -1,0 +1,261 @@
+﻿
+************************************************
+**                   Objects                  **
+************************************************
+
+Project: General information about the project.
+ |
+ |-Value-> Name
+ |-Value-- Description 
+ |
+
+Variable:
+ |-Value-> Name
+ |-Value-- Description
+ |-Value-- DefaultValue
+ |-Value-- Type
+ |
+
+Boolean:
+ |-Value-> Name
+ |-Value-- Description
+ |-Value-- Default 
+ |
+
+Counter:
+ |-Value-> Name
+ |-Value-- Description
+ |-Value-- DefaultValue
+ |-Value-- Minimum
+ |-Value-- Maximum
+ |
+
+Signal:
+ |-Value-> Name
+ |-Value-- Description
+ |
+
+Output:
+ |-Value-- Action
+ |
+ |-Object-- Variable
+ |
+
+Relation:
+ |-Value-> Name
+ |-Value-- Description
+ |-Value-- Action
+ |
+ |-Object- Input [Signal]
+ |-Object- Output [Variable]
+ |
+
+Machine:
+ |-Value-> Name
+ |-Value-- Description
+ |
+ |-Object-- Transition
+ |
+ |-Collection-- States
+ |-Collection-- SuperStates
+ |
+
+Transition:
+ |-Value-> Name
+ |-Value-- Description
+ |-Value-- Priority
+ |-Value-- Condition
+ |-Value-- Trigger
+ |-Value-- Timeout
+ |
+ |-Object-- StartState [State]
+ |-Object-- EndState [State]
+ |
+ |-Collection-- Outputs
+ |
+
+State:
+ |-Value-> Name
+ |-Value-- Description
+ |
+ |-Collection-- Fathers
+ |-Collection-- EnterOutputs [Outputs]
+ |-Collection-- ExitOutputs [Outputs]
+ |-Collection-- Transitions
+ |
+
+SuperState:
+ |-Value-> Name
+ |-Value-- Description
+ |
+ |-Collection-- Fathers
+ |-Collection-- EnterOutputs [Outputs]
+ |-Collection-- ExitOutputs [Outputs]
+ |-Collection-- Transitions
+ |-Collection-- States
+ |-Collection-- SuperStates
+ |
+
+
+************************************************
+**           Collections of objects           **
+************************************************
+
+Variables: Contains the list of all the variables in the project.
+ |
+ |-Value-> Count
+ |
+ |-Iterator- Variable
+ |
+
+BoolInputs:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- BoolInput [Boolean]
+ |
+
+ BoolFlags:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- BoolFlag [Boolean]
+ |
+
+ BoolOutputs:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- BoolOutput [Boolean]
+ |
+
+ CounterFlags:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- CounterFlag [Counter]
+ |
+
+ InputEvents:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- InputEvent [Signal]
+ |
+
+ FlagMessages:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- FlagMessage [Signal]
+ |
+
+ OutputEvents:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- OutputEvent [Signal]
+ |
+
+Relations: Contains the list of all the Relations in the project.
+ |
+ |-Value-> Count
+ |
+ |-Iterator- Relation
+ |
+
+Machines: Contains the list of machines in the project.
+ |
+ |-Value-> Count
+ |
+ |-Iterator- Machine
+ |
+
+Transitions: Contains the list of all the transitions in the project.
+ |
+ |-Value-> Count
+ |
+ |-Iterator- Transition
+ |
+
+States: Contains the list of all the states in the project.
+ |
+ |-Value-> Count
+ |
+ |-Iterator- State
+ |  |-Value-> Name
+ |  |-Value-- Description
+ |  |
+ |  |-Collection-- Fathers
+ |  |-Collection-- EnterOutputs [Outputs]
+ |  |-Collection-- ExitOutputs [Outputs]
+ |  |-Collection-- Transitions
+ |
+
+SuperStates: Contains the list of all the super states in the project.
+ |
+ |-Value-> Count
+ |
+ |-Iterator- SuperState
+ |
+
+Outputs:
+ |
+ |-Value-> Count
+ |
+ |-Iterator- Output
+ |
+
+************************************************
+**                  Syntax                    **
+************************************************
+
+--- Symbols ---
+
+@ -> start of command or insertion
+# -> end of command
+% -> Non populated start and end lines block
+* -> iteration
+! -> iteration element
+> -> alias
++ -> block
+~ -> document setting
+? -> conditional
+. -> last or object members access
+
+
+Non populated block
+start: @%*Operation#
+end: @%*#
+
+--- Usage ---
+
+Insert object value:
+
+   @Project.Name#
+
+its the same as:
+
+   @Project#
+
+because "Name" is the default object value
+
+---
+
+Using one line iterators:
+
+To list all the project variables with the default value:
+
+   @*Variable# @+Variable.DefaultValue#
+   @*Variable > var# @+var.DefaultValue#
+
+To list all the descriptions of the project variables:
+
+   @*Variable.Description#
+
+
+
+
+************************************************
+**                File names                  **
+************************************************

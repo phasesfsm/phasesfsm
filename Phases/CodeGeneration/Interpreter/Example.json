@@ -1,0 +1,107 @@
+﻿{
+    "Project": {
+        "name": "{{Project}}"
+    },
+    "Variables": {
+        "BooleanInputs": [{{for index, var in Variables.BooleanInputs:
+            { "Name": "{{var.Name}}", "Default": "{{var.Default}}"}{{if index < Variables.BooleanInputs - 1:,}}}}
+        ],
+        "InputEvents": [{{for index, var in Variables.InputEvents:
+            "{{var}}"{{if index < Variables.InputEvents - 1:,}}}}
+        ],
+        "BooleanFlags": [{{for index, var in Variables.BooleanFlags:
+            { "Name": "{{var.Name}}", "Default": "{{var.Default}}"}{{if index < Variables.BooleanFlags - 1:,}}}}
+        ],
+        "CounterFlags": [{{for index, var in Variables.CounterFlags:
+            { "Name": "{{var.Name}}", "Default": "{{var.Default}}"}{{if index < Variables.CounterFlags - 1:,}}}}
+        ],
+        "MessagesFlags": [{{for index, var in Variables.MessagesFlags:
+            { "Name": "{{var.Name}}", "Default": "{{var.Default}}"}{{if index < Variables.MessagesFlags - 1:,}}}}
+        ],
+        "BooleanOutputs": [{{for index, var in Variables.BooleanOutputs:
+            { "Name": "{{var.Name}}", "Default": "{{var.Default}}"}{{if index < Variables.BooleanOutputs - 1:,}}}}
+        ],
+        "OutputEvents": [{{for index, var in Variables.OutputEvents:
+            "{{var}}"{{if index < Variables.OutputEvents - 1:,}}}}
+        ]
+    },
+    "Relations": [{{for index, indir in Relations:
+        { "Name": "{{indir.Name}}", "{{Input}}": "{{indir.Input}}", "{{Action}}": "{{indir.Action}}", "{{Output}}": "{{indir.Output}}" }{{if index < Relations - 1:,}}}}
+    ],
+    "Machines": [{{for index, mach in Machines:
+        {
+            "Name": "{{mach.Name}}",
+            "Description": "{{mach.Description}}",
+            "Transition":
+            {
+                "Name": "{{mach.Transition.Name}}",
+                "Condition": "{{mach.Transition.Condition}}",
+                "Trigger": "{{mach.Transition.Trigger}}",
+                "Timeout": "{{mach.Transition.Timeout}}",
+                "Outputs": [{{for index2, output in trans.Outputs:
+                    { "Output": "{{output.Name}}", "Action": "{{output.Action}}" }{{if index2 < trans.Outputs - 1:,}}}}
+                ],
+                "End": "{{mach.Transition.EndState}}"
+            },
+            "SuperStates": [{{for index2, sup in mach.SuperStates:
+                "{{sup}}"{{if index2 < mach.SuperStates - 1:,}}}}
+            ],
+            "States": [{{for index2, state in mach.States:
+                "{{state}}"{{if index2 < mach.States - 1:,}}}}
+            ]
+        }{{if index < Machines - 1:,}}}}
+    ],
+    "Transitions": [{{for index, trans in Transitions:
+        {
+            "Name": "{{trans.Name}}",
+            "Description": "{{trans.Description}}",
+            "Priority": "{{trans.Priority}}",
+            "Condition": "{{trans.Condition}}",
+            "Trigger": "{{trans.Trigger}}",
+            "Timeout": "{{trans.Timeout}}",
+            "Outputs": [{{for index2, output in trans.Outputs:
+                { "Output": "{{output.Name}}", "Action": "{{output.Action}}" }{{if index2 < trans.Outputs - 1:,}}}}
+            ],
+            "StartState": "{{trans.StartState}}",
+            "EndState": "{{trans.EndState}}"
+        }{{if index < Transitions - 1:,}}}}
+    ],
+    "SuperStates": [{{for index, sup in SuperStates:
+        {
+            "Name": "{{sup.Name}}",
+            "Description": "{{sup.Description}}",
+            "Father": "{{sup.Father}}",
+            "EnterOutputs": [{{for index2, output in sup.EnterOutputs:
+                { "Output": "{{output.Name}}", "Action": "{{output.Action}}" }{{if index2 < sup.EnterOutputs - 1:,}}}}
+            ],
+            "ExitOutputs": [{{for index2, output in sup.ExitOutputs:
+                { "Output": "{{output.Name}}", "Action": "{{output.Action}}" }{{if index2 < sup.ExitOutputs - 1:,}}}}
+            ],
+            "Transitions": [{{for index2, trans in sup.Transitions:
+                "{{trans}}"{{if index2 < sup.Transitions - 1:,}}}}
+            ],
+            "SuperStates": [{{for index2, sup2 in sup.SuperStates:
+                "{{sup2}}"{{if index2 < sup.SuperStates - 1:,}}}}
+            ],
+            "States": [{{for index2, state in sup.States:
+                "{{state}}"{{if index2 < sup.States - 1:,}}}}
+            ]
+        }{{if index < SuperStates - 1:,}}}}
+    ],
+    "States": [{{for index, state in States:
+        {
+            "Name": "{{state.Name}}",
+            "Description": "{{state.Description}}",
+            "Father": "{{state.Father}}",
+            "EnterOutputs": [{{for index2, output in state.EnterOutputs:
+                { "Output": "{{output.Name}}", "Action": "{{output.Action}}" }{{if index2 < state.EnterOutputs - 1:,}}}}
+            ],
+            "ExitOutputs": [{{for index2, output in state.ExitOutputs:
+                { "Output": "{{output.Name}}", "Action": "{{output.Action}}" }{{if index2 < state.ExitOutputs - 1:,}}}}
+            ],
+            "Transitions": [{{for index2, trans in state.Transitions:
+                "{{trans}}"{{if index2 < state.Transitions - 1:,}}}}
+            ]
+        }{{if index < States - 1:,}}}}
+    ]
+}

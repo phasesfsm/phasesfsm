@@ -1,0 +1,135 @@
+﻿@~Condition VariablePrefix @Project#->#
+@~Comparator & &&#
+@~Comparator | ||#
+
+#include "@Project#.h"
+#include <string.h>
+
+const @Project#_Struct @Project#_Defaults = @^Project#_DEFAULT_VALUES;
+
+static void @Project#_ClearEvents() {
+    if(@Project#->AnyInputEvent) {
+        @Project#->AnyInputEvent = 0;
+        @Project#->@*InputEvent# = 0;
+    }
+}
+
+void @Project#_Init(@Project#_Struct *const mach) {
+    @Project# = mach;
+
+    //Load default values here
+    memcpy(mach, &@Project#_Defaults, sizeof(@Project#_Struct));
+
+    @Project#_@*Machine#_Init();
+}
+
+void @Project#_Tick(@Project#_Struct *const mach) {
+    @Project# = mach;
+
+    @Project#_@*Machine#_Tick();
+    @Project#_ClearEvents();
+}
+
+void @Project#_SendEvent(@Project#_Struct *const mach, @Project#_EventInputs event) {
+    mach->AnyInputEvent = 1;
+    switch(event)
+    {
+        case @Project#_@*+InputEvent#:
+            mach->@+InputEvent# = 1;
+            break;@#
+    }
+}
+
+@%*+Machine#
+/*****************************************************************************/
+/*                              @+Machine#                                   */
+/*****************************************************************************/
+
+void @Project#_@+Machine#_Init() {
+    //Set @Project#ine counter to 0
+    @Project#->@+Machine#_Counter = 0;
+
+    //Start state
+    @Project#_@+Machine#_StateEntry(@Project#_@+Machine.EntryState#);
+}
+
+void @Project#_@+Machine#_StateEntry(@Project#_States state) {
+    switch(state) {
+        case @Project#_@+Machine.*+TState#:
+            @Project#->@+Machine#_State = @Project#_@+TState#;
+            @Project#_StateChanged(@Project#, @Project#_@+TState#);
+            break;@#
+        case @Project#_@+Machine.*+TSuperState#:
+@%+Machine.?+HasEntry#
+            @Project#->@+Machine#_Counter = 0;
+            
+            //State entry outputs here
+            @Project#->@+TSuperState.*EntryOutput#;
+            
+            //Load state entry
+            @Project#_@+Machine#_StateEntry(@Project#_@+TSuperState.EntryState#);
+@#
+            break;@#
+    }
+}
+
+@+Machine.%*+LSuperState#
+void @Project#_@+LSuperState#_StateEntry(@Project#_States state) {
+    @Project#->@+LSuperState.&*Father#_State = @Project#_@+Father.Child#;
+    switch(state) {
+        case @Project#_@+LSuperState.*+TState#:
+            @Project#->@+LSuperState#_State = @Project#_@+TState#;
+            @Project#_StateChanged(@Project#, @Project#_@+TState#);
+            break;@#
+    }
+}
+@#
+
+@+Machine.%*+LSuperState#
+void @Project#_@+LSuperState#_RunState(@Project#_States state) {
+    switch(state) {
+        case @Project#_@+LSuperState.*+TState#:
+@%+TState.*+Transition#
+            @!0?if:else if#(@+Transition.Condition#) {
+                //Transition outputs here
+                @Project#_OutputChanged(@Project#, @Project#_@+Transition.*BoolOutput#, @+BoolOutput.Value#);
+                @Project#_ReceiveEvent(@Project#, @Project#_@+Transition.*EventOutput#);
+
+                //switch state
+                @Project#_@+Transition.End.Father#_StateEntry(@Project#_@+Transition.End#);
+                @Project#->@+Transition.End.Father#_Counter = 0;
+@#
+            } else {
+                return;
+            }
+            break;@#
+        case @Project#_@+LSuperState.*+TSuperState#:
+            //Increment counter
+            @Project#->@+TSuperState#_Counter++;
+
+            @!0?if:else if#(@+Transition.Condition#) {
+                //Transition outputs here
+
+                //switch state
+                @Project#_@+Transition.End.Father#_StateEntry(@Project#_@+Transition.End#);
+            } else {
+                //execute current local state
+                @Project#_@+TSuperState#_RunState(@Project#->@+TSuperState#_State);
+                return;
+            }
+            break;@#
+    }
+    @Project#->@+LSuperState#_Counter = 0;
+}
+@#
+
+void @Project#_@+Machine#_Tick() {
+    //Increment counter
+    @Project#->@+Machine#_Counter++;
+
+    if(@Project#->@+Machine#_State == @Project#_NonStarted) return;
+
+    //execute current state
+    @Project#_@+Machine#_RunState(@Project#->@+Machine#_State);
+}
+@#

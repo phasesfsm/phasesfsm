@@ -1,0 +1,36 @@
+﻿Basic Objects:
+
+- BasicMachine
+- BasicState
+- BasicTransition (only out transitions)
+
+All the Machine should be represented using this 3 basic types.
+
+(root)
+BasicRoot
+|
+|--BasicStates
+|   |
+|   |----BasicTransitions
+|
+|
+|
+|--BasicMachines
+    |
+    |----BasicTransitions
+    |
+    |----States
+	|     |
+	|     |---Transitions
+	|
+	|
+	|----BasicMachines
+	      |
+		  ...
+
+Basic Object		Contains
+--------------------------------------------------------------------
+BasicRoot			(origin, sub states, sub machines, end points)
+BasicMachine		(origin, out transitions, sub states, sub machines, end points)
+BasicState			(out transitions)
+BasicTransition		(pointing state)

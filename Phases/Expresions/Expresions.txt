@@ -1,0 +1,25 @@
+﻿
+
+
+
+
+
+Precedence	Simbols		Name			Usage in Conditional	Usage in Outputs
+-------------------------------------------------------------------------------
+	1	LR		()		Parentesis			Grouping				-
+	2	RL		!		Not					Unary prefix		Clear value
+	2	RL		'		Maximum				Unary prefix		Set to Maximum
+	2	RL		.		Minimum				Unary prefix		Set to Minimum
+	2	RL		+		Increment				-				Increment Counter
+	2	RL		-		Decrement				-				Decrement Counter
+	7	LR		=		Equal				Comparison			Assing a numeric value
+	7	LR		!=		Not equal			Comparison				-
+	8	LR		&		And					Operator				-
+	9	LR		^		Xor					Operator				-
+	10	LR		|		Or					Operator				-
+	15	LR		,		Separator				-				Separate outputs
+
+
+*** Symbols ***
+
+Operator symbols:	& | ^

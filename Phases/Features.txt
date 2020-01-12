@@ -1,0 +1,103 @@
+﻿
+Simbology:
+
+-	To do.
+W-	Working on.
+I-	Incomplete.
+R-	Ready.
+
+To add:
+** General **
+	I-	Save document visual options
+	R-	Save latest window state when closing.
+	-	Show document title on window bar.
+	-	Show (*) if the file is unsaved.
+	-	Highlight link object when drawing transition.
+
+** Interface **
+	R-	Zoom functionality.
+	R-	Scroll functionality.
+	R-	Add zoom selector.
+	R-	Zoom on draw through the shadow box.
+	R-	Create a Zoom percent scale.
+	R-	Add check machine button.
+
+** Objects **
+	R-	Add link Alias with DrawableObject.
+	-	Show output on state.
+	R-	Fix drawing transitions with one click.
+	
+** Draw **
+	-	Fix transition arrow view problems.
+	R-	Preserve clip rectangles size.
+
+** Mouse **
+	R-	Drag view with mouse wheel button.
+	-	Contextual menu with right click.
+
+** Tree view **
+	-	Select objects on tree view when are selected on draw.
+	R-	Update object connections.
+	-	Find objects in tree view (also add textbox above treeview).
+	-	Update object name changes (Maybe change StartObject and EndObject in Transitions to Transition Input, Output lists).
+	-	Drop&drag drawable objects.
+
+** File **
+	-	Print.
+	-	Print preview.
+	-	Export to image formats.
+	-	Export to PDF.
+
+** Edit **
+	-	Document preferences.
+
+** View **
+	R-	Center view.
+	R-	Add move view to shadow clicked location.
+	R-	Grid background.
+	R-	Zoom drop-down selector.
+	R-	Restore view.
+	-	Objects view mode (show names, show operations).
+
+** Format **
+	-	Same size.
+	-	View order.
+
+** Tools **
+	-	Code generation.
+	-	Variables map.
+	-	Options.
+
+** Help **
+	-	Add Help menu.
+	-	Document functions.
+	-	Document user interface usage.
+	R-	Add about window.
+        . Add licence to About window
+
+*** Machine check ***
+	-	Check unused objects.
+		. Transitions must to have start and end object.
+		. States must to have connected a Transition directly or by an Alias.
+	-	Build machine objects table.
+		. All alias are replaced for the correspondent State.
+		. All 
+
+	-	Errors
+		. Transition without start connection.
+		. Transition without end connection.
+		. Transition without connection.
+		. Object without Transition.
+	-	Warnings
+		. Bloking state: there is not transition out state.
+
+*** Code Generation ***
+    -   Add cottle.ini options:
+            And
+            Or
+            Xor
+            Not
+    -   Add file header options
+            include(file)
+            filename("")
+    -   Generate a Store local to the file.
