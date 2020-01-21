@@ -439,6 +439,98 @@ namespace Phases.CodeGeneration.Interpreter
             return RenderDocument(document, store, fileName);
         }
 
+        public bool RenderDual(string scriptText, string fileName, out string renderedInput, out string renderedOutput, out List<int> sectionsLines)
+        {
+            string[] sourceLines = scriptText.Split(Environment.NewLine);
+            var sourceText = new StringBuilder();
+            int index = 0;
+            foreach (string line in sourceLines)
+            {
+                sourceText.Append(index);
+                sourceText.Append('\t');
+                sourceText.AppendLine(line);
+                index++;
+            }
+            string linedInput = sourceText.ToString();
+            string linedOutput = RenderScript(linedInput, fileName);
+            if (linedOutput == null)
+            {
+                renderedInput = null;
+                renderedOutput = null;
+                sectionsLines = null;
+                return false;
+            }
+
+            string[] resultLines = linedOutput.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var input = new StringBuilder();
+            var output = new StringBuilder();
+            sectionsLines = new List<int>();
+            index = 0;
+            int ridx = 0, num = 0, left, lines = 0;
+            sectionsLines.Add(lines);
+            bool sect1 = false;
+            foreach (string line in sourceLines)
+            {
+                lines = input.ToString().Split(Environment.NewLine).Count() - 1;
+                input.AppendLine(line);
+                left = 0;
+                for (int i = ridx; i < resultLines.Length; i++)
+                {
+                    int tindex = resultLines[i].IndexOf('\t');
+                    if (resultLines[i].Contains('\t') && int.TryParse(resultLines[i].Substring(0, tindex), out int lnum))
+                    {
+                        if (lnum <= index)
+                        {
+                            output.AppendLine(resultLines[i].Substring(tindex + 1));
+                            num = lnum;
+                            left++;
+                        }
+                        else
+                        {
+                            ridx = i;
+                            break;
+                        }
+                    }
+                }
+                bool sect = false;
+                bool sect2 = false;
+                if (index > num)
+                {
+                    output.AppendLine();
+                    num++;
+                    sect2 = true;
+                }
+                if (!sect1 && sect2)
+                {
+                    sect1 = true;
+                    if (!sectionsLines.Contains(lines - 1)) sectionsLines.Add(lines - 1);
+                }
+                else if (sect1 && !sect2)
+                {
+                    sect1 = false;
+                    if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
+                }
+                while (left > 1)
+                {
+                    input.AppendLine();
+                    left--;
+                    sect = true;
+                }
+                if (sect)
+                {
+                    if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
+                    lines = input.ToString().Split(Environment.NewLine).Count() - 1;
+                    if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
+                }
+                index++;
+            }
+            lines = input.ToString().Split(Environment.NewLine).Count();
+            if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
+            renderedInput = input.ToString();
+            renderedOutput = output.ToString();
+            return true;
+        }
+
         private void RenewFolder()
         {
             string renewPath = Path.Combine(path, Name);

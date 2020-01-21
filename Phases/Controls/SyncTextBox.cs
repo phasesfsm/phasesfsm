@@ -48,6 +48,7 @@ namespace Phases.Controls
             HideSelection = false;
             ScrollBars = RichTextBoxScrollBars.ForcedBoth;
             WordWrap = false;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 
             _components = new System.ComponentModel.Container();
             // Calculate width of "W" to set;the small horizontal increment

@@ -20,6 +20,7 @@ namespace Phases
         GeneratorData Data;
         RenderingContext Context;
         string RootPath, Source, DestFile;
+        List<int> sectionLines = new List<int>();
 
         internal CottleEditor(string rootPath, string source, string destFile, RenderingContext context)
         {
@@ -37,77 +38,43 @@ namespace Phases
 
         private void CtbResult_Paint(object sender, PaintEventArgs e)
         {
-            //e.Graphics.DrawLine(Pens.Black, 10, 10, 100, 100);
+            //for (int index = 2; index < sectionLines.Count; index += 2)
+            //{
+            //    int y = ctbResult.GetPositionFromCharIndex(ctbResult.GetFirstCharIndexFromLine(sectionLines[index - 1])).Y;
+            //    int height = ctbResult.GetPositionFromCharIndex(ctbResult.GetFirstCharIndexFromLine(sectionLines[index])).Y - y;
+            //    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(50, 200, 200, 200)), e.ClipRectangle.X, y, e.ClipRectangle.Width, height);
+            //}
         }
 
         private void CtbSource_Paint(object sender, PaintEventArgs e)
         {
-            //e.Graphics.DrawLine(Pens.Black, e.ClipRectangle.X, ctbSource.VerticalScroll, e.ClipRectangle.Right, ctbSource.VerticalScroll);
-
+            //for (int index = 2; index < sectionLines.Count; index += 2)
+            //{
+            //    int y = ctbSource.GetPositionFromCharIndex(ctbSource.GetFirstCharIndexFromLine(sectionLines[index - 1])).Y;
+            //    int height = ctbSource.GetPositionFromCharIndex(ctbSource.GetFirstCharIndexFromLine(sectionLines[index])).Y - y;
+            //    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(50, 200, 200, 200)), e.ClipRectangle.X, y, e.ClipRectangle.Width, height);
+            //}
+            // division line
+            //foreach (var lineNumber in sectionLines)
+            //{
+            //    int y = ctbSource.GetPositionFromCharIndex(ctbSource.GetFirstCharIndexFromLine(lineNumber)).Y - 1;
+            //    e.Graphics.DrawLine(Pens.Black, e.ClipRectangle.X, y, e.ClipRectangle.Right, y);
+            //}
         }
+
 
         private void BtGenerate_Click(object sender, EventArgs e)
         {
             ctbSource.Text = "";
             ctbResult.Text = "";
 
-            string[] lines = File.ReadAllLines(Source);
-            StringBuilder sb = new StringBuilder();
-            int index = 0;
-            foreach (string line in lines)
-            {
-                sb.Append(index);
-                sb.Append('\t');
-                sb.AppendLine(line);
-                index++;
-            }
             var project = new CodeGeneration.Interpreter.Project(Data, RootPath);
 
-            string render = project.RenderScript(sb.ToString(), DestFile);
-            if (render == null) return;
+            var result = project.RenderDual(File.ReadAllText(Source), DestFile, out string input, out string output, out sectionLines);
+            if (!result) return;
 
-            string[] rlines = render.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            var rb = new StringBuilder();
-            index = 0;
-            int ridx = 0, num = 0, left;
-            foreach (string line in lines)
-            {
-                ctbSource.SelectedText = line + Environment.NewLine;
-
-                left = 0;
-                for (int i = ridx; i < rlines.Length; i++)
-                {
-                    int tindex = rlines[i].IndexOf('\t');
-                    if (rlines[i].Contains('\t') && int.TryParse(rlines[i].Substring(0, tindex), out int lnum))
-                    {
-                        if (lnum <= index)
-                        {
-                            rb.AppendLine(rlines[i].Substring(tindex + 1));
-                            num = lnum;
-                            left++;
-                        }
-                        else
-                        {
-                            ridx = i;
-                            break;
-                        }
-                    }
-                }
-                if (index > num)
-                {
-                    rb.AppendLine();
-                    num++;
-                }
-                while (left > 1)
-                {
-                    ctbSource.SelectedText = Environment.NewLine;
-                    left--;
-                }
-                index++;
-            }
-            ctbSource.SelectionStart = 0;
-            ctbResult.Text = rb.ToString();
-            FormatText(rb.ToString(), ctbResult);
+            FormatText(input.ToString(), ctbSource);
+            FormatText(output.ToString(), ctbResult);
         }
 
         private void CottleEditor_Load(object sender, EventArgs e)
@@ -191,6 +158,9 @@ namespace Phases
 
             foreach (Match match in mtokens)
             {
+                m_rtb.SelectedText = match.Value;
+                m_rtb.SelectionStart = index;
+                m_rtb.SelectionLength = match.Value.Length;
                 if (match.Groups["macro_processor"].Success)
                 {
                     m_rtb.SelectionColor = Color.Brown;
@@ -216,8 +186,8 @@ namespace Phases
                     m_rtb.SelectionFont = new Font("Courier New", 10, FontStyle.Regular);
                     m_rtb.SelectionColor = Color.Black;
                 }
-                m_rtb.SelectedText = match.Value;
-                index += match.Value.Length;
+                m_rtb.SelectionStart = m_rtb.TextLength;
+                index = m_rtb.TextLength;
             }
             rtb.Rtf = m_rtb.Rtf;
         }
