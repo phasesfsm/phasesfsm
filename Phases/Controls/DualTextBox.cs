@@ -81,6 +81,20 @@ namespace DualText
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+
+#if NETCOREAPP3_1
+            //sub-controls location
+            hScrollL.Top = Height - hScrollL.Height;
+            hScrollR.Top = hScrollL.Top;
+            vScrollL.Left = Width / 2 - vScrollL.Width;
+            vScrollL.Height = hScrollL.Top;
+            vScrollR.Left = Width - vScrollR.Width;
+            vScrollR.Height = hScrollL.Top;
+            leftLabel.Top = hScrollL.Top + 1;
+            rightLabel.Top = hScrollL.Top + 1;
+            rightLabel.Left = Width - rightLabel.Width;
+#endif
+            // Scrolls resizing
             leftLabel.Left = vScrollL.Right - leftLabel.Width;
             hScrollL.Width = leftLabel.Left;
             hScrollR.Left = vScrollL.Right;
@@ -92,18 +106,18 @@ namespace DualText
 
             Refresh();
         }
-        #endregion
+#endregion
 
-        #region "Control drawing"
+#region "Control drawing"
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             leftView.Draw(e.Graphics);
             rightView.Draw(e.Graphics);
         }
-        #endregion
+#endregion
 
-        #region "Text configuration"
+#region "Text configuration"
         public event Func<string, string> ProcessText;
         public void SetText(string sourceText)
         {
@@ -222,9 +236,9 @@ namespace DualText
         {
             return leftView.Text.ToString();
         }
-        #endregion
+#endregion
 
-        #region "Scrolling"
+#region "Scrolling"
         private void vScrollL_ValueChanged(object sender, EventArgs e)
         {
             vScrollR.Value = vScrollL.Value;
@@ -257,9 +271,9 @@ namespace DualText
             else if (vert > vScrollR.Maximum - vScrollR.LargeChange) vScrollR.Value = vScrollR.Maximum - vScrollR.LargeChange;
             else vScrollR.Value = vert;
         }
-        #endregion
+#endregion
 
-        #region "Editions and actions"
+#region "Editions and actions"
         [Browsable(false)] public string UndoText => leftView.Cursor.Actions.UndoText;
         public bool Undo()
         {
@@ -274,9 +288,9 @@ namespace DualText
             ActiveView = leftView;
             return more;
         }
-        #endregion
+#endregion
 
-        #region "Keyboard events"
+#region "Keyboard events"
         private void Scrolls_KeyPress(object sender, KeyPressEventArgs e) => OnKeyPress(e);
         private void Scrolls_KeyUp(object sender, KeyEventArgs e) => OnKeyUp(e);
         private void Scrolls_KeyDown(object sender, KeyEventArgs e) => OnKeyDown(e);
@@ -428,9 +442,9 @@ namespace DualText
             }
         }
 
-        #endregion
+#endregion
 
-        #region "Mouse events"
+#region "Mouse events"
 
         private Point? downClick = null;
         private Cursor FlippedArrow;
@@ -554,9 +568,9 @@ namespace DualText
             MoveVertScroll(-e.Delta * FontHeight / 40);
         }
 
-        #endregion
+#endregion
 
-        #region "Control focus"
+#region "Control focus"
         protected override void OnEnter(EventArgs e)
         {
             base.OnEnter(e);
@@ -568,6 +582,6 @@ namespace DualText
             lastView = ActiveView;
             ActiveView = null;
         }
-        #endregion
+#endregion
     }
 }
