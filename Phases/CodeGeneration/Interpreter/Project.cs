@@ -26,7 +26,9 @@ namespace Phases.CodeGeneration.Interpreter
         private CustomSetting pjSetting, pjAltSetting;
         private BasicObjectsTree activeMachine = null;
         private DateTime dateTime;
-
+        public string Errors { get; private set; }
+        public int ErrorLine { get; private set; }
+        public int ErrorColumn { get; private set; }
         public Project(GeneratorData generatorData, string scriptsFolder)
         {
             Data = generatorData;
@@ -196,8 +198,7 @@ namespace Phases.CodeGeneration.Interpreter
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(string.Format("Error pre-parsing file: {0}.{1}{2}", file, Environment.NewLine, ex.Message), "Phases",
-                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                Errors = string.Format("Error pre-parsing file: {0}.{1}{2}", file, Environment.NewLine, ex.Message);
                 return null;
             }
 
@@ -236,8 +237,9 @@ namespace Phases.CodeGeneration.Interpreter
                     }
                     catch (ParseException ex)
                     {
-                        System.Windows.Forms.MessageBox.Show(string.Format("Error parsing {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file), "Cottle",
-                            System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                        Errors = string.Format("Error parsing {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file);
+                        ErrorLine = ex.Line;
+                        ErrorColumn = ex.Column;
                         stream.Dispose();
                         return null;
                     }
@@ -286,8 +288,9 @@ namespace Phases.CodeGeneration.Interpreter
                     }
                     catch (ParseException ex)
                     {
-                        System.Windows.Forms.MessageBox.Show(string.Format("Error parsing:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message), "Cottle",
-                            System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                        Errors = string.Format("Error parsing:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message);
+                        ErrorLine = ex.Line;
+                        ErrorColumn = ex.Column;
                         stream.Dispose();
                         return null;
                     }
@@ -305,8 +308,9 @@ namespace Phases.CodeGeneration.Interpreter
             }
             catch (ParseException ex)
             {
-                System.Windows.Forms.MessageBox.Show(string.Format("Error rendering {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file), "Cottle",
-                    System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                Errors = string.Format("Error rendering {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file);
+                ErrorLine = ex.Line;
+                ErrorColumn = ex.Column;
                 return null;
             }
             if (enableAltRender)
@@ -323,8 +327,9 @@ namespace Phases.CodeGeneration.Interpreter
                         }
                         catch (ParseException ex)
                         {
-                            System.Windows.Forms.MessageBox.Show(string.Format("Error in alt parsing {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file), "Cottle",
-                                System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                            Errors = string.Format("Error in alt parsing {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file);
+                            ErrorLine = ex.Line;
+                            ErrorColumn = ex.Column;
                             stream.Dispose();
                             return null;
                         }
@@ -336,8 +341,9 @@ namespace Phases.CodeGeneration.Interpreter
                 }
                 catch (ParseException ex)
                 {
-                    System.Windows.Forms.MessageBox.Show(string.Format("Error in alt rendering {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file), "Cottle",
-                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Warning);
+                    Errors = string.Format("Error in alt rendering {3}:\r\nLine {0}, pos {1}: {2}", ex.Line, ex.Column, ex.Message, file);
+                    ErrorLine = ex.Line;
+                    ErrorColumn = ex.Column;
                     return null;
                 }
             }
@@ -415,7 +421,7 @@ namespace Phases.CodeGeneration.Interpreter
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(string.Format("Error saving output file {0}: {1}", destFile, ex.Message));
+                Errors = string.Format("Error saving output file {0}: {1}", destFile, ex.Message);
                 return false;
             }
             return true;
