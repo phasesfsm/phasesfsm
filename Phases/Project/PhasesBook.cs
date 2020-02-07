@@ -11,6 +11,7 @@ using Phases.Actions;
 using Phases.Importers;
 using Phases.Importers.StateCad;
 using Phases.Utils;
+using System.IO;
 
 namespace Phases
 {
@@ -27,6 +28,7 @@ namespace Phases
         private int ActionIndex = 0, SavedIndex = 0;
         public string Language { get; set; } = "";
         public string ScriptsFolder { get; set; } = "";
+        public string TargetLanguage { get; set; } = "";
         public string ExecAfter { get; set; } = "";
         private Protected Protected;
 
@@ -408,6 +410,15 @@ namespace Phases
                     {
                         if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
                         ScriptsFolder = str;
+                        string folderName = Path.GetFileName(str);
+                        if (folderName.EndsWith(".cottle"))
+                        {
+                            TargetLanguage = folderName.Substring(0, folderName.Length - 7);
+                        }
+                        else
+                        {
+                            TargetLanguage = folderName;
+                        }
                     }
                     else
                     {

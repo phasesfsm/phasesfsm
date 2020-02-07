@@ -20,10 +20,15 @@ namespace Phases
         private CodeGeneratorProperties gProps;
         private string rootPath;
 
-        internal CodeGeneratorConfig(GeneratorData generatorData)
+        internal CodeGeneratorConfig(GeneratorData generatorData, string configPath = "")
         {
             this.gData = generatorData;
             InitializeComponent();
+            if (!string.IsNullOrEmpty(configPath))
+            {
+                string filePath = Path.Combine(configPath, "cottle.ini");
+                if (File.Exists(filePath)) LoadConfiguration(filePath);
+            }
         }
 
         private void BtOpenFolder_Click(object sender, EventArgs e)

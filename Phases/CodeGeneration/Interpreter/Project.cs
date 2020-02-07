@@ -21,7 +21,7 @@ namespace Phases.CodeGeneration.Interpreter
         public string Name => Data.Profile.ProjectName;
 
         public GeneratorData Data { get; private set; }
-        private string scriptsFolder, path;
+        private string scriptsFolder, resultsPath;
         private bool fileHead, enableAltRender = false;
         private CustomSetting pjSetting, pjAltSetting;
         private BasicObjectsTree activeMachine = null;
@@ -47,10 +47,10 @@ namespace Phases.CodeGeneration.Interpreter
                 string fileName = Path.GetFileName(filePath);
                 if (fileName == "cottle.ini") continue;
                 fileHead = true;
-                res = ProccessScript(filePath, path, fileName);
+                res = ProccessScript(filePath, resultsPath, fileName);
                 if (!res) return false;
             }
-            res = ProccessDirs(scriptsFolder, path);
+            res = ProccessDirs(scriptsFolder, resultsPath);
             if (!res) return false;
             return true;
         }
@@ -115,7 +115,7 @@ namespace Phases.CodeGeneration.Interpreter
 
         private bool LoadSettings()
         {
-            path = Data.Profile.Path;
+            scriptsFolder = Data.Book.ScriptsFolder;
             pjSetting = new CustomSetting
             {
                 Trimmer = CustomTrimmer
@@ -127,7 +127,7 @@ namespace Phases.CodeGeneration.Interpreter
 
             if (Data.Profile.Properties == null)
             {
-                Data.Profile.Properties = new CodeGeneratorProperties(Path.Combine(path, "cottle.ini"));
+                Data.Profile.Properties = new CodeGeneratorProperties(Path.Combine(scriptsFolder, "cottle.ini"));
             }
 
             pjSetting.BlockBegin = Data.Profile.Properties.BlockBegin;
@@ -139,7 +139,14 @@ namespace Phases.CodeGeneration.Interpreter
             pjAltSetting.BlockContinue = Data.Profile.Properties.AltBlockContinue;
             pjAltSetting.BlockEnd = Data.Profile.Properties.AltBlockEnd;
 
-            path = Data.Profile.Properties.GenerationPath;
+            if (string.IsNullOrEmpty(Data.Profile.Properties.GenerationPath))
+            {
+                resultsPath = Data.Profile.Path;
+            }
+            else
+            {
+                resultsPath = Data.Profile.Properties.GenerationPath;
+            }
 
             /*if (line.StartsWith("Option="))
             {
@@ -161,21 +168,21 @@ namespace Phases.CodeGeneration.Interpreter
 
             store["Variables"] = new Dictionary<Value, Value>
             {
-                { "BooleanInputs", Data.Variables.BooleanInputs.ConvertAll(var => (Value)(var as BooleanInput).GetDictionary()) },
+                { "BooleanInputs", Data.Variables.BooleanInputs.ToDictionary(var => (Value)var.Name, var => (Value)(var as BooleanInput).GetDictionary()) },
                 { "InputEvents", Data.Variables.EventInputs.ConvertAll(var => (Value)var.Name) },
-                { "BooleanFlags", Data.Variables.BooleanFlags.ConvertAll(var => (Value)(var as BooleanFlag).GetDictionary()) },
-                { "CounterFlags", Data.Variables.CounterFlags.ConvertAll(var => (Value)(var as CounterFlag).GetDictionary()) },
+                { "BooleanFlags", Data.Variables.BooleanFlags.ToDictionary(var => (Value)var.Name, var => (Value)(var as BooleanFlag).GetDictionary()) },
+                { "CounterFlags", Data.Variables.CounterFlags.ToDictionary(var => (Value)var.Name, var => (Value)(var as CounterFlag).GetDictionary()) },
                 { "MessageFlags", Data.Variables.MessageFlags.ConvertAll(var => (Value)var.Name) },
-                { "BooleanOutputs", Data.Variables.BooleanOutputs.ConvertAll(var => (Value)(var as BooleanOutput).GetDictionary()) },
+                { "BooleanOutputs", Data.Variables.BooleanOutputs.ToDictionary(var => (Value)var.Name, var => (Value)(var as BooleanOutput).GetDictionary()) },
                 { "OutputEvents", Data.Variables.EventOutputs.ConvertAll(var => (Value)var.Name) }
             };
 
-            store["Relations"] = Data.RelationsList.ConvertAll(indir => (Value)indir.GetDictionary());
-            store["Equations"] = Data.EquationsList.ConvertAll(equation => (Value)equation.GetDictionary());
-            store["Machines"] = Data.Trees.ConvertAll(tree => (Value)tree.GetDictionary());
-            store["Transitions"] = Data.BasicTransitionsList().ToList().ConvertAll(trans => (Value)trans.GetDictionary());
-            store["SuperStates"] = Data.SuperStatesList().ToList().ConvertAll(state => (Value)state.GetDictionary());
-            store["States"] = Data.StatesList().ToList().ConvertAll(state => (Value)state.GetDictionary());
+            store["Relations"] = Data.RelationsList.ToDictionary(indir => (Value)indir.Name, indir => (Value)indir.GetDictionary());
+            store["Equations"] = Data.EquationsList.ToDictionary(equation => (Value)equation.Name, equation => (Value)equation.GetDictionary());
+            store["Machines"] = Data.Trees.ToDictionary(tree => (Value)tree.Name, tree => (Value)tree.GetDictionary());
+            store["Transitions"] = Data.BasicTransitionsList().ToDictionary(trans => (Value)trans.Name, trans => (Value)trans.GetDictionary());
+            store["SuperStates"] = Data.SuperStatesList().ToDictionary(state => (Value)state.Name, state => (Value)state.GetDictionary());
+            store["States"] = Data.StatesList().ToDictionary(state => (Value)state.Name, state => (Value)state.GetDictionary());
 
             if (activeMachine != null)
             {
@@ -445,101 +452,9 @@ namespace Phases.CodeGeneration.Interpreter
             return RenderDocument(document, store, fileName);
         }
 
-        public bool RenderDual(string scriptText, string fileName, out string renderedInput, out string renderedOutput, out List<int> sectionsLines)
-        {
-            string[] sourceLines = scriptText.Split(Environment.NewLine);
-            var sourceText = new StringBuilder();
-            int index = 0;
-            foreach (string line in sourceLines)
-            {
-                sourceText.Append(index);
-                sourceText.Append('\t');
-                sourceText.AppendLine(line);
-                index++;
-            }
-            string linedInput = sourceText.ToString();
-            string linedOutput = RenderScript(linedInput, fileName);
-            if (linedOutput == null)
-            {
-                renderedInput = null;
-                renderedOutput = null;
-                sectionsLines = null;
-                return false;
-            }
-
-            string[] resultLines = linedOutput.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            var input = new StringBuilder();
-            var output = new StringBuilder();
-            sectionsLines = new List<int>();
-            index = 0;
-            int ridx = 0, num = 0, left, lines = 0;
-            sectionsLines.Add(lines);
-            bool sect1 = false;
-            foreach (string line in sourceLines)
-            {
-                lines = input.ToString().Split(Environment.NewLine).Count() - 1;
-                input.AppendLine(line);
-                left = 0;
-                for (int i = ridx; i < resultLines.Length; i++)
-                {
-                    int tindex = resultLines[i].IndexOf('\t');
-                    if (resultLines[i].Contains('\t') && int.TryParse(resultLines[i].Substring(0, tindex), out int lnum))
-                    {
-                        if (lnum <= index)
-                        {
-                            output.AppendLine(resultLines[i].Substring(tindex + 1));
-                            num = lnum;
-                            left++;
-                        }
-                        else
-                        {
-                            ridx = i;
-                            break;
-                        }
-                    }
-                }
-                bool sect = false;
-                bool sect2 = false;
-                if (index > num)
-                {
-                    output.AppendLine();
-                    num++;
-                    sect2 = true;
-                }
-                if (!sect1 && sect2)
-                {
-                    sect1 = true;
-                    if (!sectionsLines.Contains(lines - 1)) sectionsLines.Add(lines - 1);
-                }
-                else if (sect1 && !sect2)
-                {
-                    sect1 = false;
-                    if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
-                }
-                while (left > 1)
-                {
-                    input.AppendLine();
-                    left--;
-                    sect = true;
-                }
-                if (sect)
-                {
-                    if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
-                    lines = input.ToString().Split(Environment.NewLine).Count() - 1;
-                    if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
-                }
-                index++;
-            }
-            lines = input.ToString().Split(Environment.NewLine).Count();
-            if (!sectionsLines.Contains(lines)) sectionsLines.Add(lines);
-            renderedInput = input.ToString();
-            renderedOutput = output.ToString();
-            return true;
-        }
-
         private void RenewFolder()
         {
-            string renewPath = Path.Combine(path, Name);
+            string renewPath = Path.Combine(resultsPath, Name);
 
             if (Directory.Exists(renewPath))
             {

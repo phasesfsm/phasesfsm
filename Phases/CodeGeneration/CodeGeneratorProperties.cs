@@ -93,7 +93,8 @@ namespace Phases.CodeGeneration
                     }
                     else
                     {
-                        continue;
+                        obj = value;
+                        //continue;
                     }
                     foreach (PropertyInfo propertyInfo in type)
                     {

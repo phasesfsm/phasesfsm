@@ -1208,7 +1208,7 @@ namespace Phases
                     //language settings
                     if(book.Language == "Cottle")
                     {
-                        lbLanguage.Text = book.ScriptsFolder;
+                        lbLanguage.Text = book.TargetLanguage;
                     }
                     else
                     {
@@ -1554,39 +1554,15 @@ namespace Phases
             //Create project
             if(book.Language == "Cottle")
             {
-                string path = "", name;
-                if (profile.Path != "")
-                {
-                    foreach (string dir in Directory.EnumerateDirectories(profile.Path))
-                    {
-                        name = Path.GetFileName(dir);
-                        if (name == book.ScriptsFolder + ".cottle")
-                        {
-                            path = dir;
-                            break;
-                        }
-                    }
-                }
-                if (path == "")
-                {
-                    foreach (string dir in Directory.EnumerateDirectories(Environment.CurrentDirectory))
-                    {
-                        name = Path.GetFileName(dir);
-                        if (name == book.ScriptsFolder + ".cottle")
-                        {
-                            path = dir;
-                            break;
-                        }
-                    }
-                }
-                if (path == "")
+                string path = Path.Combine(book.ScriptsFolder, "cottle.ini");
+                if (!File.Exists(path))
                 {
                     MessageBox.Show("Scripts source folder not found.", "Code generator error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 else
                 {
-                    project = new CodeGeneration.Interpreter.Project(generatorData, path);
+                    project = new CodeGeneration.Interpreter.Project(generatorData, book.ScriptsFolder);
                 }
             }
             else
@@ -1631,12 +1607,14 @@ namespace Phases
         private void CodGenLanguageSelection(object sender, EventArgs e)
         {
             CottleConfigForm configForm = new CottleConfigForm();
+            List<string> paths = new List<string>();
             foreach(string dir in Directory.EnumerateDirectories(Environment.CurrentDirectory))
             {
                 string name = Path.GetFileName(dir);
                 if (name.EndsWith(".cottle"))
                 {
                     configForm.languagesList.Items.Add(name.Substring(0, name.Length - 7));
+                    paths.Add(dir);
                 }
             }
             if(profile.Path != "")
@@ -1647,13 +1625,15 @@ namespace Phases
                     if (name.EndsWith(".cottle"))
                     {
                         configForm.languagesList.Items.Add(name.Substring(0, name.Length - 7));
+                        paths.Add(dir);
                     }
                 }
             }
             if (configForm.ShowDialog(this) == DialogResult.Cancel) return;
             book.Language = "Cottle";
-            book.ScriptsFolder = configForm.languagesList.Text;
-            lbLanguage.Text = book.ScriptsFolder;
+            book.TargetLanguage = configForm.languagesList.Text;
+            book.ScriptsFolder = paths[configForm.languagesList.SelectedIndex];
+            lbLanguage.Text = book.TargetLanguage;
 
             saveToolStripMenuItem.Enabled = true;
         }
@@ -2435,7 +2415,7 @@ namespace Phases
         private void ConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!DrawCheck(false)) generatorData = null;
-            CodeGeneratorConfig codeGeneratorConfig = new CodeGeneratorConfig(generatorData);
+            CodeGeneratorConfig codeGeneratorConfig = new CodeGeneratorConfig(generatorData, book.ScriptsFolder);
             codeGeneratorConfig.ShowDialog();
             codeGeneratorConfig.Dispose();
         }
