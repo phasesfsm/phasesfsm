@@ -432,9 +432,17 @@ namespace Phases.DrawableObjects
             data.AddRange(nameS);
 
             //Add description
-            data.Add(Serialization.Token.ObjectDescription);
             var descriptionS = Encoding.Unicode.GetBytes(description);
-            data.Add((byte)descriptionS.Length);
+            if (descriptionS.Length > 255)
+            {
+                data.Add(Serialization.Token.ObjectLargeDescription);
+                data.AddRange(BitConverter.GetBytes((ushort)descriptionS.Length));
+            }
+            else
+            {
+                data.Add(Serialization.Token.ObjectDescription);
+                data.Add((byte)descriptionS.Length);
+            }
             data.AddRange(descriptionS);
 
             //End object definition
@@ -520,8 +528,21 @@ namespace Phases.DrawableObjects
             name = Encoding.Unicode.GetString(data, index, len);
             index += len;
             //Get object description
-            if (data[index++] != Serialization.Token.ObjectDescription) return null;
-            len = data[index++];
+            if (data[index] == Serialization.Token.ObjectLargeDescription)
+            {
+                index++;
+                len = BitConverter.ToUInt16(data, index);
+                index += 2;
+            }
+            else if (data[index] == Serialization.Token.ObjectDescription)
+            {
+                index++;
+                len = data[index++];
+            }
+            else
+            {
+                return null;
+            }
             description = Encoding.Unicode.GetString(data, index, len);
             index += len;
             //Check end definition

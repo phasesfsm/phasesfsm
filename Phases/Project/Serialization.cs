@@ -95,6 +95,7 @@ namespace Phases
             public const byte ObjectId = 0x61;
             public const byte ObjectName = 0x62;
             public const byte ObjectDescription = 0x63;
+            public const byte ObjectLargeDescription = 0x64;
 
             //Object specific parameters
             public const byte StringValue = 0x70;    //Lenght; bytes
