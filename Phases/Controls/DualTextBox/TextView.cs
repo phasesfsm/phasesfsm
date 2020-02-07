@@ -35,6 +35,7 @@ namespace DualText
             
             // draw line numbers rectangle
             g.FillRectangle(new SolidBrush(BaseFormat.LineNumbers.BackgroundColor), SideArea);
+            g.SetClip(SideArea);
 
             g.TranslateTransform(SideArea.X, ReferencePoint.Y);
             int y = ToDrawText.Top * BaseFormat.FontHeight;
