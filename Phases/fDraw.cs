@@ -51,6 +51,18 @@ namespace Phases
         {
             InitializeComponent();
 
+            //Initialize ui
+            leftTabControl.TabPages.Remove(variablesTabPage);
+            simTools.Visible = false;
+            logsViewToolStripMenuItem.Checked = false;
+            undoToolStripMenuItem.Tag = btUndo;
+            redoToolStripMenuItem.Tag = btRedo;
+            saveToolStripMenuItem.Tag = btSave;
+            pasteToolStripMenuItem.Tag = btPaste;
+            copyToolStripMenuItem.Tag = btCopy;
+            cutToolStripMenuItem.Tag = btCut;
+            deleteToolStripMenuItem.Tag = btDelete;
+
             //Add KeyPress event to propertyGrid
             propertyGrid.SelectedObject = null;
             propertyGrid.Controls[2].Controls[1].KeyPress += controls_KeyPress;
@@ -89,18 +101,6 @@ namespace Phases
 #if DEBUG   //debug ui
             debugToolStripMenuItem.Visible = true;
 #endif
-
-            //Initialize ui
-            leftTabControl.TabPages.Remove(variablesTabPage);
-            simTools.Visible = false;
-            logsViewToolStripMenuItem.Checked = false;
-            undoToolStripMenuItem.Tag = btUndo;
-            redoToolStripMenuItem.Tag = btRedo;
-            saveToolStripMenuItem.Tag = btSave;
-            pasteToolStripMenuItem.Tag = btPaste;
-            copyToolStripMenuItem.Tag = btCopy;
-            cutToolStripMenuItem.Tag = btCut;
-            deleteToolStripMenuItem.Tag = btDelete;
 
             //Zoom indicators and controls
             zoomStripComboBox.Items.AddRange(zoomScales.ToList().ConvertAll(scale => scale.ToString() + " %").ToArray());
@@ -1081,7 +1081,7 @@ namespace Phases
         {
             Clipboard.SetData("Phases.Copy", mouse.SerializeSelection());
             AddAction(RecordableAction.ActionTypes.Cut);
-            book.SelectedSheet.draw.RemoveObjects(mouse.SelectedObjects);
+            //book.SelectedSheet.draw.RemoveObjects(mouse.SelectedObjects);
             mouse.ClearSelection();
             pBox.Refresh();
             RefreshSelection(false);
