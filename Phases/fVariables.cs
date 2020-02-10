@@ -15,10 +15,9 @@ namespace Phases
     {
         private VariableCollection Variables;
 
-        public fVariables(object variables)
+        internal fVariables(VariableCollection variables)
         {
-            if (!(variables is VariableCollection)) throw new Exception("Objeto invalido.");
-            Variables = (VariableCollection)variables;
+            Variables = variables;
             InitializeComponent();
         }
 

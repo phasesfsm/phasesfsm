@@ -95,7 +95,7 @@ namespace Phases.Importers.StateCad
         public Text GetText()
         {
             var text = new Text(Owner.OwnerDraw, Util.ScaleRectangle(TextRectangle, Owner.Transform));
-            text.Name = Owner.OwnerDraw.OwnerSheet.OwnerBook.NextObjectName(text.GetFormName());
+            text.Name = Owner.OwnerDraw.OwnerSheet.NextObjectName(text.GetFormName());
             Owner.OwnerDraw.AddObject(text);
             text.Description = Text[1];
             return text;
@@ -104,7 +104,7 @@ namespace Phases.Importers.StateCad
         public Equation GetEcuation()
         {
             var equation = new Equation(Owner.OwnerDraw, Util.ScaleRectangle(TextRectangle, Owner.Transform));
-            equation.Name = Owner.OwnerDraw.OwnerSheet.OwnerBook.NextObjectName(equation.GetFormName());
+            equation.Name = Owner.OwnerDraw.OwnerSheet.NextObjectName(equation.GetFormName());
             Owner.OwnerDraw.AddObject(equation);
             equation.Operation = Text[1];
             equation.AssignTo = Text[3];
@@ -124,7 +124,7 @@ namespace Phases.Importers.StateCad
         {
             Rectangle rect = Util.GetPositiveRectangle(Parameter[0], Parameter[1], Parameter[6], 2 * Parameter[1] - Parameter[7]);
             Origin origin = new Origin(Owner.OwnerDraw, Util.Center(Util.ScaleRectangle(rect, Owner.Transform)));
-            origin.Name = Owner.OwnerDraw.OwnerSheet.OwnerBook.NextObjectName(origin.GetFormName());
+            origin.Name = Owner.OwnerDraw.OwnerSheet.NextObjectName(origin.GetFormName());
             Owner.OwnerDraw.AddObject(origin);
             return origin;
         }
@@ -138,7 +138,7 @@ namespace Phases.Importers.StateCad
                 inst[4].Point(0)
             };
             SimpleTransition trans = new SimpleTransition(Owner.OwnerDraw, pts, null);
-            trans.Name = Owner.OwnerDraw.OwnerSheet.OwnerBook.NextObjectName(trans.GetFormName());
+            trans.Name = Owner.OwnerDraw.OwnerSheet.NextObjectName(trans.GetFormName());
             Owner.OwnerDraw.AddObject(trans);
             trans.StartObject = select;
             Point point = trans.StartPoint;

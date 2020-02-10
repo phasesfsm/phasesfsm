@@ -498,17 +498,17 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[0])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[1])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[2])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[3])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref textPointOffset)) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref maxDist[0])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref maxDist[1])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref StartAngle)) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref EndAngle)) return false;
-            int priority = 0;
-            if (!Serialization.DeserializeParameter(data, ref index, ref priority)) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[0])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[1])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[2])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[3])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out textPointOffset)) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out maxDist[0])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out maxDist[1])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out StartAngle)) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out EndAngle)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out int priority)) return false;
+            Priority = priority;
             return true;
         }
 

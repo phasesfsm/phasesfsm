@@ -1,4 +1,5 @@
 ﻿using Phases.DrawableObjects;
+using Phases.Variables;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -22,11 +23,10 @@ namespace Phases.PropertiesCoverters
 
             if (svc != null && codes != null)
             {
-                Dictionary<string, int> dictionary;
+                DrawableObject obj = context.Instance as DrawableObject;
+                DrawingSheet sheet = obj.OwnerDraw.OwnerSheet;
 
-                dictionary = ((DrawableObject)context.Instance).OwnerDraw.OwnerSheet.OwnerBook.Variables.InternalOutputs.ToDictionary(kvp => kvp.Name, kvp => kvp.GetImageIndex());
-
-                using (var form = new EditOutput(dictionary, value as string))
+                using (var form = new EditOutput(VariableCollection.GetOutputsDictionary(sheet), value as string))
                 {
                     if (svc.ShowDialog(form) == DialogResult.OK)
                     {

@@ -7,10 +7,11 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.ComponentModel;
 using Phases.DrawableObjects;
+using Phases.Variables;
 
 namespace Phases
 {
-    class DrawingSheet : SheetParameters, IDisposable
+    abstract class DrawingSheet : SheetParameters, IDisposable
     {
         readonly int crossSize = 20;
         readonly int gridSeparation = 10;
@@ -18,16 +19,18 @@ namespace Phases
         public PhasesBook OwnerBook;
         public TreeNode sheetTree;
         
-        public DrawableCollection draw;
+        public DrawableCollection Sketch;
         Pen borderPen = new Pen(Color.Black, 0.001f);
         Pen gridPointPen = new Pen(Color.LightGray, 0.001f);
         Pen gridLinePen = new Pen(Color.WhiteSmoke, 0.001f);
+        public abstract VariableCollection Variables { get; }
+        public abstract List<IGlobal> Globals { get; }
 
         public override string Name
         {
             set
             {
-                OwnerBook.Sheets.FindAll(sh => sh.Name != name).ForEach(sh => sh.draw.Objects.FindAll(obj => obj is Nested && ((Nested)obj).pointing == name).ForEach(obj => ((Nested)obj).pointing = value));
+                OwnerBook.Sheets.FindAll(sh => sh.Name != name).ForEach(sh => sh.Sketch.Objects.FindAll(obj => obj is Nested nested && nested.PointingTo == name).ForEach(obj => ((Nested)obj).PointingTo = value));
                 name = value;
                 if (sheetTree != null)
                 {
@@ -36,13 +39,14 @@ namespace Phases
                 }
             }
         }
+        public override string ToString() => Name;
 
         public DrawingSheet(PhasesBook ownerBook, string sheetName, Size size, int imageIndex = Constants.ImageIndex.SubSheet)
             : base(sheetName, size)
         {
             OwnerBook = ownerBook;
             sheetTree = new TreeNode(sheetName, imageIndex, imageIndex);
-            draw = new DrawableCollection(this);
+            Sketch = new DrawableCollection(this);
         }
 
         public void Draw(Graphics g)
@@ -100,10 +104,11 @@ namespace Phases
             }
         }
 
-        public static string[] ChildSheetsNames(List<DrawingSheet> book, DrawingSheet current)
-        {
-            return book.ConvertAll(sh => sh.Name).Skip(1).SkipWhile(sh => sh == current.name).ToArray();
-        }
+        public virtual string NextObjectName(string prefix) => OwnerBook.NextObjectName(prefix);
+
+        public virtual string NextObjectName(string prefix, List<DrawableObject> list) => OwnerBook.NextObjectName(prefix, list);
+
+        public virtual bool ExistsName(string name) => OwnerBook.ExistsName(name);
 
         #region "Serialization"
 
@@ -112,11 +117,18 @@ namespace Phases
             var data = new List<byte>();
             data.Add(Serialization.Token.StartSheetDefinition);
 
+            switch (this)
+            {
+                case ModelSheet model:
+                    data.Add((byte)SheetTypes.Model);
+                    break;
+            }
+
             //Sheet parameters
             data.AddRange(base.Serialize());
 
             //Serialize draw
-            data.AddRange(draw.Serialize());
+            data.AddRange(Sketch.Serialize());
 
             data.Add(Serialization.Token.EndSheetDefinition);
             return data.ToArray();
@@ -124,18 +136,32 @@ namespace Phases
 
         public override bool Deserialize(byte[] data, ref int index)
         {
-            if (data.Length < 7) return false;
-
-            //Sheet information
-            if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.StartSheetDefinition)) return false;
+            if (data.Length < 6) return false;
 
             if (!base.Deserialize(data, ref index)) return false;
             sheetTree.Text = name;
 
             //Deserialize draw
-            if (!draw.Deserialize(data, ref index)) return false;
+            if (!Sketch.Deserialize(data, ref index)) return false;
 
             return Serialization.Token.Deserialize(data, ref index, Serialization.Token.EndSheetDefinition);
+        }
+
+        public enum SheetTypes
+        {
+            Model,
+
+            // Default
+            Global = Serialization.Token.SheetName,
+            Error = -1
+        }
+
+        public static SheetTypes DeserializeSheetType(byte[] data, ref int index)
+        {
+            if (data.Length < 7 || !Serialization.Token.Deserialize(data, ref index, Serialization.Token.StartSheetDefinition)) return SheetTypes.Error;
+            SheetTypes sheetType = (SheetTypes)data[index];
+            if (data[index] != (byte)SheetTypes.Global) index++;
+            return sheetType;
         }
 
         public void Dispose()

@@ -31,53 +31,13 @@ namespace Phases
             OwnerSheet.sheetTree.Expand();
         }
 
-        public List<DrawableObject> Objects
-        {
-            get
-            {
-                return objects;
-            }
-        }
-
-        public List<Link> Links
-        {
-            get
-            {
-                return objects.FindAll(obj => obj is Link).ConvertAll(obj => obj as Link);
-            }
-        }
-
-        public List<Origin> Origins
-        {
-            get
-            {
-                return objects.FindAll(obj => obj is Origin).ConvertAll(obj => obj as Origin);
-            }
-        }
-
-        public List<Alias> Aliases
-        {
-            get
-            {
-                return objects.FindAll(obj => obj is Alias).ConvertAll(obj => obj as Alias);
-            }
-        }
-
-        public List<State> States
-        {
-            get
-            {
-                return objects.FindAll(obj => obj is State).ConvertAll(obj => (State)obj);
-            }
-        }
-
-        public List<SuperState> SuperStates
-        {
-            get
-            {
-                return objects.FindAll(obj => obj is SuperState).ConvertAll(obj => (SuperState)obj);
-            }
-        }
+        public List<DrawableObject> Objects => objects;
+        public List<Link> Links => objects.FindAll(obj => obj is Link).ConvertAll(obj => obj as Link);
+        public List<Origin> Origins => objects.FindAll(obj => obj is Origin).ConvertAll(obj => obj as Origin);
+        public List<Alias> Aliases => objects.FindAll(obj => obj is Alias).ConvertAll(obj => obj as Alias);
+        public List<State> States => objects.FindAll(obj => obj is State).ConvertAll(obj => obj as State);
+        public List<SuperState> SuperStates => objects.FindAll(obj => obj is SuperState).ConvertAll(obj => obj as SuperState);
+        public List<Nested> Nesteds => objects.FindAll(obj => obj is Nested).ConvertAll(obj => obj as Nested);
 
         public void Paint(Graphics g, DrawAttributes att)
         {
@@ -127,8 +87,8 @@ namespace Phases
             AddObjectTree(@object);
             if(@object is IGlobal global)
             {
-                if(global is Origin origin && origin.Father == null) OwnerSheet.OwnerBook.Globals.Add(origin);
-                else OwnerSheet.OwnerBook.Globals.Add(global);
+                if(global is Origin origin && origin.Father == null) OwnerSheet.Globals.Add(origin);
+                else OwnerSheet.Globals.Add(global);
             }
         }
 
@@ -138,7 +98,7 @@ namespace Phases
             Objects.AddRange(objects);
             objects.ForEach(obj => Shadow.Add(obj.GetClone()));
             objects.ForEach(obj => AddObjectTree(obj));
-            objects.FindAll(obj => obj is Origin).ForEach(obj => OwnerSheet.OwnerBook.Globals.Add(obj as Origin));
+            objects.FindAll(obj => obj is Origin).ForEach(obj => OwnerSheet.Globals.Add(obj as Origin));
         }
 
         public void RemoveObjects(List<DrawableObject> list)
@@ -200,7 +160,15 @@ namespace Phases
                 }
                 else if(obj is Origin origin)
                 {
-                    OwnerSheet.OwnerBook.Globals.Remove(origin);
+                    OwnerSheet.Globals.Remove(origin);
+                }
+                else if (obj is Relation relation)
+                {
+                    OwnerSheet.Globals.Remove(relation);
+                }
+                else if (obj is Equation equation)
+                {
+                    OwnerSheet.Globals.Remove(equation);
                 }
                 Objects.Remove(obj);
                 Shadow.Remove(obj);
@@ -216,7 +184,7 @@ namespace Phases
         {
             Objects.Clear();
             Shadow.Clear();
-            OwnerSheet.OwnerBook.Globals.Clear();
+            OwnerSheet.Globals.Clear();
         }
 
         public DrawableObject GetOnObject(Point position)

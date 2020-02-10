@@ -275,7 +275,7 @@ namespace Phases.DrawableObjects
                         MessageBox.Show(string.Format("'{0}' is a reserved name.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
                     }
-                    else if (OwnerDraw.OwnerSheet.OwnerBook.ExistsName(value))
+                    else if (OwnerDraw.OwnerSheet.ExistsName(value))
                     {
                         MessageBox.Show(string.Format("The name '{0}' already exists.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
@@ -563,9 +563,8 @@ namespace Phases.DrawableObjects
 
         public static bool DeserializeRelation(byte[] data, ref int index, out string objName)
         {
-            objName = null;
-            if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.RelationName)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref objName)) return false;
+            if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.RelationName)) { objName = ""; return false; }
+            if (!Serialization.DeserializeParameter(data, ref index, out objName)) return false;
             return true;
         }
     }

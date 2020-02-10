@@ -9,11 +9,11 @@ namespace Phases.Expresions
 {
     class SyntaxAnalyzer
     {
-        List<SyntaxToken> tokens;
+        public List<SyntaxToken> Tokens { get; private set; }
 
-        public SyntaxAnalyzer(LexicalAnalyzer lexic, List<Variable> variables)
+        public SyntaxAnalyzer(LexicalAnalyzer lexic, List<string> variables)
         {
-            tokens = new List<SyntaxToken>();
+            Tokens = new List<SyntaxToken>();
             Stack<Token> branches = new Stack<Token>();
             Token.Types context = Token.Types.None;
             Token previous = null;
@@ -26,7 +26,7 @@ namespace Phases.Expresions
                 switch (token.Type)
                 {
                     case Token.Types.Id:
-                        if (variables.Exists(var => var.Name == token.Text))
+                        if (variables.Contains(token.Text))
                         {
                             if (context == Token.Types.Id || context == Token.Types.SufixSymbol
                                 || context == Token.Types.GroupEnds) qualifiers = SyntaxToken.Qualifiers.Unexpected;
@@ -65,7 +65,7 @@ namespace Phases.Expresions
                             || context == Token.Types.GroupBegins) qualifiers = SyntaxToken.Qualifiers.Unexpected;
                         break;
                 }
-                tokens.Add(new SyntaxToken(token, qualifiers));
+                Tokens.Add(new SyntaxToken(token, qualifiers));
                 context = token.Type;
                 previous = token;
             }
@@ -73,11 +73,9 @@ namespace Phases.Expresions
             {
                 while (branches.Count > 0)
                 {
-                    tokens.Add(new SyntaxToken(branches.Pop(), SyntaxToken.Qualifiers.NonClosed));
+                    Tokens.Add(new SyntaxToken(branches.Pop(), SyntaxToken.Qualifiers.NonClosed));
                 }
             }
         }
-
-        public List<SyntaxToken> Tokens => tokens;
     }
 }

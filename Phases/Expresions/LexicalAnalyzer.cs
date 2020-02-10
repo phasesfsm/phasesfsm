@@ -104,10 +104,6 @@ namespace Phases.Expresions
                 {
                     case "!":
                         return OperationType.Clear;
-                    case "'":
-                        return OperationType.Maximum;
-                    case ".":
-                        return OperationType.Minimum;
                     default:
                         return OperationType.Unknown;
                 }
@@ -121,6 +117,10 @@ namespace Phases.Expresions
                         return OperationType.Increment;
                     case "-":
                         return OperationType.Decrement;
+                    case ".max":
+                        return OperationType.Maximum;
+                    case ".min":
+                        return OperationType.Minimum;
                     default:
                         return OperationType.Unknown;
                 }

@@ -1,5 +1,7 @@
 ﻿using Phases.DrawableObjects;
+using Phases.Variables;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
@@ -23,16 +25,12 @@ namespace Phases.PropertiesCoverters
 
             if (svc != null && codes != null)
             {
-                using (var form = new EditCondition())
+                DrawableObject obj = context.Instance as DrawableObject;
+                DrawingSheet sheet = obj.OwnerDraw.OwnerSheet;
+
+                using (var form = new EditCondition(VariableCollection.GetConditionDictionary(sheet), codes))
                 {
-                    var trans = context.Instance as DrawableObject;
-                    form.variables = trans.OwnerDraw.OwnerSheet.OwnerBook.Variables.ConditionalVariables;
-                    form.tbCondition.Dictionary = form.variables.ToDictionary(kvp => kvp.Name, kvp => kvp.GetImageIndex());
-                    form.tbCondition.Text = codes;
-                    if (svc.ShowDialog(form) == DialogResult.OK)
-                    {
-                        value = form.tbCondition.Text;
-                    }
+                    if (svc.ShowDialog(form) == DialogResult.OK) value = form.Condition;
                 }
             }
             return value;

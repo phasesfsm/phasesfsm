@@ -44,6 +44,21 @@ namespace Phases.Variables
             }
         }
 
+        public override Value Evaluate(OperationType operation, Value currentValue)
+        {
+            switch (operation)
+            {
+                case OperationType.Clear:
+                    return false;
+                case OperationType.Set:
+                    return true;
+                case OperationType.Toggle:
+                    return !currentValue.AsBoolean;
+                default:
+                    return currentValue;
+            }
+        }
+
         #region "Serialization"
 
         public override byte[] Serialize()

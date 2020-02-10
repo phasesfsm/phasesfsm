@@ -17,9 +17,9 @@ namespace Phases.DrawableObjects
         private readonly StringFormat leftTextFormat = new StringFormat() { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center };
         private readonly StringFormat rightTextFormat = new StringFormat() { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center };
 
-        private string TriggerText => string.IsNullOrEmpty(Action) ? "" : Trigger;
+        private string TriggerText => string.IsNullOrEmpty(Trigger) ? "" : Trigger;
         private Point TriggerTextLocation => new Point(location.X - large / 2 - radio - 3, location.Y);
-        private string OutputText => string.IsNullOrEmpty(Action) ? "" : Output;
+        private string OutputText => string.IsNullOrEmpty(Output) ? "" : Output;
         private Point OutputTextLocation => new Point(location.X + large / 2 + 3, location.Y);
         public override string Text => string.IsNullOrEmpty(Action) ? Name : Action;
 
@@ -43,14 +43,14 @@ namespace Phases.DrawableObjects
         {
             get
             {
-                return OwnerDraw.OwnerSheet.OwnerBook.Globals.IndexOf(this);
+                return OwnerDraw.OwnerSheet.Globals.IndexOf(this);
             }
             set
             {
                 if (value < 0) value = 0;
-                else if (value >= OwnerDraw.OwnerSheet.OwnerBook.Globals.Count) value = OwnerDraw.OwnerSheet.OwnerBook.Globals.Count - 1;
-                OwnerDraw.OwnerSheet.OwnerBook.Globals.Remove(this);
-                OwnerDraw.OwnerSheet.OwnerBook.Globals.Insert(value, this);
+                else if (value >= OwnerDraw.OwnerSheet.Globals.Count) value = OwnerDraw.OwnerSheet.Globals.Count - 1;
+                OwnerDraw.OwnerSheet.Globals.Remove(this);
+                OwnerDraw.OwnerSheet.Globals.Insert(value, this);
             }
         }
 
@@ -205,13 +205,12 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            string str = "";
             if (!base.DeserializeObjectSpecifics(data, ref index)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out string str)) return false;
             Trigger = str;
-            if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out str)) return false;
             Output = str;
-            if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out str)) return false;
             Action = str;
             return true;
         }

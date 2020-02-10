@@ -14,15 +14,18 @@ namespace Phases
 {
     public partial class EditCondition : Form
     {
-        internal List<Variable> variables;
         private List<SyntaxToken> errors;
         private LexicalAnalyzer lexAnalyzer = new LexicalAnalyzer();
         private LexicalFormater lexFormater;
         private SyntaxAnalyzer syntaxAnalyzer;
+        public string Condition => tbCondition.Text;
 
-        public EditCondition()
+        internal EditCondition(Dictionary<string, int> dictionary, string value)
         {
             InitializeComponent();
+
+            tbCondition.Dictionary = dictionary;
+            tbCondition.Text = value;
         }
 
         private void btOk_Click(object sender, EventArgs e)
@@ -50,7 +53,7 @@ namespace Phases
         private void AnalizeText()
         {
             lexAnalyzer.Source = tbCondition.Text;
-            syntaxAnalyzer = new SyntaxAnalyzer(lexAnalyzer, variables);
+            syntaxAnalyzer = new SyntaxAnalyzer(lexAnalyzer, tbCondition.Dictionary.Keys.ToList());
 
             listLexic.Items.Clear();
             foreach(SyntaxToken token in syntaxAnalyzer.Tokens)

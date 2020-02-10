@@ -41,7 +41,6 @@ namespace Phases
         private DialogResult saveResult;
         private AppInterface appInterface;
         private CodeGenerationProfile profile;
-        private GeneratorData generatorData;
         private VirtualMachine Simulation = null;
         private bool simulationMode = false;
         private SimulationState simulationStatus;
@@ -78,7 +77,7 @@ namespace Phases
             PictureSize = pBox.Size;
 
             //Initialize draw and mouse tools
-            mouse = new MouseTool(book.SelectedSheet.draw, pBox);
+            mouse = new MouseTool(book.SelectedSheet.Sketch, pBox);
 
             //load file data
             profile = new CodeGenerationProfile();
@@ -263,13 +262,13 @@ namespace Phases
                                 switch (mouse.DrawingObjectType)
                                 {
                                     case DrawableObject.ObjectType.Text:
-                                        mouse.OnObject = new Text(book.SelectedSheet.draw, new Rectangle(mouse.FirstPoint, Size.Empty));
+                                        mouse.OnObject = new Text(book.SelectedSheet.Sketch, new Rectangle(mouse.FirstPoint, Size.Empty));
                                         mouse.DrawingObject = mouse.OnObject;
                                         mouse.Doing = MouseTool.MouseDoing.Drawing;
                                         mouse.ClearSelection();
                                         break;
                                     case DrawableObject.ObjectType.Equation:
-                                        mouse.OnObject = new Equation(book.SelectedSheet.draw, new Rectangle(mouse.FirstPoint, Size.Empty));
+                                        mouse.OnObject = new Equation(book.SelectedSheet.Sketch, new Rectangle(mouse.FirstPoint, Size.Empty));
                                         mouse.DrawingObject = mouse.OnObject;
                                         mouse.Doing = MouseTool.MouseDoing.Drawing;
                                         mouse.ClearSelection();
@@ -279,7 +278,7 @@ namespace Phases
                                     case DrawableObject.ObjectType.Alias:
                                     case DrawableObject.ObjectType.Abort:
                                     case DrawableObject.ObjectType.Relation:
-                                        mouse.OnObject = Link.Create(mouse.DrawingObjectType, book.SelectedSheet.draw, mouse.FirstPoint);
+                                        mouse.OnObject = Link.Create(mouse.DrawingObjectType, book.SelectedSheet.Sketch, mouse.FirstPoint);
                                         mouse.DrawingObject = mouse.OnObject;
                                         mouse.Doing = MouseTool.MouseDoing.Drawing;
                                         mouse.ClearSelection();
@@ -288,7 +287,7 @@ namespace Phases
                                     case DrawableObject.ObjectType.StateAlias:
                                     case DrawableObject.ObjectType.SuperState:
                                     case DrawableObject.ObjectType.Nested:
-                                        mouse.OnObject = State.Create(mouse.DrawingObjectType, book.SelectedSheet.draw, new Rectangle(mouse.FirstPoint, Size.Empty));
+                                        mouse.OnObject = State.Create(mouse.DrawingObjectType, book.SelectedSheet.Sketch, new Rectangle(mouse.FirstPoint, Size.Empty));
                                         mouse.DrawingObject = mouse.OnObject;
                                         mouse.Doing = MouseTool.MouseDoing.Drawing;
                                         mouse.ClearSelection();
@@ -296,7 +295,7 @@ namespace Phases
                                     case DrawableObject.ObjectType.SimpleTransition:
                                         if (mouse.OnObject == null)
                                         {
-                                            oTrans = new SimpleTransition(book.SelectedSheet.draw, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
+                                            oTrans = new SimpleTransition(book.SelectedSheet.Sketch, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
                                         }
                                         else
                                         {
@@ -305,16 +304,16 @@ namespace Phases
                                                 Origin origin = (Origin)mouse.OnObject;
                                                 if (origin.OutTransitions.Length == 0)
                                                 {
-                                                    oTrans = new SimpleTransition(book.SelectedSheet.draw, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
+                                                    oTrans = new SimpleTransition(book.SelectedSheet.Sketch, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
                                                 }
                                                 else
                                                 {
-                                                    oTrans = new SimpleTransition(book.SelectedSheet.draw, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
+                                                    oTrans = new SimpleTransition(book.SelectedSheet.Sketch, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
                                                 }
                                             }
                                             else
                                             {
-                                                oTrans = new SimpleTransition(book.SelectedSheet.draw, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
+                                                oTrans = new SimpleTransition(book.SelectedSheet.Sketch, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
                                                 oTrans.StartAngle = dAngle;
                                             }
                                         }
@@ -326,7 +325,7 @@ namespace Phases
                                     case DrawableObject.ObjectType.SuperTransition:
                                         if (mouse.OnObject == null || mouse.OnObject is SimpleState || mouse.OnObject is Alias || mouse.OnObject is StateAlias)
                                         {
-                                            oTrans = new SuperTransition(book.SelectedSheet.draw, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
+                                            oTrans = new SuperTransition(book.SelectedSheet.Sketch, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
                                         }
                                         else
                                         {
@@ -335,16 +334,16 @@ namespace Phases
                                                 Origin origin = (Origin)mouse.OnObject;
                                                 if (origin.OutTransitions.Length == 0)
                                                 {
-                                                    oTrans = new SuperTransition(book.SelectedSheet.draw, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
+                                                    oTrans = new SuperTransition(book.SelectedSheet.Sketch, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
                                                 }
                                                 else
                                                 {
-                                                    oTrans = new SuperTransition(book.SelectedSheet.draw, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
+                                                    oTrans = new SuperTransition(book.SelectedSheet.Sketch, new Point[] { mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint, mouse.FirstPoint }, null);
                                                 }
                                             }
                                             else
                                             {
-                                                oTrans = new SuperTransition(book.SelectedSheet.draw, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
+                                                oTrans = new SuperTransition(book.SelectedSheet.Sketch, new Point[] { mouse.StartDrawPoint, mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), mouse.FirstPoint, mouse.FirstPoint }, mouse.OnObject);
                                                 oTrans.StartAngle = dAngle;
                                             }
                                         }
@@ -382,7 +381,7 @@ namespace Phases
                             case DrawableObject.ObjectType.SimpleTransition:
                             case DrawableObject.ObjectType.SuperTransition:
                                 var oTrans = mouse.DrawingObject as Transition;
-                                oTrans.Name = book.NextObjectName(oTrans.GetFormName());
+                                oTrans.Name = book.SelectedSheet.NextObjectName(oTrans.GetFormName());
                                 if (mouse.OnObject != null && !(mouse.OnObject is Origin))
                                 {
                                     oTrans.EndObject = mouse.OnObject;
@@ -391,7 +390,7 @@ namespace Phases
                                 break;
                             case DrawableObject.ObjectType.Origin:
                                 var origin = mouse.DrawingObject as Origin;
-                                origin.Name = book.NextObjectName(origin.GetFormName());
+                                origin.Name = book.SelectedSheet.NextObjectName(origin.GetFormName());
                                 pBox.Refresh();
                                 break;
                             case DrawableObject.ObjectType.End:
@@ -413,7 +412,7 @@ namespace Phases
                             case DrawableObject.ObjectType.SuperState:
                             case DrawableObject.ObjectType.Nested:
                                 var oState = mouse.DrawingObject as State;
-                                oState.Name = book.NextObjectName(oState.GetFormName());
+                                oState.Name = book.SelectedSheet.NextObjectName(oState.GetFormName());
                                 newSize = new Point(0, 0);
                                 oState.ResizeCheck(ref newSize, MouseTool.ResizingTypes.Right_Bottom);
                                 oState.Resize(newSize, MouseTool.ResizingTypes.Right_Bottom);
@@ -421,7 +420,7 @@ namespace Phases
                                 break;
                             case DrawableObject.ObjectType.Text:
                                 var oText = mouse.DrawingObject as Text;
-                                oText.Name = book.NextObjectName(oText.GetFormName());
+                                oText.Name = book.SelectedSheet.NextObjectName(oText.GetFormName());
                                 oText.Description = oText.Name;
                                 newSize = new Point(TextRenderer.MeasureText(oText.Description, DrawableObject.font).Width, 0);
                                 oText.ResizeCheck(ref newSize, MouseTool.ResizingTypes.Right_Bottom);
@@ -430,12 +429,12 @@ namespace Phases
                                 break;
                             case DrawableObject.ObjectType.Relation:
                                 var oRelation = mouse.DrawingObject as Relation;
-                                oRelation.Name = book.NextObjectName(oRelation.GetFormName());
+                                oRelation.Name = book.SelectedSheet.NextObjectName(oRelation.GetFormName());
                                 pBox.Refresh();
                                 break;
                             case DrawableObject.ObjectType.Equation:
                                 var oEquation = mouse.DrawingObject as Equation;
-                                oEquation.Name = book.NextObjectName(oEquation.GetFormName());
+                                oEquation.Name = book.SelectedSheet.NextObjectName(oEquation.GetFormName());
                                 newSize = new Point(0, 0);
                                 oEquation.ResizeCheck(ref newSize, MouseTool.ResizingTypes.Right_Bottom);
                                 oEquation.Resize(newSize, MouseTool.ResizingTypes.Right_Bottom);
@@ -507,8 +506,8 @@ namespace Phases
             {
                 case MouseTool.MouseDoing.Nothing:
                     mouse.PreviousObject = mouse.OnObject;
-                    mouse.OnObject = book.SelectedSheet.draw.GetOnObject(mouse.Location);
-                    mouse.OnTransition = book.SelectedSheet.draw.OnTransition(mouse.Location);
+                    mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
+                    mouse.OnTransition = book.SelectedSheet.Sketch.OnTransition(mouse.Location);
                     if (mouse.CursorType != MouseTool.CursorTypes.Paint && !simulationMode) pBox.Cursor = mouse.Moving(mouse.Location, DrawTransform);
                     switch (mouse.DrawingObjectType)
                     {
@@ -580,7 +579,7 @@ namespace Phases
                     break;
                 case MouseTool.MouseDoing.Drawing:
                     mouse.PreviousObject = mouse.OnObject;
-                    mouse.OnObject = book.SelectedSheet.draw.GetOnObject(mouse.Location);
+                    mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
                     switch (mouse.DrawingObjectType)
                     {
                         case DrawableObject.ObjectType.SimpleTransition:
@@ -651,12 +650,12 @@ namespace Phases
             if (mouse.OnObject is Nested)
             {
                 var nested = (Nested)mouse.OnObject;
-                var sheet = book.Sheets.Find(sh => sh.Name == nested.pointing);
+                var sheet = book.Sheets.Find(sh => sh.Name == nested.PointingTo);
                 if(sheet != null)
                 {
                     book.SelectedSheet = sheet;
                     mouse.ClearSelection();
-                    mouse.draw = book.SelectedSheet.draw;
+                    mouse.draw = book.SelectedSheet.Sketch;
                     tvObjects.SelectedNode = book.SelectedSheet.sheetTree;
                 }
             }
@@ -694,7 +693,7 @@ namespace Phases
                         case MouseTool.MouseDoing.Resizing:
                         case MouseTool.MouseDoing.MovingText:
                             mouse.Doing = MouseTool.MouseDoing.Nothing;
-                            book.SelectedSheet.draw.CancelAction(RecordableAction.ActionTypes.Move, mouse.ChangingObjects);
+                            book.SelectedSheet.Sketch.CancelAction(RecordableAction.ActionTypes.Move, mouse.ChangingObjects);
                             pBox.Refresh();
                             break;
                     }
@@ -873,9 +872,9 @@ namespace Phases
             Pen pen = new Pen(Color.Black, 1.8f);
 
             //Draw objects
-            book.SelectedSheet.draw.PaintShadow(e.Graphics, new DrawAttributes(Pens.WhiteSmoke, DrawScale, true));
+            book.SelectedSheet.Sketch.PaintShadow(e.Graphics, new DrawAttributes(Pens.WhiteSmoke, DrawScale, true));
             mouse.DrawSelectionsBack(e.Graphics);
-            book.SelectedSheet.draw.Paint(e.Graphics, new DrawAttributes(pen, DrawScale));
+            book.SelectedSheet.Sketch.Paint(e.Graphics, new DrawAttributes(pen, DrawScale));
             mouse.DrawSelections(e.Graphics, DrawTransform);
         }
 
@@ -891,7 +890,7 @@ namespace Phases
             book.SelectedSheet.Draw(e.Graphics);
 
             //Draw objects
-            book.SelectedSheet.draw.PaintShadow(e.Graphics, new DrawAttributes(Pens.Black, ShadowScale, true));
+            book.SelectedSheet.Sketch.PaintShadow(e.Graphics, new DrawAttributes(Pens.Black, ShadowScale, true));
 
             //Draw rectangle view
             Rectangle rect = GetRectangleView();
@@ -976,28 +975,35 @@ namespace Phases
             blockMouseTool = true;
         }
 
-        private void AddAction(RecordableAction.ActionTypes actionType)
+        private bool DoAction(RecordableAction.ActionTypes actionType)
         {
+            bool save = true;
             switch (actionType)
             {
                 case RecordableAction.ActionTypes.AddSheet:
                     book.CreateChildSheet();
-                    return;
-                    //break;
+                    save = false;
+                    break;
+                case RecordableAction.ActionTypes.AddModel:
+                    book.CreateModel();
+                    save = false;
+                    break;
                 case RecordableAction.ActionTypes.DeleteSheet:
                     book.DeleteActiveChildSheet();
-                    return;
-                //break;
+                    save = false;
+                    break;
                 case RecordableAction.ActionTypes.VariablesChanged:
                     byte[] before = book.Variables.Serialize();
-                    var fvar = new fVariables(book.Variables);
-                    if (fvar.ShowDialog() == DialogResult.OK)
+                    fVariables fvar;
+                    if (book.SelectedSheet is ModelSheet model)
                     {
-                        book.VariablesChanged(before);
+                        fvar = new fVariables(model.Variables);
+                        if (fvar.ShowDialog() == DialogResult.OK) book.ModelVariablesChanged(before); else save = false;
                     }
                     else
                     {
-                        return;
+                        fvar = new fVariables(book.Variables);
+                        if (fvar.ShowDialog() == DialogResult.OK) book.VariablesChanged(before); else save = false;
                     }
                     break;
                 case RecordableAction.ActionTypes.Create:
@@ -1005,7 +1011,7 @@ namespace Phases
                     break;
                 case RecordableAction.ActionTypes.MoveText:
                     var list = new List<DrawableObject>();
-                    if(mouse.OnTransition != null)
+                    if (mouse.OnTransition != null)
                     {
                         list.Add(mouse.OnTransition);
                     }
@@ -1025,6 +1031,13 @@ namespace Phases
                     book.AddDrawAction(actionType, book.SelectedSheet, mouse.ChangingObjects, mouse.SelectedObjects, mouse.SelectionFocusIndex);
                     break;
             }
+            CheckDiagram();
+            return save;
+        }
+
+        private void AddAction(RecordableAction.ActionTypes actionType)
+        {
+            if (!DoAction(actionType)) return;
             //Update buttons
             undoToolStripMenuItem.Enabled = true;
             btUndo.ToolTipText = book.UndoText();
@@ -1103,7 +1116,7 @@ namespace Phases
         {
             var paste = (byte[])Clipboard.GetData("Phases.Copy");
             if (paste == null) return;
-            if (mouse.DeserializeSelection(paste, sender == pasteContextMenu, mouse.Location, book.NextObjectName))
+            if (mouse.DeserializeSelection(paste, sender == pasteContextMenu, mouse.Location, book.SelectedSheet.NextObjectName))
             {
                 AddAction(RecordableAction.ActionTypes.Paste);
             }
@@ -1127,22 +1140,27 @@ namespace Phases
 
         private void SaveToFile(string path)
         {
+#if !DEBUG
             try
             {
+#endif
                 File.WriteAllBytes(path, book.Serialize());
                 book.MarkSavedAction();
                 saveToolStripMenuItem.Enabled = false;
+
+#if !DEBUG
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error saving file: " + ex.Message);
             }
+#endif
         }
 
         private bool ReadFromFile(string path)
         {
             book = new PhasesBook(appInterface, DrawingSheet.DefaultSize);
-            mouse = new MouseTool(book.SelectedSheet.draw, pBox);
+            mouse = new MouseTool(book.SelectedSheet.Sketch, pBox);
             byte[] data;
             bool res;
             try
@@ -1195,12 +1213,11 @@ namespace Phases
                     profile.ProjectName = Path.GetFileNameWithoutExtension(FileName);
                     profile.Path = Path.GetDirectoryName(FileName);
 
-                    mouse.draw = book.SelectedSheet.draw;
+                    mouse.draw = book.SelectedSheet.Sketch;
                     propertyGrid.SelectedObject = book.SelectedSheet;
                     undoToolStripMenuItem.Enabled = false;
                     redoToolStripMenuItem.Enabled = false;
                     saveToolStripMenuItem.Enabled = false;
-                    generatorData = null;
                     msgList.Items.Clear();
                     pBox.Refresh();
                     pShadow.Refresh();
@@ -1239,10 +1256,9 @@ namespace Phases
             }
             propertyGrid.SelectedObject = null;
             book = new PhasesBook(appInterface, DrawingSheet.DefaultSize);
-            mouse = new MouseTool(book.SelectedSheet.draw, pBox);
+            mouse = new MouseTool(book.SelectedSheet.Sketch, pBox);
             undoToolStripMenuItem.Enabled = false;
             redoToolStripMenuItem.Enabled = false;
-            generatorData = null;
             Text = "Phases FSM";
             FileName = "";
             msgList.Items.Clear();
@@ -1253,8 +1269,8 @@ namespace Phases
 
         private void ClearDraw()
         {
-            book.SelectedSheet.draw.Clear(tvObjects);
-            mouse = new MouseTool(book.SelectedSheet.draw, pBox);
+            book.SelectedSheet.Sketch.Clear(tvObjects);
+            mouse = new MouseTool(book.SelectedSheet.Sketch, pBox);
             saveToolStripMenuItem.Enabled = false;
             pBox.Refresh();
             pShadow.Refresh();
@@ -1276,7 +1292,7 @@ namespace Phases
 
         private void btSelectAll_Click(object sender, EventArgs e)
         {
-            mouse.SetSelection(book.SelectedSheet.draw.Objects);
+            mouse.SetSelection(book.SelectedSheet.Sketch.Objects);
             pBox.Refresh();
         }
 
@@ -1379,7 +1395,7 @@ namespace Phases
             {
                 book.SelectedSheet = ((DrawableObject)tvObjects.SelectedNode.Tag).OwnerDraw.OwnerSheet;
                 mouse.ClearSelection();
-                mouse.draw = book.SelectedSheet.draw;
+                mouse.draw = book.SelectedSheet.Sketch;
                 mouse.AddToSelection((DrawableObject)tvObjects.SelectedNode.Tag);
                 propertyGrid.SelectedObject = (DrawableObject)tvObjects.SelectedNode.Tag;
                 pBox.Refresh();
@@ -1388,7 +1404,7 @@ namespace Phases
             {
                 book.SelectedSheet = (DrawingSheet)tvObjects.SelectedNode.Tag;
                 mouse.ClearSelection();
-                mouse.draw = book.SelectedSheet.draw;
+                mouse.draw = book.SelectedSheet.Sketch;
                 propertyGrid.SelectedObject = book.SelectedSheet;
                 pBox.Refresh();
             }
@@ -1414,7 +1430,7 @@ namespace Phases
             {
                 book.SelectedSheet = @object.OwnerDraw.OwnerSheet;
                 mouse.ClearSelection();
-                mouse.draw = book.SelectedSheet.draw;
+                mouse.draw = book.SelectedSheet.Sketch;
                 mouse.AddToSelection(@object);
                 propertyGrid.SelectedObject = @object;
             }
@@ -1462,6 +1478,11 @@ namespace Phases
             AddAction(RecordableAction.ActionTypes.AddSheet);
         }
 
+        private void createNewModelTreeMenu_Click(object sender, EventArgs e)
+        {
+            AddAction(RecordableAction.ActionTypes.AddModel);
+        }
+
         private void btVariables_Click(object sender, EventArgs e)
         {
             AddAction(RecordableAction.ActionTypes.VariablesChanged);
@@ -1473,20 +1494,28 @@ namespace Phases
             AddAction(RecordableAction.ActionTypes.DeleteSheet);
         }
 
-        #region "Diagram check"
+#region "Diagram check"
         private void btChecks_Click(object sender, EventArgs e)
         {
             DrawCheck();
         }
 
+        private void CheckDiagram()
+        {
+            msgList.Items.Clear();
+            book.BuildData = new GeneratorData(book, profile, rtbSimLog);
+            foreach (CheckMessage msg in book.BuildData.MessagesList)
+            {
+                msgList.Items.Add(msg.GetListViewItem());
+            }
+            logsViewToolStripMenuItem.Checked = true;
+       }
+
         private bool DrawCheck(bool promptMessages = true)
         {
             bool res = false;
-            msgList.Items.Clear();
-
-            generatorData = new GeneratorData(book, profile, rtbSimLog);
-
-            if (generatorData.ErrorsCount == 0 && generatorData.WarningsCount == 0)
+            CheckDiagram();
+            if (book.BuildData.ErrorsCount == 0 && book.BuildData.WarningsCount == 0)
             {
                 lbStatus.ForeColor = Color.Black;
                 lbStatus.Text = "Check successful without errors.";
@@ -1495,23 +1524,16 @@ namespace Phases
             else
             {
                 lbStatus.ForeColor = Color.DarkRed;
-                lbStatus.Text = string.Format("Check finished with {0} errors and {1} warnings.", generatorData.ErrorsCount, generatorData.WarningsCount);
-                if (generatorData.ErrorsCount == 0)
+                lbStatus.Text = string.Format("Check finished with {0} errors and {1} warnings.", book.BuildData.ErrorsCount, book.BuildData.WarningsCount);
+                if (book.BuildData.ErrorsCount == 0)
                 {
                     res = true;
                 }
                 else if (promptMessages)
                 {
-                    MessageBox.Show("There are errors in the diagram.", "The verification failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show("There are errors in the diagram.", "The verification failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    logsViewToolStripMenuItem.Checked = true;
                 }
-            }
-            if (promptMessages)
-            {
-                foreach (CheckMessage msg in generatorData.MessagesList)
-                {
-                    msgList.Items.Add(msg.GetListViewItem());
-                }
-                logsViewToolStripMenuItem.Checked = true;
             }
             return res;
         }
@@ -1543,7 +1565,7 @@ namespace Phases
         {
             ((fDraw)Owner).GoToObject((msgList.SelectedItems[0].Tag as CheckMessage).Object2, true);
         }
-        #endregion
+#endregion
 
         private void btGenerateCode_Click(object sender, EventArgs e)
         {
@@ -1562,7 +1584,7 @@ namespace Phases
                 }
                 else
                 {
-                    project = new CodeGeneration.Interpreter.Project(generatorData, book.ScriptsFolder);
+                    project = new CodeGeneration.Interpreter.Project(book.BuildData, book.ScriptsFolder);
                 }
             }
             else
@@ -1715,31 +1737,31 @@ namespace Phases
             int idx;
             signalsDraw.VariablesStatus = new VariablesStatusLog();
             // Adding variables and states to track
-            foreach (BooleanInput variable in generatorData.Variables.BooleanInputs)
+            foreach (BooleanInput variable in book.BuildData.Variables.BooleanInputs)
             {
                 signalsDraw.VariablesStatus.Histories.Add(new VariableHistory(variable.Name, variable.DefaultValue));
             }
-            foreach (Variable variable in generatorData.Variables.EventInputs)
+            foreach (Variable variable in book.BuildData.Variables.EventInputs)
             {
                 signalsDraw.VariablesStatus.Histories.Add(new VariableHistory(variable.Name));
             }
-            foreach (BooleanOutput variable in generatorData.Variables.BooleanOutputs)
+            foreach (BooleanOutput variable in book.BuildData.Variables.BooleanOutputs)
             {
                 signalsDraw.VariablesStatus.Histories.Add(new VariableHistory(variable.Name, variable.DefaultValue));
             }
-            foreach (Variable variable in generatorData.Variables.EventOutputs)
+            foreach (Variable variable in book.BuildData.Variables.EventOutputs)
             {
                 signalsDraw.VariablesStatus.Histories.Add(new VariableHistory(variable.Name));
             }
-            foreach (BooleanFlag variable in generatorData.Variables.BooleanFlags)
+            foreach (BooleanFlag variable in book.BuildData.Variables.BooleanFlags)
             {
                 signalsDraw.VariablesStatus.Histories.Add(new VariableHistory(variable.Name, variable.DefaultValue));
             }
-            foreach (MessageFlag variable in generatorData.Variables.MessageFlags)
+            foreach (MessageFlag variable in book.BuildData.Variables.MessageFlags)
             {
                 signalsDraw.VariablesStatus.Histories.Add(new VariableHistory(variable.Name));
             }
-            foreach (BasicObjectsTree tree in generatorData.Trees)
+            foreach (BasicObjectsTree tree in book.BuildData.Trees)
             {
                 foreach (BasicMachine mach in tree.SuperStatesList())
                 {
@@ -1756,7 +1778,7 @@ namespace Phases
                     }
                 }
             }
-            Simulation = new VirtualMachine(generatorData, signalsDraw.VariablesStatus);
+            Simulation = new VirtualMachine(book.BuildData, signalsDraw.VariablesStatus);
 
             //clear simulation log
             rtbSimLog.Clear();
@@ -1766,46 +1788,46 @@ namespace Phases
             foreach (BooleanInput var in book.Variables.BooleanInputs)
             {
                 dgEntradas.Rows.Add("B", var.Name, var.DefaultValue, var.DefaultValue);
-                generatorData.Store[var.Name] = var.DefaultValue;
+                book.BuildData.Store[var.Name] = var.DefaultValue;
             }
             foreach (Variable var in book.Variables.EventInputs)
             {
                 dgEntradas.Rows.Add("E", var.Name, false, false);
-                generatorData.Store[var.Name] = false;
+                book.BuildData.Store[var.Name] = false;
             }
             //Other variables
             dgVariables.Rows.Clear();
             foreach (BooleanOutput var in book.Variables.BooleanOutputs)
             {
-                generatorData.Store[var.Name] = var.DefaultValue;
+                book.BuildData.Store[var.Name] = var.DefaultValue;
                 idx = dgVariables.Rows.Add("O", var.Name, "");
                 dgVariables.Rows[idx].Cells[0].ToolTipText = "Boolean Output";
             }
             foreach (BooleanFlag var in book.Variables.BooleanFlags)
             {
-                generatorData.Store[var.Name] = var.DefaultValue;
+                book.BuildData.Store[var.Name] = var.DefaultValue;
                 idx = dgVariables.Rows.Add("F", var.Name, "");
                 dgVariables.Rows[idx].Cells[0].ToolTipText = "Boolean Flag";
             }
             foreach (CounterFlag var in book.Variables.CounterFlags)
             {
-                generatorData.Store[var.Name] = var.DefaultValue;
+                book.BuildData.Store[var.Name] = var.DefaultValue;
                 idx = dgVariables.Rows.Add("C", var.Name, "");
                 dgVariables.Rows[idx].Cells[0].ToolTipText = "Counter Flag";
             }
             foreach (MessageFlag var in book.Variables.MessageFlags)
             {
-                generatorData.Store[var.Name] = false;
+                book.BuildData.Store[var.Name] = false;
                 idx = dgVariables.Rows.Add("M", var.Name, "");
                 dgVariables.Rows[idx].Cells[0].ToolTipText = "Message";
             }
             foreach (EventOutput var in book.Variables.EventOutputs)
             {
-                generatorData.Store[var.Name] = false;
+                book.BuildData.Store[var.Name] = false;
                 idx = dgVariables.Rows.Add("E", var.Name, "");
                 dgVariables.Rows[idx].Cells[0].ToolTipText = "Output Event";
             }
-            foreach (BasicObjectsTree tree in generatorData.Trees)
+            foreach (BasicObjectsTree tree in book.BuildData.Trees)
             {
                 idx = dgVariables.Rows.Add("R", tree.Root.Name, "");
                 dgVariables.Rows[idx].Cells[0].ToolTipText = "Root machine";
@@ -1815,7 +1837,7 @@ namespace Phases
                     dgVariables.Rows[idx].Cells[0].ToolTipText = "Sub machine";
                 }
             }
-            foreach (BasicObjectsTree tree in generatorData.Trees)
+            foreach (BasicObjectsTree tree in book.BuildData.Trees)
             {
                 foreach (BasicMachine mach in tree.SuperStatesList())
                 {
@@ -1823,7 +1845,7 @@ namespace Phases
                     {
                         idx = dgVariables.Rows.Add("SS", mach.Name, "");
                         dgVariables.Rows[idx].Cells[0].ToolTipText = "Super State";
-                        generatorData.Store[mach.Name] = false;
+                        book.BuildData.Store[mach.Name] = false;
                     }
                 }
                 foreach (BasicState state in tree.StatesList())
@@ -1832,7 +1854,7 @@ namespace Phases
                     {
                         idx = dgVariables.Rows.Add("S", state.Name, "");
                         dgVariables.Rows[idx].Cells[0].ToolTipText = "State";
-                        generatorData.Store[state.Name] = false;
+                        book.BuildData.Store[state.Name] = false;
                     }
                 }
             }
@@ -2008,7 +2030,7 @@ namespace Phases
                     string val = row.Cells[2].Value.ToString();
                     string current = row.Cells[3].Value.ToString();
                     row.Cells[3].Value = (bool)row.Cells[2].Value;
-                    generatorData.Store[row.Cells[1].Value.ToString()] = (bool)row.Cells[2].Value;
+                    book.BuildData.Store[row.Cells[1].Value.ToString()] = (bool)row.Cells[2].Value;
                     switch (valType)
                     {
                         case "E":
@@ -2045,7 +2067,7 @@ namespace Phases
                 if (current == "") current = "false";
 
                 // Get current variable name from Store
-                string val = generatorData.Store[varName].AsString;
+                string val = book.BuildData.Store[varName].AsString;
                 if (val == "") val = "false";
 
                 // master counter offset
@@ -2145,7 +2167,7 @@ namespace Phases
                 if (row.Cells[0].Value.ToString() == "E" && row.Cells[2].Value.ToString() == "sent")
                 {
                     row.Cells[2].Value = "";
-                    generatorData.Store[row.Cells[1].Value.ToString()] = false;
+                    book.BuildData.Store[row.Cells[1].Value.ToString()] = false;
                 }
             }
         }
@@ -2274,7 +2296,7 @@ namespace Phases
             if(dialogImport.ShowDialog(this) == DialogResult.OK)
             {
                 book = new PhasesBook(appInterface, DrawingSheet.DefaultSize);
-                mouse = new MouseTool(book.SelectedSheet.draw, pBox);
+                mouse = new MouseTool(book.SelectedSheet.Sketch, pBox);
                 if(!book.ImportStateCADFile(File.ReadAllBytes(dialogImport.FileName)))
                 {
                     MessageBox.Show("Error importing the file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -2414,8 +2436,8 @@ namespace Phases
 
         private void ConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!DrawCheck(false)) generatorData = null;
-            CodeGeneratorConfig codeGeneratorConfig = new CodeGeneratorConfig(generatorData, book.ScriptsFolder);
+            if (!DrawCheck(false)) book.BuildData = null;
+            CodeGeneratorConfig codeGeneratorConfig = new CodeGeneratorConfig(book.BuildData, book.ScriptsFolder);
             codeGeneratorConfig.ShowDialog();
             codeGeneratorConfig.Dispose();
         }
