@@ -16,9 +16,9 @@ namespace Phases.BasicObjects
         public override string Alias => Output.Name;
 
         public OperationType Operation { get; private set; }
-        public IInternalOutput Output { get; private set; }
+        public Variable Output { get; private set; }
 
-        public BasicOutput(OperationType operation, IInternalOutput output)
+        public BasicOutput(OperationType operation, Variable output)
         {
             Operation = operation;
             Output = output;

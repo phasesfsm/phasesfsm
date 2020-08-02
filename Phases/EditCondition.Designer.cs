@@ -80,6 +80,9 @@ namespace Phases
             this.imageList.Images.SetKeyName(5, "booleanflag.png");
             this.imageList.Images.SetKeyName(6, "flipflop.png");
             this.imageList.Images.SetKeyName(7, "counter.png");
+            this.imageList.Images.SetKeyName(8, "state.ico");
+            this.imageList.Images.SetKeyName(9, "superstate.ico");
+            this.imageList.Images.SetKeyName(10, "nested32.ico");
             // 
             // listMessages
             // 
@@ -186,7 +189,6 @@ namespace Phases
         #endregion
         private System.Windows.Forms.Button btOk;
         private System.Windows.Forms.Button btCancel;
-        internal ExpressionBox tbCondition;
         public System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.ListBox listMessages;
         private System.Windows.Forms.ListBox listLexic;
@@ -194,5 +196,6 @@ namespace Phases
         private System.Windows.Forms.Label lbMsg;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox tbResult;
+        private ExpressionBox tbCondition;
     }
 }

@@ -275,7 +275,7 @@ namespace Phases.DrawableObjects
                         MessageBox.Show(string.Format("'{0}' is a reserved name.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
                     }
-                    else if (OwnerDraw.OwnerSheet.OwnerBook.ExistsName(value))
+                    else if (OwnerDraw.OwnerSheet.ExistsName(value))
                     {
                         MessageBox.Show(string.Format("The name '{0}' already exists.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
@@ -432,9 +432,17 @@ namespace Phases.DrawableObjects
             data.AddRange(nameS);
 
             //Add description
-            data.Add(Serialization.Token.ObjectDescription);
             var descriptionS = Encoding.Unicode.GetBytes(description);
-            data.Add((byte)descriptionS.Length);
+            if (descriptionS.Length > 255)
+            {
+                data.Add(Serialization.Token.ObjectLargeDescription);
+                data.AddRange(BitConverter.GetBytes((ushort)descriptionS.Length));
+            }
+            else
+            {
+                data.Add(Serialization.Token.ObjectDescription);
+                data.Add((byte)descriptionS.Length);
+            }
             data.AddRange(descriptionS);
 
             //End object definition
@@ -520,8 +528,21 @@ namespace Phases.DrawableObjects
             name = Encoding.Unicode.GetString(data, index, len);
             index += len;
             //Get object description
-            if (data[index++] != Serialization.Token.ObjectDescription) return null;
-            len = data[index++];
+            if (data[index] == Serialization.Token.ObjectLargeDescription)
+            {
+                index++;
+                len = BitConverter.ToUInt16(data, index);
+                index += 2;
+            }
+            else if (data[index] == Serialization.Token.ObjectDescription)
+            {
+                index++;
+                len = data[index++];
+            }
+            else
+            {
+                return null;
+            }
             description = Encoding.Unicode.GetString(data, index, len);
             index += len;
             //Check end definition
@@ -542,9 +563,8 @@ namespace Phases.DrawableObjects
 
         public static bool DeserializeRelation(byte[] data, ref int index, out string objName)
         {
-            objName = null;
-            if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.RelationName)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref objName)) return false;
+            if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.RelationName)) { objName = ""; return false; }
+            if (!Serialization.DeserializeParameter(data, ref index, out objName)) return false;
             return true;
         }
     }

@@ -32,14 +32,14 @@ namespace Phases.DrawableObjects
         {
             get
             {
-                return OwnerDraw.OwnerSheet.OwnerBook.Globals.IndexOf(this);
+                return OwnerDraw.OwnerSheet.Globals.IndexOf(this);
             }
             set
             {
                 if (value < 0) value = 0;
-                else if (value >= OwnerDraw.OwnerSheet.OwnerBook.Globals.Count) value = OwnerDraw.OwnerSheet.OwnerBook.Globals.Count - 1;
-                OwnerDraw.OwnerSheet.OwnerBook.Globals.Remove(this);
-                OwnerDraw.OwnerSheet.OwnerBook.Globals.Insert(value, this);
+                else if (value >= OwnerDraw.OwnerSheet.Globals.Count) value = OwnerDraw.OwnerSheet.Globals.Count - 1;
+                OwnerDraw.OwnerSheet.Globals.Remove(this);
+                OwnerDraw.OwnerSheet.Globals.Insert(value, this);
             }
         }
 
@@ -284,9 +284,9 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            if (!Serialization.DeserializeParameter(data, ref index, ref rect)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref result)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref operation)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out rect)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out result)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out operation)) return false;
             return true;
         }
 

@@ -71,7 +71,7 @@ namespace Phases.Variables
             };
         }
 
-        public Value Evaluate(OperationType operation, Value currentValue)
+        public override Value Evaluate(OperationType operation, Value currentValue)
         {
             switch (operation)
             {

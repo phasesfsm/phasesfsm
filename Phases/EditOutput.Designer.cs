@@ -33,10 +33,13 @@
             this.listAll = new System.Windows.Forms.ListBox();
             this.listOut = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioIncrement = new System.Windows.Forms.RadioButton();
+            this.radioDecrement = new System.Windows.Forms.RadioButton();
             this.radioClear = new System.Windows.Forms.RadioButton();
             this.radioMin = new System.Windows.Forms.RadioButton();
             this.radioToggle = new System.Windows.Forms.RadioButton();
             this.radioMax = new System.Windows.Forms.RadioButton();
+            this.radioSend = new System.Windows.Forms.RadioButton();
             this.radioFalse = new System.Windows.Forms.RadioButton();
             this.radioTrue = new System.Windows.Forms.RadioButton();
             this.btOk = new System.Windows.Forms.Button();
@@ -44,9 +47,6 @@
             this.btRemove = new System.Windows.Forms.Button();
             this.btAdd = new System.Windows.Forms.Button();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
-            this.radioDecrement = new System.Windows.Forms.RadioButton();
-            this.radioIncrement = new System.Windows.Forms.RadioButton();
-            this.radioSend = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,7 +60,7 @@
             this.listAll.ItemHeight = 18;
             this.listAll.Location = new System.Drawing.Point(12, 12);
             this.listAll.Name = "listAll";
-            this.listAll.Size = new System.Drawing.Size(154, 290);
+            this.listAll.Size = new System.Drawing.Size(190, 291);
             this.listAll.TabIndex = 0;
             this.listAll.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listAll_DrawItem);
             this.listAll.DoubleClick += new System.EventHandler(this.listAll_DoubleClick);
@@ -74,9 +74,9 @@
             this.listOut.FormattingEnabled = true;
             this.listOut.IntegralHeight = false;
             this.listOut.ItemHeight = 18;
-            this.listOut.Location = new System.Drawing.Point(230, 12);
+            this.listOut.Location = new System.Drawing.Point(266, 12);
             this.listOut.Name = "listOut";
-            this.listOut.Size = new System.Drawing.Size(144, 290);
+            this.listOut.Size = new System.Drawing.Size(185, 291);
             this.listOut.TabIndex = 1;
             this.listOut.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listOut_DrawItem);
             this.listOut.SelectedIndexChanged += new System.EventHandler(this.listOut_SelectedIndexChanged);
@@ -94,12 +94,36 @@
             this.groupBox1.Controls.Add(this.radioSend);
             this.groupBox1.Controls.Add(this.radioFalse);
             this.groupBox1.Controls.Add(this.radioTrue);
-            this.groupBox1.Location = new System.Drawing.Point(380, 12);
+            this.groupBox1.Location = new System.Drawing.Point(457, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(165, 244);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Modifier";
+            // 
+            // radioIncrement
+            // 
+            this.radioIncrement.AutoSize = true;
+            this.radioIncrement.Location = new System.Drawing.Point(21, 189);
+            this.radioIncrement.Name = "radioIncrement";
+            this.radioIncrement.Size = new System.Drawing.Size(72, 17);
+            this.radioIncrement.TabIndex = 8;
+            this.radioIncrement.TabStop = true;
+            this.radioIncrement.Text = "Increment";
+            this.radioIncrement.UseVisualStyleBackColor = true;
+            this.radioIncrement.Click += new System.EventHandler(this.Options_Click);
+            // 
+            // radioDecrement
+            // 
+            this.radioDecrement.AutoSize = true;
+            this.radioDecrement.Location = new System.Drawing.Point(21, 212);
+            this.radioDecrement.Name = "radioDecrement";
+            this.radioDecrement.Size = new System.Drawing.Size(77, 17);
+            this.radioDecrement.TabIndex = 7;
+            this.radioDecrement.TabStop = true;
+            this.radioDecrement.Text = "Decrement";
+            this.radioDecrement.UseVisualStyleBackColor = true;
+            this.radioDecrement.Click += new System.EventHandler(this.Options_Click);
             // 
             // radioClear
             // 
@@ -149,6 +173,18 @@
             this.radioMax.UseVisualStyleBackColor = true;
             this.radioMax.Click += new System.EventHandler(this.Options_Click);
             // 
+            // radioSend
+            // 
+            this.radioSend.AutoSize = true;
+            this.radioSend.Location = new System.Drawing.Point(21, 28);
+            this.radioSend.Name = "radioSend";
+            this.radioSend.Size = new System.Drawing.Size(53, 17);
+            this.radioSend.TabIndex = 2;
+            this.radioSend.TabStop = true;
+            this.radioSend.Text = "Send.";
+            this.radioSend.UseVisualStyleBackColor = true;
+            this.radioSend.Click += new System.EventHandler(this.Options_Click);
+            // 
             // radioFalse
             // 
             this.radioFalse.AutoSize = true;
@@ -177,7 +213,7 @@
             // 
             this.btOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btOk.Location = new System.Drawing.Point(389, 281);
+            this.btOk.Location = new System.Drawing.Point(466, 282);
             this.btOk.Name = "btOk";
             this.btOk.Size = new System.Drawing.Size(75, 23);
             this.btOk.TabIndex = 3;
@@ -189,7 +225,7 @@
             // 
             this.btCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btCancel.Location = new System.Drawing.Point(470, 281);
+            this.btCancel.Location = new System.Drawing.Point(547, 282);
             this.btCancel.Name = "btCancel";
             this.btCancel.Size = new System.Drawing.Size(75, 23);
             this.btCancel.TabIndex = 4;
@@ -199,7 +235,7 @@
             // btRemove
             // 
             this.btRemove.Image = global::Phases.Properties.Resources.Left_32;
-            this.btRemove.Location = new System.Drawing.Point(172, 86);
+            this.btRemove.Location = new System.Drawing.Point(208, 86);
             this.btRemove.Name = "btRemove";
             this.btRemove.Size = new System.Drawing.Size(52, 43);
             this.btRemove.TabIndex = 6;
@@ -209,7 +245,7 @@
             // btAdd
             // 
             this.btAdd.Image = global::Phases.Properties.Resources.Right_32;
-            this.btAdd.Location = new System.Drawing.Point(172, 37);
+            this.btAdd.Location = new System.Drawing.Point(208, 37);
             this.btAdd.Name = "btAdd";
             this.btAdd.Size = new System.Drawing.Size(52, 43);
             this.btAdd.TabIndex = 5;
@@ -229,47 +265,11 @@
             this.imageList.Images.SetKeyName(6, "flipflop.png");
             this.imageList.Images.SetKeyName(7, "counter.png");
             // 
-            // radioDecrement
-            // 
-            this.radioDecrement.AutoSize = true;
-            this.radioDecrement.Location = new System.Drawing.Point(21, 212);
-            this.radioDecrement.Name = "radioDecrement";
-            this.radioDecrement.Size = new System.Drawing.Size(77, 17);
-            this.radioDecrement.TabIndex = 7;
-            this.radioDecrement.TabStop = true;
-            this.radioDecrement.Text = "Decrement";
-            this.radioDecrement.UseVisualStyleBackColor = true;
-            this.radioDecrement.Click += new System.EventHandler(this.Options_Click);
-            // 
-            // radioIncrement
-            // 
-            this.radioIncrement.AutoSize = true;
-            this.radioIncrement.Location = new System.Drawing.Point(21, 189);
-            this.radioIncrement.Name = "radioIncrement";
-            this.radioIncrement.Size = new System.Drawing.Size(72, 17);
-            this.radioIncrement.TabIndex = 8;
-            this.radioIncrement.TabStop = true;
-            this.radioIncrement.Text = "Increment";
-            this.radioIncrement.UseVisualStyleBackColor = true;
-            this.radioIncrement.Click += new System.EventHandler(this.Options_Click);
-            // 
-            // radioSend
-            // 
-            this.radioSend.AutoSize = true;
-            this.radioSend.Location = new System.Drawing.Point(21, 28);
-            this.radioSend.Name = "radioSend";
-            this.radioSend.Size = new System.Drawing.Size(53, 17);
-            this.radioSend.TabIndex = 2;
-            this.radioSend.TabStop = true;
-            this.radioSend.Text = "Send.";
-            this.radioSend.UseVisualStyleBackColor = true;
-            this.radioSend.Click += new System.EventHandler(this.Options_Click);
-            // 
             // EditOutput
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(557, 316);
+            this.ClientSize = new System.Drawing.Size(634, 317);
             this.Controls.Add(this.btRemove);
             this.Controls.Add(this.btAdd);
             this.Controls.Add(this.btCancel);

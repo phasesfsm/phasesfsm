@@ -16,13 +16,13 @@ namespace Phases.BasicObjects
         public override string Alias => Relation.Name;
 
         public Relation Relation { get; private set; }
-        public IIndirectInput Input { get; private set; }
+        public Variable Input { get; private set; }
         public BasicOutput Action { get; private set; }
         public override List<DrawableObject> ObjectList => new List<DrawableObject> { Relation };
 
         public override SimulationMark SimulationMark { get => Relation.SimulationMark; set => Relation.SimulationMark = value; }
 
-        public BasicRelation(Relation Relation, IIndirectInput input, BasicOutput action)
+        public BasicRelation(Relation Relation, Variable input, BasicOutput action)
         {
             this.Relation = Relation;
             Input = input;

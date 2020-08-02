@@ -16,6 +16,7 @@ namespace Phases.Expresions
             Numeric,
             OperatorSymbol,
             SufixSymbol,
+            UnionSymbol,
             PrefixSymbol,
             GroupBegins,
             GroupEnds

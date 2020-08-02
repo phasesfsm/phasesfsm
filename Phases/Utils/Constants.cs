@@ -31,8 +31,9 @@ namespace Phases
             public const int In = 14;
             public const int Out = 15;
 
-            public const int Sheet = 16;
-            public const int SubSheet = 17;
+            public const int MainSheet = 16;
+            public const int SubSheet = 16;
+            public const int ModelSheet = 17;
 
             public const int Texts = 18;
 

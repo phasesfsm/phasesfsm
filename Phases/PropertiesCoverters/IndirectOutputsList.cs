@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Phases.DrawableObjects;
+using Phases.Variables;
 
 namespace Phases.PropertiesCoverters
 {
@@ -17,7 +18,10 @@ namespace Phases.PropertiesCoverters
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return new StandardValuesCollection((context.Instance as DrawableObject).OwnerDraw.OwnerSheet.OwnerBook.Variables.IndirectOutputs.ConvertAll(var => var.Name));
+            Relation relation = context.Instance as Relation;
+            DrawingSheet sheet = relation.OwnerDraw.OwnerSheet;
+
+            return new StandardValuesCollection(VariableCollection.GetIndirectOutputsList(sheet));
         }
     }
 }

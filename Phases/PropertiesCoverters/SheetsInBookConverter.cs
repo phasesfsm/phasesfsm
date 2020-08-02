@@ -18,7 +18,10 @@ namespace Phases.PropertiesCoverters
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return new StandardValuesCollection(DrawingSheet.ChildSheetsNames(((Nested)context.Instance).OwnerDraw.OwnerSheet.OwnerBook.Sheets, ((Nested)context.Instance).OwnerDraw.OwnerSheet));
+            Nested nested = context.Instance as Nested;
+            DrawingSheet sheet = nested.OwnerDraw.OwnerSheet;
+
+            return new StandardValuesCollection(sheet.OwnerBook.Models.FindAll(model => model != sheet).ConvertAll(model => model.Name));
         }
     }
 }

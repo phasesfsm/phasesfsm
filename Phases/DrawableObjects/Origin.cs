@@ -34,14 +34,14 @@ namespace Phases.DrawableObjects
         {
             get
             {
-                return OwnerDraw.OwnerSheet.OwnerBook.Globals.IndexOf(this);
+                return OwnerDraw.OwnerSheet.Globals.IndexOf(this);
             }
             set
             {
                 if (value < 0) value = 0;
-                else if (value >= OwnerDraw.OwnerSheet.OwnerBook.Globals.Count) value = OwnerDraw.OwnerSheet.OwnerBook.Globals.Count - 1;
-                OwnerDraw.OwnerSheet.OwnerBook.Globals.Remove(this);
-                OwnerDraw.OwnerSheet.OwnerBook.Globals.Insert(value, this);
+                else if (value >= OwnerDraw.OwnerSheet.Globals.Count) value = OwnerDraw.OwnerSheet.Globals.Count - 1;
+                OwnerDraw.OwnerSheet.Globals.Remove(this);
+                OwnerDraw.OwnerSheet.Globals.Insert(value, this);
             }
         }
 
@@ -76,11 +76,11 @@ namespace Phases.DrawableObjects
             base.Moved();
             if (Father == null)
             {
-                if (!OwnerDraw.OwnerSheet.OwnerBook.Globals.Contains(this)) OwnerDraw.OwnerSheet.OwnerBook.Globals.Add(this);
+                if (!OwnerDraw.OwnerSheet.Globals.Contains(this)) OwnerDraw.OwnerSheet.Globals.Add(this);
             }
             else
             {
-                if (OwnerDraw.OwnerSheet.OwnerBook.Globals.Contains(this)) OwnerDraw.OwnerSheet.OwnerBook.Globals.Remove(this);
+                if (OwnerDraw.OwnerSheet.Globals.Contains(this)) OwnerDraw.OwnerSheet.Globals.Remove(this);
             }
         }
 

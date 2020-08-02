@@ -38,7 +38,7 @@ namespace Phases.BasicObjects
                 OperationType operation = LexicalRules.GetOutputOperation(outputAction);
                 if (State.OwnerDraw.OwnerSheet.OwnerBook.Variables.InternalOutputs.FirstOrDefault(output => output.Name == outputName) is IInternalOutput ioutput)
                 {
-                    EnterOutputs.Add(new BasicOutput(operation, ioutput));
+                    EnterOutputs.Add(new BasicOutput(operation, ioutput as Variable));
                 }
             }
             foreach (string outputAction in State.ExitOutputsList)
@@ -47,7 +47,7 @@ namespace Phases.BasicObjects
                 OperationType operation = LexicalRules.GetOutputOperation(outputAction);
                 if (State.OwnerDraw.OwnerSheet.OwnerBook.Variables.InternalOutputs.FirstOrDefault(output => output.Name == outputName) is IInternalOutput ioutput)
                 {
-                    ExitOutputs.Add(new BasicOutput(operation, ioutput));
+                    ExitOutputs.Add(new BasicOutput(operation, ioutput as Variable));
                 }
             }
         }

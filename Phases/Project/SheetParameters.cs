@@ -133,25 +133,23 @@ namespace Phases
 
         public virtual bool Deserialize(byte[] data, ref int index)
         {
-            byte bt = 0;
             //Name
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.SheetName)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref name)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out name)) return false;
             
             //Sheet size
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.SheetSize)) return false;
-            Size size = Size.Empty;
-            if (!Serialization.DeserializeParameter(data, ref index, ref size)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out Size size)) return false;
             sheetRectangle = new Rectangle(Util.InvertSign(Util.Middle(size)), size);
             //Zoom
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.SheetZoom)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref zoom)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out zoom)) return false;
             //View point
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.SheetViewPoint)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref viewPoint)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out viewPoint)) return false;
             //Grid
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.SheetGrid)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref bt)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out byte bt)) return false;
             grid = (GridStyle)bt;
 
             return true;

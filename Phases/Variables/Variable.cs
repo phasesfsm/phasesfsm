@@ -52,7 +52,7 @@ namespace Phases.Variables
                     MessageBox.Show("Invalid variable name.", "Property value error.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-                if (value != name && Owner.OwnerBook.ExistsName(value))
+                if (value != name && Owner.OwnerMachine.ExistsName(value))
                 {
                     MessageBox.Show("The captures variable name already exists.", "Property value error.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -111,6 +111,8 @@ namespace Phases.Variables
             throw new Exception("Non handled operation.");
         }
 
+        public abstract Value Evaluate(OperationType operation, Value currentValue);
+
         #region "Serialization"
 
         public int GetImageIndex()
@@ -167,12 +169,10 @@ namespace Phases.Variables
         {
             variable = null;
             id = 0;
-            byte token;
-            string name = "";
             if (!Serialization.Token.IsVariable(data, index)) return false;
-            token = data[index++];
-            if (!Serialization.DeserializeId(data, ref index, ref id)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref name)) return false;
+            byte token = data[index++];
+            if (!Serialization.DeserializeId(data, ref index, out id)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out string name)) return false;
             switch (token)
             {
                 case Serialization.Token.BooleanInputVariable:

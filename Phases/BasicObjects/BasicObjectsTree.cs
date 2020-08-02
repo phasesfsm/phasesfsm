@@ -71,7 +71,7 @@ namespace Phases.BasicObjects
             var btrans = new BasicTransition(trans, this);
             UsedObjects.Add(trans, btrans);
             BasicTransitionsList.Add(btrans);
-            AddVariables(trans);
+            //AddVariables(trans);
             btrans.Pointing = AddObject(dest, trans.EndObject);
             if((trans.EndObject is End || trans.EndObject is Abort) && btrans.Pointing != null &&
                 btrans.Pointing.State is SuperState && !btrans.Transition.StartObject.HasFather(btrans.Pointing.State as SuperState))
@@ -127,6 +127,9 @@ namespace Phases.BasicObjects
                     }
                     Messages.Add(new CheckMessage(CheckMessage.MessageTypes.Warning, "Abort is outside a super state.", abort));
                     return null;
+                case Nested nested:
+                    var bMach = AddMachine(dest, nested);
+                    return bMach;
             }
             throw new Exception("Non handled pointing object.");
         }
@@ -136,7 +139,7 @@ namespace Phases.BasicObjects
             var bstate = new BasicState(state);
             UsedObjects.Add(state, bstate);
             usedStates.Add(state, bstate);
-            AddVariables(state);
+            //AddVariables(state);
             if (state.Father == null)
             {
                 dest.Add(bstate);
@@ -162,23 +165,24 @@ namespace Phases.BasicObjects
             return bstate;
         }
 
-        private BasicMachine AddMachine(List<BasicState> dest, SuperState superState)
+        private BasicMachine AddMachine(List<BasicState> dest, INestedState nstate)
         {
-            if(usedStates.TryGetValue(superState, out BasicState bstate))
+            var state = nstate as State;
+            if (usedStates.TryGetValue(nstate as State, out BasicState bstate))
             {
                 return bstate as BasicMachine;
             }
-            var bmach = new BasicMachine(superState);
-            UsedObjects.Add(superState, bmach);
-            usedStates.Add(superState, bmach);
-            AddVariables(superState);
+            var bmach = new BasicMachine(state);
+            UsedObjects.Add(state, bmach);
+            usedStates.Add(state, bmach);
+            //AddVariables(superState);
             BasicTransition btrans;
-            if (superState.Father == null)
+            if (state.Father == null)
             {
                 dest.Add(bmach);
                 bmach.SetFather(this);
             }
-            else if (usedStates.TryGetValue(superState.Father, out BasicState bobj))
+            else if (usedStates.TryGetValue(state.Father, out BasicState bobj))
             {
                 var bmachF = bobj as BasicMachine;
                 bmachF.States.Add(bmach);
@@ -186,13 +190,13 @@ namespace Phases.BasicObjects
             }
             else
             {
-                var bmachF = AddMachine(dest, superState.Father);
+                var bmachF = AddMachine(dest, state.Father);
                 bmachF.States.Add(bmach);
                 bmach.SetFather(bmachF);
             }
-            if (superState.Origin != null)
+            if (nstate.Origin != null)
             {
-                BasicRoot mroot = new BasicRoot(bmach, superState.Origin);
+                BasicRoot mroot = new BasicRoot(bmach, nstate.Origin);
                 bmach.Root = mroot;
                 UsedObjects.Add(bmach.Origin, mroot);
                 btrans = AddTransition(bmach.States, bmach.Origin.OutTransitions.FirstOrDefault() as SimpleTransition);
@@ -212,12 +216,26 @@ namespace Phases.BasicObjects
             }
             else if (bmach.HasInputs())
             {
-                Messages.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Super state with incoming transitions must have an origin.", superState));
+                Messages.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Super state with incoming transitions must have an origin.", state));
             }
-            foreach (Transition trans in superState.AllOutTransitions)
+            foreach (Transition trans in state.AllOutTransitions)
             {
-                btrans = AddTransition(dest, trans as SimpleTransition);
-                bmach.Transitions.Add(btrans);
+                if (trans is SimpleTransition strans)
+                {
+                    btrans = AddTransition(dest, strans);
+                    bmach.Transitions.Add(btrans);
+                }
+                else if (trans is SuperTransition sptrans)
+                {
+                    if (!nstate.ContainedObjects.Any(obj => obj.Name == sptrans.Links))
+                    {
+                        Messages.Add(new CheckMessage(CheckMessage.MessageTypes.Error, string.Format("Super state does not cointain an end/abort object called '{0}'.", sptrans.Links), sptrans, state));
+                    }
+                    else if (state.AllOutTransitions.Count(tr => tr is SuperTransition st && st.Links == sptrans.Links) > 1)
+                    {
+                        Messages.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Super state cannot have more than one transition linked to specific end/abort object.", sptrans, state));
+                    }
+                }
             }
             return bmach;
         }

@@ -169,6 +169,7 @@
             this.goToObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.createNewSheetTreeMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewModelTreeMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteSheetTreeMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteObjectTreeMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.iconsImageList = new System.Windows.Forms.ImageList(this.components);
@@ -669,14 +670,12 @@
             // btToolNested
             // 
             this.btToolNested.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btToolNested.Enabled = false;
             this.btToolNested.Image = global::Phases.Properties.Resources.nested32;
             this.btToolNested.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btToolNested.Name = "btToolNested";
             this.btToolNested.Size = new System.Drawing.Size(36, 36);
             this.btToolNested.Tag = "Nested";
             this.btToolNested.Text = "Nested";
-            this.btToolNested.Visible = false;
             this.btToolNested.Click += new System.EventHandler(this.btMouseTool_Click);
             this.btToolNested.DoubleClick += new System.EventHandler(this.btMouseTool_DoubleClick);
             // 
@@ -1380,7 +1379,7 @@
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             this.toolsToolStripMenuItem.Visible = false;
             // 
@@ -1484,41 +1483,49 @@
             this.goToObjectToolStripMenuItem,
             this.toolStripSeparator9,
             this.createNewSheetTreeMenu,
+            this.createNewModelTreeMenu,
             this.deleteSheetTreeMenu,
             this.deleteObjectTreeMenu});
             this.treeContextMenu.Name = "treeContextMenu";
-            this.treeContextMenu.Size = new System.Drawing.Size(165, 98);
+            this.treeContextMenu.Size = new System.Drawing.Size(171, 120);
             // 
             // goToObjectToolStripMenuItem
             // 
             this.goToObjectToolStripMenuItem.Name = "goToObjectToolStripMenuItem";
-            this.goToObjectToolStripMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.goToObjectToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.goToObjectToolStripMenuItem.Text = "Go to object";
             this.goToObjectToolStripMenuItem.Click += new System.EventHandler(this.goToObjectToolStripMenuItem_Click);
             // 
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(167, 6);
             // 
             // createNewSheetTreeMenu
             // 
             this.createNewSheetTreeMenu.Name = "createNewSheetTreeMenu";
-            this.createNewSheetTreeMenu.Size = new System.Drawing.Size(164, 22);
+            this.createNewSheetTreeMenu.Size = new System.Drawing.Size(170, 22);
             this.createNewSheetTreeMenu.Text = "Create new sheet";
             this.createNewSheetTreeMenu.Click += new System.EventHandler(this.createNewSheetTreeMenu_Click);
+            // 
+            // createNewModelTreeMenu
+            // 
+            this.createNewModelTreeMenu.Name = "createNewModelTreeMenu";
+            this.createNewModelTreeMenu.Size = new System.Drawing.Size(170, 22);
+            this.createNewModelTreeMenu.Text = "Create new model";
+            this.createNewModelTreeMenu.Click += new System.EventHandler(this.createNewModelTreeMenu_Click);
             // 
             // deleteSheetTreeMenu
             // 
             this.deleteSheetTreeMenu.Name = "deleteSheetTreeMenu";
-            this.deleteSheetTreeMenu.Size = new System.Drawing.Size(164, 22);
+            this.deleteSheetTreeMenu.Size = new System.Drawing.Size(170, 22);
             this.deleteSheetTreeMenu.Text = "Delete sheet";
             this.deleteSheetTreeMenu.Click += new System.EventHandler(this.deleteSheetTreeMenu_Click);
             // 
             // deleteObjectTreeMenu
             // 
             this.deleteObjectTreeMenu.Name = "deleteObjectTreeMenu";
-            this.deleteObjectTreeMenu.Size = new System.Drawing.Size(164, 22);
+            this.deleteObjectTreeMenu.Size = new System.Drawing.Size(170, 22);
             this.deleteObjectTreeMenu.Text = "Delete object";
             // 
             // iconsImageList
@@ -1602,6 +1609,7 @@
             // splitContainer5
             // 
             this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer5.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer5.Location = new System.Drawing.Point(3, 3);
             this.splitContainer5.Name = "splitContainer5";
             this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -1614,7 +1622,7 @@
             // 
             this.splitContainer5.Panel2.Controls.Add(this.dgVariables);
             this.splitContainer5.Size = new System.Drawing.Size(225, 398);
-            this.splitContainer5.SplitterDistance = 173;
+            this.splitContainer5.SplitterDistance = 185;
             this.splitContainer5.TabIndex = 0;
             // 
             // dgEntradas
@@ -1634,7 +1642,7 @@
             this.dgEntradas.Location = new System.Drawing.Point(0, 0);
             this.dgEntradas.Name = "dgEntradas";
             this.dgEntradas.RowHeadersVisible = false;
-            this.dgEntradas.Size = new System.Drawing.Size(225, 173);
+            this.dgEntradas.Size = new System.Drawing.Size(225, 185);
             this.dgEntradas.TabIndex = 0;
             this.dgEntradas.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEntradas_CellValueChanged);
             this.dgEntradas.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgEntradas_CurrentCellDirtyStateChanged);
@@ -1691,7 +1699,7 @@
             this.dgVariables.Name = "dgVariables";
             this.dgVariables.ReadOnly = true;
             this.dgVariables.RowHeadersVisible = false;
-            this.dgVariables.Size = new System.Drawing.Size(225, 221);
+            this.dgVariables.Size = new System.Drawing.Size(225, 209);
             this.dgVariables.TabIndex = 1;
             this.dgVariables.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgVariables_CurrentCellDirtyStateChanged);
             // 
@@ -2771,6 +2779,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator19;
         private System.Windows.Forms.ToolStripButton btExitSimule;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator20;
+        private System.Windows.Forms.ToolStripMenuItem createNewModelTreeMenu;
     }
 }
 
