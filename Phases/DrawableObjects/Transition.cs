@@ -100,6 +100,8 @@ namespace Phases.DrawableObjects
                 }
             }
         }
+        // Temporary value whe opening the file
+        internal int priority;
 
         public Transition(DrawableCollection ownerDraw, Point[] splinePoints, DrawableObject startObject)
             : base(ownerDraw)
@@ -605,8 +607,7 @@ namespace Phases.DrawableObjects
             if(!Serialization.DeserializeParameter(data, ref index, out maxDist[1])) return false;
             if(!Serialization.DeserializeParameter(data, ref index, out StartAngle)) return false;
             if(!Serialization.DeserializeParameter(data, ref index, out EndAngle)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, out int priority)) return false;
-            Priority = priority;
+            if (!Serialization.DeserializeParameter(data, ref index, out priority)) return false;
             return true;
         }
 

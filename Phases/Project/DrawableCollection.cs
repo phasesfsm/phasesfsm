@@ -415,6 +415,13 @@ namespace Phases
                 }
                 if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.EndObjectRelations)) return false;
             }
+
+            // Fix transitions priorities on each state
+            foreach (DrawableObject objl in objects.Values)
+            {
+                if (objl is State state) state.outTransitions = state.outTransitions.OrderBy(trans => trans.priority).ToList();
+            }
+
             return true;
         }
 
