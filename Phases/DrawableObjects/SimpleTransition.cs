@@ -47,7 +47,7 @@ namespace Phases.DrawableObjects
                 else
                 {
                     string cond = trigger == TransitionTriggerType.ConditionAndTimeout ? "&" : "|";
-                    up = string.Format("t={0} {1} ({2})", timeout.ToString(), cond, Condition);
+                    up = string.Format("t≥{0} {1} ({2})", timeout.ToString(), cond, Condition);
                 }
                 return up + (Output != "" ? Environment.NewLine + Output : "");
             }
