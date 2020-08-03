@@ -231,7 +231,6 @@ namespace Phases.DrawableObjects
             link.location = location;
             link.textPointOffset = textPointOffset;
             if (inTransitions != null) link.inTransitions = new List<Transition>(inTransitions);
-            if (outTransitions != null) link.outTransitions = new List<Transition>(outTransitions);
         }
 
         public override object Clone()

@@ -377,7 +377,7 @@ namespace Phases
             DrawableObject obj;
             int id;
 
-            //Objects definitions
+            // Objects definitions
             while (Serialization.Token.Is(data, index, Serialization.Token.StartObjectDefinition))
             {
                 obj = DrawableObject.DeserializeObjectDefinition(owner, data, ref index, out id);
@@ -385,7 +385,7 @@ namespace Phases
                 objects.Add(id, obj);
             }
 
-            //Objects specific settings
+            // Objects specific settings
             while (Serialization.Token.Is(data, index, Serialization.Token.StartObjectParameters))
             {
                 index++;
@@ -395,7 +395,7 @@ namespace Phases
                 if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.EndObjectParameters)) return false;
             }
 
-            //Objects relations
+            // Objects relations
             while (Serialization.Token.Is(data, index, Serialization.Token.StartObjectRelations))
             {
                 index++;
@@ -416,10 +416,17 @@ namespace Phases
                 if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.EndObjectRelations)) return false;
             }
 
-            // Fix transitions priorities on each state
-            foreach (DrawableObject objl in objects.Values)
+            // Fixing relations 
+            foreach (DrawableObject objr in objects.Values)
             {
-                if (objl is State state) state.outTransitions = state.outTransitions.OrderBy(trans => trans.priority).ToList();
+                // Fix aliases out transitions list
+                if (objr is Transition trans && trans.StartObject is Alias alias)
+                {
+                    alias.AliasOutTransitions.Add(trans);
+                }
+
+                // Fix transitions priorities on each state
+                if (objr is State state) state.FixTransitionsPriorities();
             }
 
             return true;

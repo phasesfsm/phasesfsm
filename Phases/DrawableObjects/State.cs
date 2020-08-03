@@ -391,7 +391,6 @@ namespace Phases.DrawableObjects
             State state = (State)obj;
             state.rect = rect;
             state.inTransitions = new List<Transition>(inTransitions);
-            state.outTransitions = new List<Transition>(outTransitions);
             state.enterOutput = enterOutput;
             state.exitOutput = exitOutput;
         }

@@ -47,7 +47,14 @@ namespace Phases.DrawableObjects
             Equation
         }
 
-        internal List<Transition> inTransitions, outTransitions;
+        internal virtual List<Transition> outTransitions { get; private set; }
+
+        internal void FixTransitionsPriorities()
+        {
+            outTransitions = outTransitions.OrderBy(trans => trans.priority).ToList();
+        }
+
+        internal List<Transition> inTransitions;
         public static Font font = new Font("Arial", 10f);
         public TreeNode Node;
         [Browsable(false)]
@@ -78,6 +85,7 @@ namespace Phases.DrawableObjects
             if (value != null)
             {
                 value.outTransitions.Add(trans);
+                if (value is Alias alias && alias.Pointing != null) alias.AliasOutTransitions.Add(trans);
             }
         }
 
@@ -369,6 +377,7 @@ namespace Phases.DrawableObjects
         {
             obj.name = name;
             obj.description = description;
+            obj.outTransitions = new List<Transition>(outTransitions);
         }
 
         public abstract byte[] SerializeSpecifics();
