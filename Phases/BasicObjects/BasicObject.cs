@@ -37,5 +37,7 @@ namespace Phases.BasicObjects
             }
             return pFather;
         }
+
+        public override string ToString() => Name;
     }
 }

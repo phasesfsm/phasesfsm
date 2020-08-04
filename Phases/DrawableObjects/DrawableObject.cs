@@ -51,7 +51,7 @@ namespace Phases.DrawableObjects
 
         internal void FixTransitionsPriorities()
         {
-            outTransitions = outTransitions.OrderBy(trans => trans.priority).ToList();
+            outTransitions = outTransitions.OrderBy(trans => trans.SavedPriority).ToList();
         }
 
         internal List<Transition> inTransitions;

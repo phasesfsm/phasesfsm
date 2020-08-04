@@ -101,7 +101,8 @@ namespace Phases.DrawableObjects
             }
         }
         // Temporary value whe opening the file
-        internal int priority;
+        private int priority;
+        internal int SavedPriority => priority;
 
         public Transition(DrawableCollection ownerDraw, Point[] splinePoints, DrawableObject startObject)
             : base(ownerDraw)
@@ -201,7 +202,9 @@ namespace Phases.DrawableObjects
         {
             if (startObject == null) return;
             StringFormat textFormat = new StringFormat();
-            if (PriorityDrawMode == PriorityDrawModes.DrawInner)
+
+            PriorityDrawModes drawMode = StartObject is Alias ? PriorityDrawModes.DrawOuter : PriorityDrawModes.DrawInner;
+            if (drawMode == PriorityDrawModes.DrawInner)
             {
                 int position = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 8 / (2 * Math.PI));
                 // Horizontal aligment

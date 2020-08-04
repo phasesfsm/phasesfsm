@@ -100,16 +100,16 @@ namespace Phases.DrawableObjects
         }
 
         [Category("Transitions")]
-        public Transition[] AllOutTransitions
-        {
-            get
-            {
-                if (Aliases == null) return null;
-                List<Transition> list = new List<Transition>(outTransitions);
-                Aliases.ForEach(alias => list.AddRange(alias.OutTransitions));
-                return list.ToArray();
-            }
-        }
+        public Transition[] AllOutTransitions => OutTransitions;
+        //{
+        //    get
+        //    {
+        //        if (Aliases == null) return null;
+        //        List<Transition> list = new List<Transition>(outTransitions);
+        //        Aliases.ForEach(alias => list.AddRange(alias.OutTransitions));
+        //        return list.ToArray();
+        //    }
+        //}
 
         [Browsable(false)]
         public List<string> EnterOutputsList => enterOutput;
