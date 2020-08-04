@@ -45,6 +45,8 @@ namespace Phases.BasicObjects
             }
             if (Transition.StartObject is Alias alias)
                 Source = tree.UsedObjects[alias.Pointing];
+            else if (Transition.StartObject is StateAlias salias)
+                Source = tree.UsedObjects[salias.Pointing];
             else
                 Source = tree.UsedObjects[Transition.StartObject];
             if (Transition.StartObject.Father == null)

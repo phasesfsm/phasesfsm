@@ -420,9 +420,10 @@ namespace Phases
             foreach (DrawableObject objr in objects.Values)
             {
                 // Fix aliases out transitions list
-                if (objr is Transition trans && trans.StartObject is Alias alias)
+                if (objr is Transition trans)
                 {
-                    alias.AliasOutTransitions.Add(trans);
+                    if (trans.StartObject is Alias alias) alias.AliasOutTransitions.Add(trans);
+                    if (trans.StartObject is StateAlias salias) salias.AliasOutTransitions.Add(trans);
                 }
 
                 // Fix transitions priorities on each state

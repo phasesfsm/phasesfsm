@@ -86,6 +86,7 @@ namespace Phases.DrawableObjects
             {
                 value.outTransitions.Add(trans);
                 if (value is Alias alias && alias.Pointing != null) alias.AliasOutTransitions.Add(trans);
+                else if (value is StateAlias salias && salias.Pointing != null) salias.AliasOutTransitions.Add(trans);
             }
         }
 

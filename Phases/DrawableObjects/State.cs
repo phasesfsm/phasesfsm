@@ -58,7 +58,7 @@ namespace Phases.DrawableObjects
         [Category("Simulation")]
         public bool Track { get; set; } = false;
 
-        protected void AdjustSize()
+        protected virtual void AdjustSize()
         {
             Point sizeRef = Point.Empty;
             ResizeCheck(ref sizeRef, MouseTool.ResizingTypes.Right_Bottom);

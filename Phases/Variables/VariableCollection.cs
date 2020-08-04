@@ -309,7 +309,7 @@ namespace Phases.Variables
                         {
                             dictionary.Add(state.Name, ImageIndex.Nested);
                         }
-                        else
+                        else if (!(state is StateAlias))
                         {
                             dictionary.Add(state.Name, ImageIndex.State);
                         }
