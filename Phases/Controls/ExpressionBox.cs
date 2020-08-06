@@ -12,26 +12,23 @@ namespace Phases.Controls
     public partial class ExpressionBox : TextBox
     {
         private static readonly Size iconSize = new Size(16, 16);
-        Dictionary<string, int> dictionary;
-        ListBox listbox;
         ImageList imageList;
         Dictionary<string, int> FilteredList;
-        private int itemsHeight = 4;
         bool editing = false;
         List<string> operators;
 
 		private void GeneralInit()
         {
-            dictionary = new Dictionary<string, int>();
-            listbox = new ListBox();
-            listbox.IntegralHeight = false;
-            listbox.KeyUp += ListBox_KeyUp;
-            listbox.DoubleClick += ListBox_DoubleClick;
-            listbox.DrawItem += new DrawItemEventHandler(ListBox_DrawItem);
-            listbox.DrawMode = DrawMode.OwnerDrawFixed;
-            listbox.Visible = false;
-            listbox.TabStop = false;
-            listbox.ItemHeight = iconSize.Height + 2;
+            Dictionary = new Dictionary<string, int>();
+            ListBox = new ListBox();
+            ListBox.IntegralHeight = false;
+            ListBox.KeyUp += ListBox_KeyUp;
+            ListBox.DoubleClick += ListBox_DoubleClick;
+            ListBox.DrawItem += new DrawItemEventHandler(ListBox_DrawItem);
+            ListBox.DrawMode = DrawMode.OwnerDrawFixed;
+            ListBox.Visible = false;
+            ListBox.TabStop = false;
+            ListBox.ItemHeight = iconSize.Height + 2;
             operators = new List<string>();
             operators.Add(" ");
         }
@@ -48,24 +45,14 @@ namespace Phases.Controls
 
             InitializeComponent();
             GeneralInit();
-            Container.Add(listbox);
+            Container.Add(ListBox);
         }
 
         #region "Properties"
 
-        public Dictionary<string, int> Dictionary
-        {
-            get
-            {
-                return dictionary;
-            }
-            set
-            {
-                dictionary = value;
-            }
-        }
+        public Dictionary<string, int> Dictionary { get; set; }
 
-        public ListBox ListBox => listbox;
+        public ListBox ListBox { get; private set; }
 
         public ImageList ImageList
         {
@@ -80,17 +67,7 @@ namespace Phases.Controls
             }
         }
 
-        public int ListBoxMaxItemsCountHeight
-        {
-            get
-            {
-                return itemsHeight;
-            }
-            set
-            {
-                itemsHeight = value;
-            }
-        }
+        public int ListBoxMaxItemsCountHeight { get; set; } = 4;
 
         public List<string> Operators { get => operators; set => operators = value; }
 
@@ -114,11 +91,6 @@ namespace Phases.Controls
             return text.Substring(wordIndex, SelectionStart - wordIndex);
         }
 
-        private void LoadList()
-        {
-
-        }
-
         private void LocateListBox(bool fullListIfEmpty, bool forceToShow)
         {
             Point cp;
@@ -129,36 +101,36 @@ namespace Phases.Controls
             List<string> lstTemp = new List<string>();
             if (fullListIfEmpty && word == "")
             {
-                FilteredList = dictionary;
+                FilteredList = Dictionary;
             }
             else
             {
-                FilteredList = dictionary.Where(item => item.Key.ToUpper().StartsWith(word)).Select(item => item).OrderBy(key => key.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                FilteredList = Dictionary.Where(item => item.Key.ToUpper().StartsWith(word)).Select(item => item).OrderBy(key => key.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
 
             int width = 150;
             int x = Math.Min(cp.X + Left - Math.Min((imageList != null ? iconSize.Width + 4 : 0), cp.X + Left - 2), Parent.Width - width - Left - 10);
             int y = cp.Y + Bottom;
             int height;
-            if (FilteredList.Count > itemsHeight)
+            if (FilteredList.Count > ListBoxMaxItemsCountHeight)
             {
-                height = Math.Min(150, (listbox.ItemHeight + 1) * itemsHeight);
-                //Parent.Bounds.Height - (cp.Y + Bottom + listbox.ItemHeight * 2)
+                height = Math.Min(150, (ListBox.ItemHeight + 1) * ListBoxMaxItemsCountHeight);
+                //Parent.Bounds.Height - (cp.Y + Bottom + ListBox.ItemHeight * 2)
             }
             else
             {
-                height = (listbox.ItemHeight + 1) * FilteredList.Count;
+                height = (ListBox.ItemHeight + 1) * FilteredList.Count;
 
             }
-            listbox.SetBounds(x, y, width, height);
+            ListBox.SetBounds(x, y, width, height);
             if ((FilteredList.Count != 0 && word != "") || forceToShow)
             {
-                listbox.DataSource = FilteredList.Keys.ToList();
-                listbox.Show();
+                ListBox.DataSource = FilteredList.Keys.ToList();
+                ListBox.Show();
             }
             else
             {
-                listbox.Hide();
+                ListBox.Hide();
             }
         }
 
@@ -169,13 +141,13 @@ namespace Phases.Controls
         protected override void OnLostFocus(EventArgs e)
         {
             base.OnLostFocus(e);
-            if (!listbox.Focused) listbox.Visible = false;
+            if (!ListBox.Focused) ListBox.Visible = false;
         }
 
         protected override void OnParentChanged(EventArgs e)
         {
             base.OnParentChanged(e);
-            listbox.Parent = Parent;
+            ListBox.Parent = Parent;
         }
 
         protected override void OnTextChanged(EventArgs e)
@@ -203,15 +175,15 @@ namespace Phases.Controls
             switch (e.KeyData)
             {
                 case Keys.Up:
-                    if (listbox.SelectedIndex > 0) listbox.SelectedIndex--;
+                    if (ListBox.SelectedIndex > 0) ListBox.SelectedIndex--;
                     e.SuppressKeyPress = true;
                     break;
                 case Keys.Down:
-                    if (listbox.SelectedIndex < listbox.Items.Count - 1) listbox.SelectedIndex++;
+                    if (ListBox.SelectedIndex < ListBox.Items.Count - 1) ListBox.SelectedIndex++;
                     e.SuppressKeyPress = true;
                     break;
                 case Keys.Tab:
-                    if (listbox.Visible)
+                    if (ListBox.Visible)
                     {
                         ListBox_SelectOption();
                         e.SuppressKeyPress = true;
@@ -229,18 +201,18 @@ namespace Phases.Controls
             base.OnKeyPress(e);
             if (e.KeyChar == 13)
             {
-                if (listbox.Visible == true)
+                if (ListBox.Visible == true)
                 {
-                    listbox.Focus();
+                    ListBox.Focus();
                 }
                 e.Handled = true;
             }
             else if (e.KeyChar == (char)Keys.Escape)
             {
-                listbox.Visible = false;
+                ListBox.Visible = false;
                 e.Handled = true;
             }
-            else if (operators.Any(str => str.Last() == e.KeyChar) && listbox.Visible)
+            else if (operators.Any(str => str.Last() == e.KeyChar) && ListBox.Visible)
             {
                 ListBox_SelectOption();
             }
@@ -268,38 +240,38 @@ namespace Phases.Controls
             e.DrawBackground();
             if (imageList == null)
             {
-                e.Graphics.DrawString(listbox.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds, StringFormat.GenericDefault);
+                e.Graphics.DrawString(ListBox.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds, StringFormat.GenericDefault);
             }
             else
             {
                 var image = imageList.Images[FilteredList.Values.ToArray()[e.Index]];
                 e.Graphics.DrawImage(image, e.Bounds.X, e.Bounds.Y + e.Bounds.Height / 2 - image.Height / 2, image.Width, image.Height);
-                var textSize = e.Graphics.MeasureString(listbox.Items[e.Index].ToString(), e.Font);
-                e.Graphics.DrawString(listbox.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds.X + image.Width + 2, e.Bounds.Y + e.Bounds.Height / 2 - textSize.Height / 2, StringFormat.GenericDefault);
+                var textSize = e.Graphics.MeasureString(ListBox.Items[e.Index].ToString(), e.Font);
+                e.Graphics.DrawString(ListBox.Items[e.Index].ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds.X + image.Width + 2, e.Bounds.Y + e.Bounds.Height / 2 - textSize.Height / 2, StringFormat.GenericDefault);
             }
             e.DrawFocusRectangle();
         }
 
         private void ListBox_SelectOption()
         {
-            if (listbox.SelectedItem == null) return;
+            if (ListBox.SelectedItem == null) return;
             editing = true;
             int wordIndex;
             string StrLS = GetCurrentString(out wordIndex);
             string text = Text.Remove(wordIndex, SelectionStart - wordIndex);
-            text = text.Insert(wordIndex, listbox.SelectedItem.ToString());
+            text = text.Insert(wordIndex, ListBox.SelectedItem.ToString());
             Text = text;
-            SelectionStart = wordIndex + listbox.SelectedItem.ToString().Length;
-            listbox.Hide();
+            SelectionStart = wordIndex + ListBox.SelectedItem.ToString().Length;
+            ListBox.Hide();
             Focus();
             editing = false;
         }
 
-        public bool VisibleHelp => listbox.Visible;
+        public bool VisibleHelp => ListBox.Visible;
 
         public void HideHelp()
         {
-            listbox.Visible = false;
+            ListBox.Visible = false;
         }
 
         #endregion

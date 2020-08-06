@@ -59,6 +59,7 @@ namespace Phases
 
             //First Sheets definitions
             public const byte StartSheetDefinition = 0x20;
+
             //Sheet parameters
             public const byte SheetName = 0x21;
             public const byte SheetSize = 0x22;
@@ -95,6 +96,7 @@ namespace Phases
             public const byte ObjectId = 0x61;
             public const byte ObjectName = 0x62;
             public const byte ObjectDescription = 0x63;
+            public const byte ObjectLargeDescription = 0x64;
 
             //Object specific parameters
             public const byte StringValue = 0x70;    //Lenght; bytes
@@ -161,9 +163,9 @@ namespace Phases
             return BitConverter.GetBytes(id);
         }
 
-        public static bool DeserializeId(byte[] data, ref int index, ref int id)
+        public static bool DeserializeId(byte[] data, ref int index, out int id)
         {
-            if (index >= data.Length) return false;
+            if (index >= data.Length) { id = 0; return false; }
             id = BitConverter.ToInt32(data, index);
             index += 4;
             return true;
@@ -300,9 +302,9 @@ namespace Phases
             return data.ToArray();
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref string value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out string value)
         {
-            if (data[index] != Serialization.Token.StringValue) return false;
+            if (data[index] != Serialization.Token.StringValue) { value = null; return false; }
             index++;
             int len = BitConverter.ToInt16(data, index);
             index += 2;
@@ -341,81 +343,81 @@ namespace Phases
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref byte value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out byte value)
         {
-            if (data[index] != Serialization.Token.ByteValue) return false;
+            if (data[index] != Serialization.Token.ByteValue) { value = 0; return false; }
             index++;
             value = data[index];
             index++;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref int value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out int value)
         {
-            if (data[index] != Serialization.Token.IntValue) return false;
+            if (data[index] != Serialization.Token.IntValue) { value = 0; return false; }
             index++;
             value = BitConverter.ToInt32(data, index);
             index += 4;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref float value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out float value)
         {
-            if (data[index] != Serialization.Token.FloatValue) return false;
+            if (data[index] != Serialization.Token.FloatValue) { value = 0; return false; }
             index++;
             value = BitConverter.ToSingle(data, index);
             index += 4;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref double value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out double value)
         {
-            if (data[index] != Serialization.Token.DoubleValue) return false;
+            if (data[index] != Serialization.Token.DoubleValue) { value = 0; return false; }
             index++;
             value = BitConverter.ToDouble(data, index);
             index += 8;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref Point value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out Point value)
         {
-            if (data[index] != Serialization.Token.PointValue) return false;
+            if (data[index] != Serialization.Token.PointValue) { value = Point.Empty; return false; }
             index++;
             value = new Point(BitConverter.ToInt32(data, index), BitConverter.ToInt32(data, index + 4));
             index += 8;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref PointF value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out PointF value)
         {
-            if (data[index] != Serialization.Token.PointFValue) return false;
+            if (data[index] != Serialization.Token.PointFValue) { value = PointF.Empty; return false; }
             index++;
             value = new PointF(BitConverter.ToSingle(data, index), BitConverter.ToSingle(data, index + 4));
             index += 8;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref Size value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out Size value)
         {
-            if (data[index] != Serialization.Token.SizeValue) return false;
+            if (data[index] != Serialization.Token.SizeValue) { value = Size.Empty; return false; }
             index++;
             value = new Size(BitConverter.ToInt32(data, index), BitConverter.ToInt32(data, index + 4));
             index += 8;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref SizeF value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out SizeF value)
         {
-            if (data[index] != Serialization.Token.SizeFValue) return false;
+            if (data[index] != Serialization.Token.SizeFValue) { value = SizeF.Empty; return false; }
             index++;
             value = new SizeF(BitConverter.ToSingle(data, index), BitConverter.ToSingle(data, index + 4));
             index += 8;
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref Rectangle value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out Rectangle value)
         {
-            if (data[index] != Serialization.Token.RectangleValue) return false;
+            if (data[index] != Serialization.Token.RectangleValue) { value = Rectangle.Empty; return false; }
             index++;
             value = new Rectangle(BitConverter.ToInt32(data, index), BitConverter.ToInt32(data, index + 4),
                 BitConverter.ToInt32(data, index + 8), BitConverter.ToInt32(data, index + 12));
@@ -423,9 +425,9 @@ namespace Phases
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref RectangleF value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out RectangleF value)
         {
-            if (data[index] != Serialization.Token.RectangleFValue) return false;
+            if (data[index] != Serialization.Token.RectangleFValue) { value = RectangleF.Empty; return false; }
             index++;
             value = new RectangleF(BitConverter.ToSingle(data, index), BitConverter.ToSingle(data, index + 4),
                 BitConverter.ToSingle(data, index + 8), BitConverter.ToSingle(data, index + 12));
@@ -433,9 +435,9 @@ namespace Phases
             return true;
         }
 
-        public static bool DeserializeParameter(byte[] data, ref int index, ref DateTime value)
+        public static bool DeserializeParameter(byte[] data, ref int index, out DateTime value)
         {
-            if (data[index] != Serialization.Token.DateTime) return false;
+            if (data[index] != Serialization.Token.DateTime) { value = DateTime.MinValue; return false; }
             index++;
             value = DateTime.FromBinary(BitConverter.ToInt64(data, index));
             index += 8;

@@ -11,33 +11,36 @@ using Phases.Actions;
 using Phases.Importers;
 using Phases.Importers.StateCad;
 using Phases.Utils;
+using System.IO;
+using Phases.CodeGeneration;
 
 namespace Phases
 {
-    class PhasesBook: IDisposable
+    class PhasesBook: IMachineModel, IDisposable
     {
         public const string ChildSheetNamePrefix = "Sheet";
+        public const string ModelSheetNamePrefix = "Model";
         public const int FileVersion = 2;
 
-        private AppInterface controls;
-        private List<DrawingSheet> sheets;
-        public List<IGlobal> Globals { get; private set; }
-        private VariableCollection variables;
-        public List<RecordableAction> Actions;
+        private Protected Protected;
         private int ActionIndex = 0, SavedIndex = 0;
+
+        private AppInterface controls;
+        public List<RecordableAction> Actions;
         public string Language { get; set; } = "";
         public string ScriptsFolder { get; set; } = "";
+        public string TargetLanguage { get; set; } = "";
         public string ExecAfter { get; set; } = "";
-        private Protected Protected;
+        public GeneratorData BuildData { get; set; }
 
         public PhasesBook(AppInterface appInterface, Size size) //, MouseTool mouseTool)
         {
-            variables = new VariableCollection(this);
-            sheets = new List<DrawingSheet>();
+            Variables = new VariableCollection(this);
+            Sheets = new List<DrawingSheet>();
             Actions = new List<RecordableAction>();
             Globals = new List<IGlobal>();
             defaultNewSheetSize = size;
-            activeSheet = new DrawingSheet(this, "Main Sheet", defaultNewSheetSize, Constants.ImageIndex.Sheet);
+            activeSheet = new GlobalSheet(this, "Main Sheet", defaultNewSheetSize, Constants.ImageIndex.MainSheet);
             controls = appInterface;
             Protected = new Protected();
 
@@ -46,29 +49,13 @@ namespace Phases
             AddSheet(activeSheet);
         }
 
-        public VariableCollection Variables
-        {
-            get
-            {
-                return variables;
-            }
-        }
+        public VariableCollection Variables { get; private set; }
+        public List<IGlobal> Globals { get; private set; }
+        public List<DrawingSheet> Sheets { get; private set; }
+        public List<GlobalSheet> GlobalSheets => Sheets.FindAll(sh => sh is GlobalSheet).ConvertAll(sh => sh as GlobalSheet);
+        public List<ModelSheet> Models => Sheets.FindAll(sh => sh is ModelSheet).ConvertAll(sh => sh as ModelSheet);
 
-        public List<DrawingSheet> Sheets
-        {
-            get
-            {
-                return sheets;
-            }
-        }
-
-        public DrawingSheet MainSheet
-        {
-            get
-            {
-                return sheets[0];
-            }
-        }
+        public DrawingSheet MainSheet => Sheets.First();
 
         private DrawingSheet activeSheet;
         public DrawingSheet SelectedSheet
@@ -79,7 +66,7 @@ namespace Phases
             }
             set
             {
-                if (!sheets.Contains(value)) throw new Exception("Non founded sheet.");
+                if (!Sheets.Contains(value)) throw new Exception("Non founded sheet.");
                 activeSheet = value;
             }
         }
@@ -101,13 +88,22 @@ namespace Phases
         {
             sheet.sheetTree.Tag = sheet;
             controls.view.Nodes.Add(sheet.sheetTree);
-            sheets.Add(sheet);
+            Sheets.Add(sheet);
         }
 
         public DrawingSheet CreateChildSheet()
         {
             string sheetName = NextChildSheetName(ChildSheetNamePrefix);
-            var sheet = new DrawingSheet(this, sheetName, defaultNewSheetSize);
+            var sheet = new GlobalSheet(this, sheetName, defaultNewSheetSize);
+            AddSheet(sheet);
+            //Actions.Add(new SheetAction(RecordableAction.ActionTypes.AddSheet, sheet.Serialize()));
+            //ActionIndex++;
+            return sheet;
+        }
+        public DrawingSheet CreateModel()
+        {
+            string sheetName = NextChildSheetName(ModelSheetNamePrefix);
+            var sheet = new ModelSheet(this, sheetName, defaultNewSheetSize);
             AddSheet(sheet);
             //Actions.Add(new SheetAction(RecordableAction.ActionTypes.AddSheet, sheet.Serialize()));
             //ActionIndex++;
@@ -119,21 +115,31 @@ namespace Phases
             //Actions.Add(new SheetAction(RecordableAction.ActionTypes.DeleteSheet, SelectedSheet.Serialize()));
             //ActionIndex++;
             controls.view.Nodes.Remove(SelectedSheet.sheetTree);
-            sheets.Remove(SelectedSheet);
+            Sheets.Remove(SelectedSheet);
             controls.view.SelectedNode = controls.view.Nodes[0];
         }
 
         private string NextChildSheetName(string prefix)
         {
             int i = 1;
-            while (sheets.Exists(sh => sh.Name == prefix + i)) i++;
+            while (Sheets.Exists(sh => sh.Name == prefix + i)) i++;
             return prefix + i;
+        }
+
+        public List<DrawableObject> GetFullObjectsList()
+        {
+            var list = new List<DrawableObject>();
+            foreach (DrawingSheet sheet in Sheets)
+            {
+                list.AddRange(sheet.Sketch.Objects);
+            }
+            return list;
         }
 
         public string NextObjectName(string prefix)
         {
             int i = 1;
-            while (sheets.Exists(sh => sh.draw.Objects.Exists(obj => obj.Name == prefix + i)))
+            while (Sheets.Exists(sh => sh is GlobalSheet && sh.Sketch.Objects.Exists(obj => obj.Name == prefix + i)))
             {
                 i++;
             }
@@ -143,7 +149,7 @@ namespace Phases
         public string NextObjectName(string prefix, List<DrawableObject> list)
         {
             int i = 1;
-            while (sheets.Exists(sh => sh.draw.Objects.Exists(obj => obj.Name == prefix + i)) || list.Exists(obj => obj.Name == prefix + i))
+            while (Sheets.Exists(sh => sh.Sketch.Objects.Exists(obj => obj.Name == prefix + i)) || list.Exists(obj => obj.Name == prefix + i))
             {
                 i++;
             }
@@ -153,21 +159,11 @@ namespace Phases
         public bool ExistsName(string name)
         {
             if (Variables.All.Exists(obj => obj.Name == name)) return true;
-            foreach(DrawingSheet sheet in Sheets)
-            {
-                if (sheet.draw.Objects.Exists(obj => obj.Name == name)) return true;
-            }
-            return false;
-        }
-
-        public List<DrawableObject> GetFullObjectsList()
-        {
-            var list = new List<DrawableObject>();
             foreach (DrawingSheet sheet in Sheets)
             {
-                list.AddRange(sheet.draw.Objects);
+                if (sheet is GlobalSheet && sheet.Sketch.Objects.Exists(obj => obj.Name == name)) return true;
             }
-            return list;
+            return false;
         }
 
         #region "Actions undo/redo"
@@ -175,6 +171,12 @@ namespace Phases
         public void VariablesChanged(byte[] before)
         {
             VariablesAction action = new VariablesAction(RecordableAction.ActionTypes.VariablesChanged, before, Variables.Serialize());
+            Actions.Add(action);
+            ActionIndex++;
+        }
+        public void ModelVariablesChanged(byte[] before)
+        {
+            VariablesAction action = new VariablesAction(RecordableAction.ActionTypes.ModelVariablesChanged, before, Variables.Serialize());
             Actions.Add(action);
             ActionIndex++;
         }
@@ -224,7 +226,7 @@ namespace Phases
             }
             //Create the action object
             var action = new DrawAction(actionType, sheet, changingObjects, selectedObjects, focusIndex);
-            sheet.draw.PerformAction(action);
+            sheet.Sketch.PerformAction(action);
             //Add new action
             Actions.Add(action);
             ActionIndex++;
@@ -238,7 +240,7 @@ namespace Phases
             if (action is DrawAction daction)
             {
                 controls.view.SelectedNode = daction.Sheet.sheetTree;
-                SelectedSheet.draw.Undo(mouse, daction);
+                SelectedSheet.Sketch.Undo(mouse, daction);
             }
             else if (action is VariablesAction vaction)
             {
@@ -273,7 +275,7 @@ namespace Phases
             if (action is DrawAction daction)
             {
                 SelectedSheet = daction.Sheet;
-                SelectedSheet.draw.Redo(mouse, daction);
+                SelectedSheet.Sketch.Redo(mouse, daction);
             }
             else if (action is VariablesAction vaction)
             {
@@ -324,10 +326,10 @@ namespace Phases
             data.Add(Serialization.Token.EndBookInformation);
 
             //Serialize book variables
-            data.AddRange(variables.Serialize());
+            data.AddRange(Variables.Serialize());
 
             //Serialize sheets
-            foreach (DrawingSheet sheet in sheets)
+            foreach (DrawingSheet sheet in Sheets)
             {
                 data.AddRange(sheet.Serialize());
             }
@@ -357,7 +359,7 @@ namespace Phases
         public bool Deserialize(byte[] data)
         {
             if (data.Length < 7) return false;
-            if (sheets.Count != 1) return false;
+            if (Sheets.Count != 1) return false;
             DrawingSheet sheet;
             int index = 0, fileVersion = 0, idx = 0;
             string str = "";
@@ -386,7 +388,7 @@ namespace Phases
 
             //File and file version
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.StartFile)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref fileVersion)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out fileVersion)) return false;
             switch (fileVersion)
             {
                 case 1:
@@ -395,7 +397,7 @@ namespace Phases
                     idx = index;
                     if (Serialization.Token.Deserialize(data, ref index, Serialization.Token.CodeGenerationLanguage))
                     {
-                        if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
+                        if (!Serialization.DeserializeParameter(data, ref index, out str)) return false;
                         Language = str;
                     }
                     else
@@ -406,8 +408,17 @@ namespace Phases
                     idx = index;
                     if (Serialization.Token.Deserialize(data, ref index, Serialization.Token.CodeGenerationFolder))
                     {
-                        if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
+                        if (!Serialization.DeserializeParameter(data, ref index, out str)) return false;
                         ScriptsFolder = str;
+                        string folderName = Path.GetFileName(str);
+                        if (folderName.EndsWith(".cottle"))
+                        {
+                            TargetLanguage = folderName.Substring(0, folderName.Length - 7);
+                        }
+                        else
+                        {
+                            TargetLanguage = folderName;
+                        }
                     }
                     else
                     {
@@ -417,7 +428,7 @@ namespace Phases
                     idx = index;
                     if (Serialization.Token.Deserialize(data, ref index, Serialization.Token.CodeGenerationExec))
                     {
-                        if (!Serialization.DeserializeParameter(data, ref index, ref str)) return false;
+                        if (!Serialization.DeserializeParameter(data, ref index, out str)) return false;
                         ExecAfter = "";
                     }
                     else
@@ -436,16 +447,26 @@ namespace Phases
             if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.EndBookInformation)) return false;
 
             //Deserialize variables
-            if (!variables.Deserialize(data, ref index)) return false;
+            if (!Variables.Deserialize(data, ref index)) return false;
 
             //Main sheet definition
-            if (!Serialization.Token.Is(data, index, Serialization.Token.StartSheetDefinition)) return false;
+            if (!Serialization.Token.Deserialize(data, ref index, Serialization.Token.StartSheetDefinition)) return false;
             if(!activeSheet.Deserialize(data, ref index)) return false;
 
             //Sheets definitions
             while (Serialization.Token.Is(data, index, Serialization.Token.StartSheetDefinition))
             {
-                sheet = CreateChildSheet();
+                switch (DrawingSheet.DeserializeSheetType(data, ref index))
+                {
+                    case DrawingSheet.SheetTypes.Global:
+                        sheet = CreateChildSheet();
+                        break;
+                    case DrawingSheet.SheetTypes.Model:
+                        sheet = CreateModel();
+                        break;
+                    default:
+                        return false;
+                }
                 if (!sheet.Deserialize(data, ref index)) return false;
             }
 
@@ -457,7 +478,7 @@ namespace Phases
                 string name = "";
                 while (Serialization.Token.Deserialize(data, ref index, Serialization.Token.ObjectName))
                 {
-                    Serialization.DeserializeParameter(data, ref index, ref name);
+                    Serialization.DeserializeParameter(data, ref index, out name);
                     if (!list.Exists(obj => obj.Name == name)) return false;
                     var gobj = list.Find(obj => obj.Name == name) as IGlobal;
                     if (!prioList.Contains(gobj))
@@ -478,7 +499,7 @@ namespace Phases
             {
                 data[i] ^= 0x80;
             }
-            StateCadImporter importer = new StateCadImporter(Encoding.Default.GetString(data), MainSheet.draw, 4f);
+            StateCadImporter importer = new StateCadImporter(Encoding.Default.GetString(data), MainSheet.Sketch, 4f);
             Dictionary<int, DrawableObject> list = new Dictionary<int, DrawableObject>();
 
             Rectangle sheet = importer.DrawArea;
@@ -556,7 +577,7 @@ namespace Phases
 
         public void Dispose()
         {
-            foreach(DrawingSheet sheet in sheets)
+            foreach(DrawingSheet sheet in Sheets)
             {
                 sheet.Dispose();
             }

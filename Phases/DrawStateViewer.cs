@@ -33,11 +33,11 @@ namespace Phases
             fDraw.SetViewToPosition(pDraw, Point.Empty, ShadowTransform);
             fDraw.SetViewToPosition(pSelection, Point.Empty, ShadowTransform);
 
-            foreach (DrawableObject obj in book.SelectedSheet.draw.Shadow)
+            foreach (DrawableObject obj in book.SelectedSheet.Sketch.Shadow)
             {
                 dgShadow.Rows.Add(obj.Name, obj.ObjNumber, obj.zInstance);
             }
-            foreach (DrawableObject obj in book.SelectedSheet.draw.Objects)
+            foreach (DrawableObject obj in book.SelectedSheet.Sketch.Objects)
             {
                 dgDraw.Rows.Add(obj.Name, obj.ObjNumber, obj.zInstance);
             }
@@ -53,7 +53,7 @@ namespace Phases
             e.Graphics.Transform = ShadowTransform;
 
             //Drawing objects
-            foreach (DrawableObject obj in book.SelectedSheet.draw.Shadow)
+            foreach (DrawableObject obj in book.SelectedSheet.Sketch.Shadow)
             {
                 obj.Draw(e.Graphics, ShadowScale);
             }
@@ -65,7 +65,7 @@ namespace Phases
             e.Graphics.Transform = ShadowTransform;
 
             //Drawing objects
-            foreach (DrawableObject obj in book.SelectedSheet.draw.Objects)
+            foreach (DrawableObject obj in book.SelectedSheet.Sketch.Objects)
             {
                 obj.Draw(e.Graphics, ShadowScale);
             }
@@ -88,7 +88,7 @@ namespace Phases
             dgDraw.ClearSelection();
             dgSelection.ClearSelection();
             if (dgShadow.SelectedRows.Count == 0) return;
-            propertyGrid1.SelectedObject = book.SelectedSheet.draw.Shadow[dgShadow.SelectedRows[0].Index];
+            propertyGrid1.SelectedObject = book.SelectedSheet.Sketch.Shadow[dgShadow.SelectedRows[0].Index];
         }
 
         private void dgDraw_Click(object sender, EventArgs e)
@@ -96,7 +96,7 @@ namespace Phases
             dgShadow.ClearSelection();
             dgSelection.ClearSelection();
             if (dgDraw.SelectedRows.Count == 0) return;
-            propertyGrid1.SelectedObject = book.SelectedSheet.draw.Objects[dgDraw.SelectedRows[0].Index];
+            propertyGrid1.SelectedObject = book.SelectedSheet.Sketch.Objects[dgDraw.SelectedRows[0].Index];
         }
 
         private void dgSelection_Click(object sender, EventArgs e)

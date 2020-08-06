@@ -10,6 +10,14 @@ namespace Phases.DrawableObjects
 {
     abstract class Transition : DrawableObject
     {
+        public enum PriorityDrawModes
+        {
+            NoDraw,
+            DrawInner,
+            DrawOuter
+        }
+        static PriorityDrawModes PriorityDrawMode { get; set; } = PriorityDrawModes.DrawInner;
+        public static Font priorityFont = new Font("Arial", 6f);
         static Pen guides = new Pen(Color.LightGray);
         
         private Point[] points;
@@ -92,6 +100,9 @@ namespace Phases.DrawableObjects
                 }
             }
         }
+        // Temporary value whe opening the file
+        private int priority;
+        internal int SavedPriority => priority;
 
         public Transition(DrawableCollection ownerDraw, Point[] splinePoints, DrawableObject startObject)
             : base(ownerDraw)
@@ -184,6 +195,98 @@ namespace Phases.DrawableObjects
                 g.DrawLine(new Pen(brush), TextPoint.X - width, TextPoint.Y - 1, TextPoint.X + width, TextPoint.Y - 1);
             }
             g.DrawString(Text, font, brush, TextPoint, TextFormat);
+            DrawPriority(g, brush);
+        }
+
+        protected void DrawPriority(Graphics g, Brush brush)
+        {
+            if (startObject == null) return;
+            StringFormat textFormat = new StringFormat();
+
+            PriorityDrawModes drawMode = StartObject is Alias || StartObject is StateAlias ? PriorityDrawModes.DrawOuter : PriorityDrawModes.DrawInner;
+            if (drawMode == PriorityDrawModes.DrawInner)
+            {
+                int position = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 8 / (2 * Math.PI));
+                // Horizontal aligment
+                switch (position)
+                {
+                    case 0:
+                    case 8:
+                    case 4:
+                        textFormat.Alignment = StringAlignment.Center;
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                        textFormat.Alignment = StringAlignment.Far;
+                        break;
+                    case 5:
+                    case 6:
+                    case 7:
+                        textFormat.Alignment = StringAlignment.Near;
+                        break;
+                }
+                // Vertical aligment
+                switch (position)
+                {
+                    case 7:
+                    case 8:
+                    case 0:
+                    case 1:
+                        textFormat.LineAlignment = StringAlignment.Near;
+                        break;
+                    case 2:
+                    case 6:
+                        textFormat.LineAlignment = StringAlignment.Center;
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                        textFormat.LineAlignment = StringAlignment.Far;
+                        break;
+                }
+                //g.DrawString(position.ToString(), font, brush, StartPoint, textFormat);
+            }
+            else
+            {
+                int hposition = (int)Math.Floor((StartAngle + 1 * Math.PI / 2) * 10 / (2 * Math.PI));
+                // Horizontal aligment
+                switch (hposition)
+                {
+                    case 0:
+                    case 4:
+                    case 7:
+                        textFormat.Alignment = StringAlignment.Far;
+                        break;
+                    case 1:
+                    case 3:
+                    case 6:
+                    case 8:
+                        textFormat.Alignment = StringAlignment.Center;
+                        break;
+                    case 2:
+                    case 5:
+                    case 9:
+                        textFormat.Alignment = StringAlignment.Near;
+                        break;
+                }
+
+                // Vertical aligment
+                int vposition = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 2 / (2 * Math.PI));
+                switch (vposition)
+                {
+                    case 0:
+                    case 2:
+                        textFormat.LineAlignment = StringAlignment.Far;
+                        break;
+                    case 1:
+                        textFormat.LineAlignment = StringAlignment.Near;
+                        break;
+                }
+                //g.DrawString(hposition.ToString(), font, brush, StartPoint, textFormat);
+                //g.DrawString(vposition.ToString(), font, brush, StartPoint, textFormat);
+            }
+            g.DrawString(Priority.ToString(), priorityFont, brush, StartPoint, textFormat);
         }
 
         public override void DrawSimulationMark(Graphics g)
@@ -498,17 +601,16 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[0])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[1])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[2])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref points[3])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref textPointOffset)) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref maxDist[0])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref maxDist[1])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref StartAngle)) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, ref EndAngle)) return false;
-            int priority = 0;
-            if (!Serialization.DeserializeParameter(data, ref index, ref priority)) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[0])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[1])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[2])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out points[3])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out textPointOffset)) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out maxDist[0])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out maxDist[1])) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out StartAngle)) return false;
+            if(!Serialization.DeserializeParameter(data, ref index, out EndAngle)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out priority)) return false;
             return true;
         }
 

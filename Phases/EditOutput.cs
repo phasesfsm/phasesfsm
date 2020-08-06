@@ -189,10 +189,12 @@ namespace Phases
                 {
                     case VariableCollection.ImageIndex.EventOutput:
                     case VariableCollection.ImageIndex.MessageFlag:
+                    case VariableCollection.ImageIndex.EventInput:
                         if (indexOption.Option == 0) str.Insert(0, '»');
                         break;
                     case VariableCollection.ImageIndex.BooleanOutput:
                     case VariableCollection.ImageIndex.BooleanFlag:
+                    case VariableCollection.ImageIndex.BooleanInput:
                         if (indexOption.Option == 2) str.Insert(0, '!');
                         if (indexOption.Option == 3) str.Insert(0, '~');
                         break;
@@ -234,6 +236,7 @@ namespace Phases
                 {
                     case VariableCollection.ImageIndex.BooleanOutput:
                     case VariableCollection.ImageIndex.BooleanFlag:
+                    case VariableCollection.ImageIndex.BooleanInput:
                         option = 2;
                         break;
                 }
@@ -246,6 +249,7 @@ namespace Phases
                 {
                     case VariableCollection.ImageIndex.BooleanOutput:
                     case VariableCollection.ImageIndex.BooleanFlag:
+                    case VariableCollection.ImageIndex.BooleanInput:
                         option = 3;
                         break;
                 }
@@ -258,6 +262,7 @@ namespace Phases
                 {
                     case VariableCollection.ImageIndex.EventOutput:
                     case VariableCollection.ImageIndex.MessageFlag:
+                    case VariableCollection.ImageIndex.EventInput:
                         option = 0;
                         break;
                 }
@@ -313,6 +318,7 @@ namespace Phases
                 {
                     case VariableCollection.ImageIndex.BooleanFlag:
                     case VariableCollection.ImageIndex.BooleanOutput:
+                    case VariableCollection.ImageIndex.BooleanInput:
                         option = 1;
                         break;
                 }
@@ -328,14 +334,14 @@ namespace Phases
             switch (index)
             {
                 case VariableCollection.ImageIndex.BooleanOutput:
+                case VariableCollection.ImageIndex.BooleanFlag:
+                case VariableCollection.ImageIndex.BooleanInput:
                     option = 1;
                     break;
                 case VariableCollection.ImageIndex.EventOutput:
                 case VariableCollection.ImageIndex.MessageFlag:
+                case VariableCollection.ImageIndex.EventInput:
                     option = 0;
-                    break;
-                case VariableCollection.ImageIndex.BooleanFlag:
-                    option = 1;
                     break;
                 case VariableCollection.ImageIndex.CounterFlag:
                     option = 4;
@@ -354,10 +360,12 @@ namespace Phases
                 {
                     case VariableCollection.ImageIndex.BooleanFlag:
                     case VariableCollection.ImageIndex.BooleanOutput:
+                    case VariableCollection.ImageIndex.BooleanInput:
                         SetOptions(false, true, true, true);
                         break;
                     case VariableCollection.ImageIndex.EventOutput:
                     case VariableCollection.ImageIndex.MessageFlag:
+                    case VariableCollection.ImageIndex.EventInput:
                         SetOptions(true);
                         break;
                     case VariableCollection.ImageIndex.CounterFlag:

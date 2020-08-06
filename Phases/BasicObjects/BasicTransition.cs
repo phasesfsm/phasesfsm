@@ -40,11 +40,16 @@ namespace Phases.BasicObjects
                 OperationType operation = LexicalRules.GetOutputOperation(outputAction);
                 if (Transition.OwnerDraw.OwnerSheet.OwnerBook.Variables.InternalOutputs.FirstOrDefault(output => output.Name == outputName) is IInternalOutput ioutput)
                 {
-                    Outputs.Add(new BasicOutput(operation, ioutput));
+                    Outputs.Add(new BasicOutput(operation, ioutput as Variable));
                 }
             }
-            Source = tree.UsedObjects[Transition.StartObject];
-            if(Transition.StartObject.Father == null)
+            if (Transition.StartObject is Alias alias)
+                Source = tree.UsedObjects[alias.Pointing];
+            else if (Transition.StartObject is StateAlias salias)
+                Source = tree.UsedObjects[salias.Pointing];
+            else
+                Source = tree.UsedObjects[Transition.StartObject];
+            if (Transition.StartObject.Father == null)
             {
                 TimerName = Util.CounterName(tree.Root.Name);
             }

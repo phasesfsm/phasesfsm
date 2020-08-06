@@ -18,6 +18,7 @@ namespace Phases.CodeGeneration
     {
         //Lists of procesed objects
         public List<DrawingSheet> UsedSheets { get; private set; }
+        public List<ModelSheet> UsedModels { get; private set; }
         public List<DrawableObject> ObjectsTable { get; private set; }
         public List<BasicRelation> RelationsList { get; private set; }
         public List<BasicEquation> EquationsList { get; private set; }
@@ -113,6 +114,7 @@ namespace Phases.CodeGeneration
         private void BuildObjectsTable()
         {
             UsedSheets = new List<DrawingSheet>();
+            UsedModels = new List<ModelSheet>();
             TransitionsList = new List<Transition>();
             ObjectsTable = new List<DrawableObject>();
             RelationsList = new List<BasicRelation>();
@@ -120,13 +122,13 @@ namespace Phases.CodeGeneration
             MessagesList = new List<CheckMessage>();
 
             //check for objects
-            if (Book.MainSheet.draw.Objects.Count == 0)
+            if (Book.MainSheet.Sketch.Objects.Count == 0)
             {
-                MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "No objects to check.", null));
+                MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "The current diagram does not represent a valid state machine.", null));
                 return;
             }
             //get only used objects from main sheet
-            GetUsedObjects(Book.MainSheet);
+            Book.GlobalSheets.ForEach(gsh => GetUsedObjects(gsh, Book.Variables));
         }
 
         private void CheckObjectsInterMachines()
@@ -155,7 +157,7 @@ namespace Phases.CodeGeneration
                 if (trans is SimpleTransition strans)
                 {
                     lexAnalyzer.Source = strans.Condition;
-                    syntaxAnalyzer = new SyntaxAnalyzer(lexAnalyzer, Book.Variables.ConditionalVariables);
+                    syntaxAnalyzer = new SyntaxAnalyzer(lexAnalyzer, VariableCollection.GetConditionDictionary(trans.OwnerDraw.OwnerSheet).Keys.ToList());
                     foreach (SyntaxToken token in syntaxAnalyzer.Tokens)
                     {
                         if (token.Qualifier != SyntaxToken.Qualifiers.Correct)
@@ -166,7 +168,7 @@ namespace Phases.CodeGeneration
                     foreach (string outputOperation in strans.OutputsList)
                     {
                         string outputName = LexicalRules.GetOutputId(outputOperation);
-                        if (!Book.Variables.InternalOutputs.Exists(output => output.Name == outputName))
+                        if (!trans.OwnerDraw.OwnerSheet.Variables.InternalOutputs.Exists(output => output.Name == outputName))
                         {
                             MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Output " + outputName + " is not defined in variables list.", trans));
                         }
@@ -177,20 +179,20 @@ namespace Phases.CodeGeneration
             {
                 if (obj is State state)
                 {
-                    //state.EnterOutputsList.RemoveAll(str => !Book.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(str)));
+                    //state.EnterOutputsList.RemoveAll(str => !state.OwnerDraw.OwnerSheet.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(str)));
                     foreach (string outputOperation in state.EnterOutputsList)
                     {
                         string outputName = LexicalRules.GetOutputId(outputOperation);
-                        if (!Book.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(outputName)))
+                        if (!state.OwnerDraw.OwnerSheet.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(outputName)))
                         {
                             MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Output " + outputName + " is not defined in variables list.", state));
                         }
                     }
-                    //state.ExitOutputsList.RemoveAll(str => !Book.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(str)));
+                    //state.ExitOutputsList.RemoveAll(str => !state.OwnerDraw.OwnerSheet.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(str)));
                     foreach (string outputOperation in state.ExitOutputsList)
                     {
                         string outputName = LexicalRules.GetOutputId(outputOperation);
-                        if (!Book.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(outputName)))
+                        if (!state.OwnerDraw.OwnerSheet.Variables.InternalOutputs.Exists(var => var.Name == LexicalAnalyzer.GetId(outputName)))
                         {
                             MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Output " + outputName + " is not defined in variables list.", state));
                         }
@@ -234,22 +236,23 @@ namespace Phases.CodeGeneration
             }
         }
 
-        private void GetUsedObjects(DrawingSheet sheet)
+        private void GetUsedObjects(DrawingSheet sheet, VariableCollection variables)
         {
-            UsedSheets.Add(sheet);
-            foreach (DrawableObject obj in sheet.draw.Objects)
+            if (sheet is ModelSheet model) UsedModels.Add(model);
+            else UsedSheets.Add(sheet);
+            foreach (DrawableObject obj in sheet.Sketch.Objects)
             {
                 if(obj is Relation indir)
                 {
-                    IIndirectInput input = Variables.IndirectInputs.FirstOrDefault(ii => ii.Name == indir.Trigger);
-                    IInternalOutput output = Variables.IndirectOutputs.FirstOrDefault(io => io.Name == indir.Output);
+                    Variable input = VariableCollection.GetIndirectInput(sheet, indir.Trigger);
+                    Variable output = VariableCollection.GetIndirectOutput(sheet, indir.Output);
                     if(input == null)
                     {
                         MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Relation trigger variable not found.", indir));
                     }
                     if(output == null)
                     {
-                        MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Relation trigger variable not found.", indir));
+                        MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Relation output variable not found.", indir));
                     }
                     if(input != null && output != null)
                     {
@@ -272,7 +275,7 @@ namespace Phases.CodeGeneration
                 }
                 else if(obj is Equation eq)
                 {
-                    IInternalOutput output = Variables.IndirectOutputs.FirstOrDefault(io => io.Name == eq.AssignTo);
+                    IInternalOutput output = variables.IndirectOutputs.FirstOrDefault(io => io.Name == eq.AssignTo);
                     if (output == null)
                     {
                         MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Relation trigger variable not found.", eq));
@@ -284,7 +287,7 @@ namespace Phases.CodeGeneration
                     LexicalAnalyzer lexAnalyzer = new LexicalAnalyzer();
                     SyntaxAnalyzer syntaxAnalyzer;
                     lexAnalyzer.Source = eq.Operation;
-                    syntaxAnalyzer = new SyntaxAnalyzer(lexAnalyzer, Book.Variables.ConditionalVariables);
+                    syntaxAnalyzer = new SyntaxAnalyzer(lexAnalyzer, VariableCollection.GetConditionDictionary(eq.OwnerDraw.OwnerSheet).Keys.ToList());
                     foreach (SyntaxToken token in syntaxAnalyzer.Tokens)
                     {
                         if (token.Qualifier != SyntaxToken.Qualifiers.Correct)
@@ -338,12 +341,11 @@ namespace Phases.CodeGeneration
                         case Nested nested:
                             if (nested.PointingTo != "")
                             {
-                                if (Book.Sheets.Exists(sh => sh.Name == nested.PointingTo))
+                                if (Book.Models.Exists(sh => sh.Name == nested.PointingTo))
                                 {
-                                    DrawingSheet sht = Book.Sheets.First(sh => sh.Name == nested.PointingTo);
-                                    if (!UsedSheets.Contains(sht))
+                                    if (!UsedModels.Contains(nested.PointedSheet))
                                     {
-                                        GetUsedObjects(sht);
+                                        GetUsedObjects(nested.PointedSheet, nested.PointedSheet.Variables);
                                     }
                                 }
                                 else
@@ -359,7 +361,7 @@ namespace Phases.CodeGeneration
                         case Alias alias:
                             if (alias.PointingTo != "")
                             {
-                                if (!sheet.draw.States.Exists(state => state.Name == alias.PointingTo))
+                                if (!sheet.Sketch.States.Exists(state => state.Name == alias.PointingTo))
                                 {
                                     MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Alias state is pointing to an unexistent state.", alias));
                                 }
@@ -372,7 +374,7 @@ namespace Phases.CodeGeneration
                         case StateAlias alias:
                             if (alias.PointingTo != "")
                             {
-                                if (!sheet.draw.States.Exists(state => state.Name == alias.PointingTo))
+                                if (!sheet.Sketch.States.Exists(state => state.Name == alias.PointingTo))
                                 {
                                     MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Alias state is pointing to an unexistent state.", alias));
                                 }
@@ -397,7 +399,7 @@ namespace Phases.CodeGeneration
                         case State state:
                             if (state.OutTransitions.Count() == 0)
                             {
-                                //MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Warning, string.Format("State '{0}' does not have out transitions.", state.Name), state));
+                                MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Warning, string.Format("State '{0}' does not have out transitions.", state.Name), state));
                             }
                             break;
                     }

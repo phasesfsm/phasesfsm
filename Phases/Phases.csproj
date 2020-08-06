@@ -145,6 +145,24 @@
     <Compile Include="CodeGeneratorConfig.Designer.cs">
       <DependentUpon>CodeGeneratorConfig.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\DualTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DualTextBox.Designer.cs">
+      <DependentUpon>DualTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DualTextBox\ActionsManager.cs" />
+    <Compile Include="Controls\DualTextBox\Format\BaseFormat.cs" />
+    <Compile Include="Controls\DualTextBox\Format\GroupsFormat.cs" />
+    <Compile Include="Controls\DualTextBox\Format\KeywordsFormat.cs" />
+    <Compile Include="Controls\DualTextBox\Format\TextFormat.cs" />
+    <Compile Include="Controls\DualTextBox\Format\TextFormatter.cs" />
+    <Compile Include="Controls\DualTextBox\TextAction.cs" />
+    <Compile Include="Controls\DualTextBox\TextCursor.cs" />
+    <Compile Include="Controls\DualTextBox\TextView.cs" />
+    <Compile Include="Controls\DualTextBox\Text\FormattedChar.cs" />
+    <Compile Include="Controls\DualTextBox\Text\Text.cs" />
+    <Compile Include="Controls\DualTextBox\Text\TextLine.cs" />
     <Compile Include="Controls\SyncTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -312,6 +330,9 @@
     <Compile Include="Importers\StateCad\Instruction.cs" />
     <Compile Include="Project\AppInterface.cs" />
     <Compile Include="Project\CodeGenerationProfile.cs" />
+    <Compile Include="Project\GlobalSheet.cs" />
+    <Compile Include="Project\IMachineModel.cs" />
+    <Compile Include="Project\ModelSheet.cs" />
     <Compile Include="PropertiesCoverters\ConditionalEditor.cs" />
     <Compile Include="PropertiesCoverters\IndirectActionsList.cs" />
     <Compile Include="PropertiesCoverters\IndirectOutputsList.cs" />
@@ -395,6 +416,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CodeGeneratorConfig.resx">
       <DependentUpon>CodeGeneratorConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DualTextBox.resx">
+      <DependentUpon>DualTextBox.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="CottleConfigForm.resx">
       <DependentUpon>CottleConfigForm.cs</DependentUpon>

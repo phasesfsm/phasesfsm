@@ -21,8 +21,11 @@ namespace Phases.Actions
             Paste,
             PropertyChanged,
             VariablesChanged,
+            ModelVariablesChanged,
             AddSheet,
             DeleteSheet,
+            AddModel,
+            DeleteModel,
             SheetParameterChanged
         }
 

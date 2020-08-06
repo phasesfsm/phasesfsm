@@ -163,9 +163,8 @@ namespace Phases
         {
             Dictionary<int, DrawableObject> objects;
             int index = 0;
-            var date = new DateTime();
 
-            if (!Serialization.DeserializeParameter(data, ref index, ref date)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out DateTime date)) return false;
             if (!DrawableCollection.DeserializeList(draw, data, ref index, out objects)) return false;
 
             Point poffset;
@@ -195,7 +194,7 @@ namespace Phases
             // Changing objects names first to handle state size change separately
             foreach (DrawableObject obj in objects.Values)
             {
-                if (draw.OwnerSheet.OwnerBook.ExistsName(obj.Name))
+                if (draw.OwnerSheet.ExistsName(obj.Name))
                 {
                     obj.Name = NextName(obj.GetFormName(), objects.Values.ToList());
                 }
@@ -318,6 +317,7 @@ namespace Phases
             {
                 if (!list.Contains(trans)) list.Add(trans);
             }
+            if (obj is Alias alias && alias.Pointing != null && !list.Contains(alias.Pointing)) list.Add(alias.Pointing);
             if (obj is State || obj is SuperState)
             {
                 foreach (DrawableObject obj2 in draw.Objects)
@@ -334,10 +334,9 @@ namespace Phases
                 var list = new List<DrawableObject>();
                 foreach (DrawableObject obj in SelectedObjects)
                 {
-                    if (obj is Transition)
+                    if (obj is Transition trans)
                     {
                         if (!list.Contains(obj)) list.Add(obj);
-                        var trans = (Transition)obj;
                         if (trans.StartObject != null) AddChangingObject(ref list, trans.StartObject);
                         if (trans.EndObject != null) AddChangingObject(ref list, trans.EndObject);
                         var shadow = draw.GetShadow(trans);
@@ -350,6 +349,15 @@ namespace Phases
                     }
                     else
                     {
+                        if (obj is Alias alias)
+                        {
+                            Alias alias_sh = draw.GetShadow(alias) as Alias;
+                            if (alias_sh == null || alias.Pointing != alias_sh.Pointing)
+                            {
+                                if (alias_sh != null && alias_sh.Pointing != null && !list.Contains(alias_sh.Pointing)) list.Add(alias_sh.Pointing);
+                                if (alias.Pointing != null && !list.Contains(alias.Pointing)) list.Add(alias.Pointing);
+                            }
+                        }
                         AddChangingObject(ref list, obj);
                     }
                 }
@@ -431,7 +439,7 @@ namespace Phases
         {
             foreach (Transition trans in @object.OutTransitions)
             {
-                if (!SelectedObjects.Contains(trans))
+                if (!SelectedObjects.Contains(trans) && trans.StartObject == @object)
                 {
                     trans.MoveStart(offset);
                 }

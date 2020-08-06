@@ -130,6 +130,26 @@ namespace Phases.DrawableObjects
         [Browsable(false)]
         public State Pointing => pointing as State;
 
+        internal override List<Transition> outTransitions => pointing == null ? base.outTransitions : pointing.outTransitions;
+        internal List<Transition> AliasOutTransitions => base.outTransitions;
+#if DEBUG
+        public Transition[] aliasOutTransitions => base.outTransitions.ToArray();
+#endif
+        protected override void AdjustSize()
+        {
+            Point sizeRef = Point.Empty;
+            ResizeCheck(ref sizeRef, MouseTool.ResizingTypes.Right_Bottom);
+            Resize(sizeRef, MouseTool.ResizingTypes.Right_Bottom);
+            foreach (Transition oTransition in InTransitions)
+            {
+                oTransition.MoveEndTo(PointFromAngle(oTransition.EndAngle));
+            }
+            foreach (Transition oTransition in AliasOutTransitions)
+            {
+                oTransition.MoveStartTo(PointFromAngle(oTransition.StartAngle));
+            }
+        }
+
         public virtual byte[] SerializeRelations()
         {
             var data = new List<byte>();

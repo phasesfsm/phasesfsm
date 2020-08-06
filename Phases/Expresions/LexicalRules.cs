@@ -16,15 +16,18 @@ namespace Phases.Expresions
 
         public static readonly string[] OperatorSymbols = { "&", "^", "|", "=", "!=" };
         public static readonly int[] OperatorsPriority = { 8, 9, 10, 7, 7 };
-        public static readonly string[] PrefixSymbols = { "!", "'", "." };
-        public static readonly string[] SufixSymbols = { };
-        public static readonly string[] OutputPrefixSymbols = { "!", "'", ".", "~", "»" };
-        public static readonly string[] OutputSufixSymbols = { "+", "-" };
+        public static readonly string[] PrefixSymbols = { "!" };
+        public static readonly string[] UnionSymbols = { "." };
+        public static readonly string[] SufixSymbols = { ".max", ".min" };
+        public static readonly string[] OutputPrefixSymbols = { "!", "~", "»" };
+        public static readonly string[] OutputUnionSymbols = { };
+        public static readonly string[] OutputSufixSymbols = { "+", "-", ".max", ".min" };
         public static readonly Predicate<string> ValidOperatorSymbol = str => OperatorSymbols.Contains(str) || PrefixSymbols.Contains(str) || SufixSymbols.Contains(str);
         public static readonly Predicate<string> ValidPrefixSymbol = str => PrefixSymbols.Contains(str);
+        public static readonly Predicate<string> ValidUnionSymbol = str => UnionSymbols.Contains(str);
         public static readonly Predicate<string> ValidSufixSymbol = str => SufixSymbols.Contains(str);
 
-        public static readonly Predicate<char> ValidStartIdExpressionChar = ch => (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_';
+        public static readonly Predicate<char> ValidStartIdExpressionChar = ch => (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_' || ch == '.';
         public static readonly Predicate<char> ValidNumericExpressionChar = ch => ch >= '0' && ch <= '9';
         public static readonly Predicate<char> ValidIdExpressionChar = ch => ValidStartIdExpressionChar(ch) || ValidNumericExpressionChar(ch);
         public static readonly Predicate<char> ValidGroupBeginsChar = ch => ch == GroupBeginsChar;
@@ -62,6 +65,12 @@ namespace Phases.Expresions
                     if (index - startIndex > 0 && ValidPrefixSymbol(text.Substring(startIndex, index - startIndex + 1)))
                     {
                         return Token.Types.PrefixSymbol;
+                    }
+                    break;
+                case Token.Types.UnionSymbol:
+                    if (index - startIndex > 0 && ValidUnionSymbol(text.Substring(startIndex, index - startIndex + 1)))
+                    {
+                        return Token.Types.UnionSymbol;
                     }
                     break;
                 case Token.Types.SufixSymbol:
@@ -132,11 +141,11 @@ namespace Phases.Expresions
             {
                 return OperationType.Send;
             }
-            else if (value.First() == '\'')
+            else if (value.EndsWith(".max"))
             {
                 return OperationType.Maximum;
             }
-            else if (value.First() == '.')
+            else if (value.EndsWith(".min"))
             {
                 return OperationType.Minimum;
             }

@@ -58,7 +58,7 @@ namespace Phases.DrawableObjects
         [Category("Simulation")]
         public bool Track { get; set; } = false;
 
-        protected void AdjustSize()
+        protected virtual void AdjustSize()
         {
             Point sizeRef = Point.Empty;
             ResizeCheck(ref sizeRef, MouseTool.ResizingTypes.Right_Bottom);
@@ -100,16 +100,16 @@ namespace Phases.DrawableObjects
         }
 
         [Category("Transitions")]
-        public Transition[] AllOutTransitions
-        {
-            get
-            {
-                if (Aliases == null) return null;
-                List<Transition> list = new List<Transition>(outTransitions);
-                Aliases.ForEach(alias => list.AddRange(alias.OutTransitions));
-                return list.ToArray();
-            }
-        }
+        public Transition[] AllOutTransitions => OutTransitions;
+        //{
+        //    get
+        //    {
+        //        if (Aliases == null) return null;
+        //        List<Transition> list = new List<Transition>(outTransitions);
+        //        Aliases.ForEach(alias => list.AddRange(alias.OutTransitions));
+        //        return list.ToArray();
+        //    }
+        //}
 
         [Browsable(false)]
         public List<string> EnterOutputsList => enterOutput;
@@ -391,7 +391,6 @@ namespace Phases.DrawableObjects
             State state = (State)obj;
             state.rect = rect;
             state.inTransitions = new List<Transition>(inTransitions);
-            state.outTransitions = new List<Transition>(outTransitions);
             state.enterOutput = enterOutput;
             state.exitOutput = exitOutput;
         }
@@ -419,7 +418,7 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            if (!Serialization.DeserializeParameter(data, ref index, ref rect)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out rect)) return false;
             if (!Serialization.DeserializeParameter(data, ref index, out string[] enterOutputs)) return false;
             enterOutput = new List<string>(enterOutputs);
             if (!Serialization.DeserializeParameter(data, ref index, out string[] exitOutputs)) return false;

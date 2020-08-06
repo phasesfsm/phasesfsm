@@ -47,7 +47,7 @@ namespace Phases.DrawableObjects
                 else
                 {
                     string cond = trigger == TransitionTriggerType.ConditionAndTimeout ? "&" : "|";
-                    up = string.Format("t={0} {1} ({2})", timeout.ToString(), cond, Condition);
+                    up = string.Format("t≥{0} {1} ({2})", timeout.ToString(), cond, Condition);
                 }
                 return up + (Output != "" ? Environment.NewLine + Output : "");
             }
@@ -167,15 +167,13 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            byte bt = 0;
-            string condition = "";
             if (!base.DeserializeObjectSpecifics(data, ref index)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref condition)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out string condition)) return false;
             Condition = condition;
             if (!Serialization.DeserializeParameter(data, ref index, out string[] outputs)) return false;
             output = new List<string>(outputs);
-            if (!Serialization.DeserializeParameter(data, ref index, ref timeout)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref bt)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out timeout)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out byte bt)) return false;
             trigger = (TransitionTriggerType)bt;
             return true;
         }

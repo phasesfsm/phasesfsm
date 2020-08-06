@@ -330,10 +330,9 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            byte bt = 0;
             if (!base.DeserializeObjectSpecifics(data, ref index)) return false;
             //Get parameters
-            if (!Serialization.DeserializeParameter(data, ref index, ref bt)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out byte bt)) return false;
             priority = (NestedPriority)bt;
             return true;
         }

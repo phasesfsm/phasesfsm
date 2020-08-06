@@ -202,7 +202,7 @@ namespace Phases.DrawableObjects
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            if (!Serialization.DeserializeParameter(data, ref index, ref rect)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out rect)) return false;
             return true;
         }
     }

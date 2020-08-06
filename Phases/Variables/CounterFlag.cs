@@ -106,9 +106,9 @@ namespace Phases.Variables
         public override bool Deserialize(byte[] data, ref int index)
         {
             if (!base.Deserialize(data, ref index)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref defaultValue)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref minimumValue)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref maximumValue)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out defaultValue)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out minimumValue)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out maximumValue)) return false;
             return true;
         }
 
@@ -123,7 +123,7 @@ namespace Phases.Variables
             };
         }
 
-        public Value Evaluate(OperationType operation, Value currentValue)
+        public override Value Evaluate(OperationType operation, Value currentValue)
         {
             int value;
             switch (operation)

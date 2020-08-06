@@ -10,7 +10,6 @@ namespace Phases.DrawableObjects
     class Nested : State, INestedState
     {
         public static readonly int SelectionBorderMargin = 5;
-        public string pointing = "";
 
         public Nested(DrawableCollection ownerDraw, Rectangle startRect)
             : base(ownerDraw, startRect)
@@ -37,18 +36,7 @@ namespace Phases.DrawableObjects
             }
         }
 
-        private NestedPriority priority;
-        public NestedPriority Priority
-        {
-            get
-            {
-                return priority;
-            }
-            set
-            {
-                priority = value;
-            }
-        }
+        public NestedPriority Priority { get; set; }
 
         public Origin Origin
         {
@@ -56,48 +44,32 @@ namespace Phases.DrawableObjects
             {
                 if(PointedSheet != null)
                 {
-                    if (PointedSheet.draw.Origins.Count > 0)
-                        return PointedSheet.draw.Origins.First();
+                    if (PointedSheet.Sketch.Origins.Count > 0)
+                        return PointedSheet.Sketch.Origins.First();
                 }
                 return null;
             }
         }
 
-        public List<DrawableObject> ContainedObjects
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public List<DrawableObject> ContainedObjects => null;
 
         public override string Text
         {
             get
             {
-                if (pointing == "") return name;
-                else return name + " -> " + pointing;
+                if (PointingTo == "") return name;
+                else return name + " -> " + PointingTo;
             }
         }
 
-        [Description("The object that activates this transition."), Category("General"), Browsable(true), TypeConverter(typeof(PropertiesCoverters.SheetsInBookConverter))]
-        public string PointingTo
-        {
-            get
-            {
-                return pointing;
-            }
-            set
-            {
-                pointing = value;
-            }
-        }
+        [Description("The Model that this object points."), Category("General"), Browsable(true), TypeConverter(typeof(PropertiesCoverters.SheetsInBookConverter))]
+        public string PointingTo { get; set; } = "";
 
-        public DrawingSheet PointedSheet
+        public ModelSheet PointedSheet
         {
             get
             {
-                return OwnerDraw.OwnerSheet.OwnerBook.Sheets.FirstOrDefault(sh => sh.Name == pointing);
+                return OwnerDraw.OwnerSheet.OwnerBook.Models.FirstOrDefault(sh => sh.Name == PointingTo);
             }
         }
 
@@ -124,10 +96,10 @@ namespace Phases.DrawableObjects
 
         public override bool Contains(State other)
         {
-            var sheet = OwnerDraw.OwnerSheet.OwnerBook.Sheets.FirstOrDefault(sh => sh.Name == pointing);
+            var sheet = OwnerDraw.OwnerSheet.OwnerBook.Sheets.FirstOrDefault(sh => sh.Name == PointingTo);
             if (sheet != null)
             {
-                return sheet.draw.objects.Contains(other);
+                return sheet.Sketch.objects.Contains(other);
             }
             else
             {
@@ -332,10 +304,10 @@ namespace Phases.DrawableObjects
         public List<Link> ContainedTransitionLinks()
         {
             var list = new List<Link>();
-            DrawingSheet sheet = OwnerDraw.OwnerSheet.OwnerBook.Sheets.FirstOrDefault(sh => sh.Name == pointing);
+            DrawingSheet sheet = OwnerDraw.OwnerSheet.OwnerBook.Sheets.FirstOrDefault(sh => sh.Name == PointingTo);
             if (sheet == null) return list;
 
-            return sheet.draw.Objects.FindAll(obj => obj is End || obj is Abort).ConvertAll(link => (Link)link);
+            return sheet.Sketch.Objects.FindAll(obj => obj is End || obj is Abort).ConvertAll(link => (Link)link);
         }
 
         public string[] ContainedTransitionLinksNames()
@@ -349,18 +321,18 @@ namespace Phases.DrawableObjects
         {
             var data = new List<byte>(base.SerializeSpecifics());
             //Add pointing sheet
-            data.AddRange(Serialization.SerializeParameter(pointing));
-            data.AddRange(Serialization.SerializeParameter((byte)priority));
+            data.AddRange(Serialization.SerializeParameter(PointingTo));
+            data.AddRange(Serialization.SerializeParameter((byte)Priority));
             return data.ToArray();
         }
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            byte bt = 0;
             if (!base.DeserializeObjectSpecifics(data, ref index)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref pointing)) return false;
-            if (!Serialization.DeserializeParameter(data, ref index, ref bt)) return false;
-            priority = (NestedPriority)bt;
+            if (!Serialization.DeserializeParameter(data, ref index, out string pointingTo)) return false;
+            PointingTo = pointingTo;
+            if (!Serialization.DeserializeParameter(data, ref index, out byte bt)) return false;
+            Priority = (NestedPriority)bt;
             return true;
         }
         #endregion

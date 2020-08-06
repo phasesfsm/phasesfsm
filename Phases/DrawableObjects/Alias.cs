@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Phases.DrawableObjects
 {
@@ -37,10 +38,23 @@ namespace Phases.DrawableObjects
             }
             set
             {
+                if (pointing != null)
+                {
+                    outTransitions.RemoveAll(trans => trans.StartObject == this);
+                }
                 pointing = OwnerDraw.Objects.Find(obj => obj.Name == value);
+                if (pointing != null)
+                {
+                    outTransitions.AddRange(base.outTransitions);
+                }
             }
         }
 
+        internal override List<Transition> outTransitions => pointing == null ? base.outTransitions : pointing.outTransitions;
+        internal List<Transition> AliasOutTransitions => base.outTransitions;
+#if DEBUG
+        public Transition[] aliasOutTransitions => base.outTransitions.ToArray();
+#endif
         [Browsable(false)]
         public State Pointing => pointing as State;
 
@@ -61,11 +75,11 @@ namespace Phases.DrawableObjects
             }
         }
 
-        public override void CopyTo(DrawableObject obj)
+        public override void CopyTo(DrawableObject @object)
         {
-            base.CopyTo(obj);
-            Alias alias = (Alias)obj;
-            alias.pointing = pointing;
+            base.CopyTo(@object);
+            Alias alias = (Alias)@object;
+            if (pointing != null) alias.pointing = OwnerDraw.Objects.Find(obj => obj.Name == pointing.Name);
         }
 
         public virtual byte[] SerializeRelations()
