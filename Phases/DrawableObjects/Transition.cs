@@ -204,7 +204,8 @@ namespace Phases.DrawableObjects
             StringFormat textFormat = new StringFormat();
 
             PriorityDrawModes drawMode = StartObject is Alias || StartObject is StateAlias ?
-                PriorityDrawModes.DrawOuter : StartObject is SuperState ? PriorityDrawModes.DrawSquareInner : PriorityDrawModes.DrawInner;
+                PriorityDrawModes.DrawOuter : StartObject is SuperState || StartObject is Nested ?
+                PriorityDrawModes.DrawSquareInner : PriorityDrawModes.DrawInner;
             switch (drawMode)
             {
                 case PriorityDrawModes.DrawInner:
