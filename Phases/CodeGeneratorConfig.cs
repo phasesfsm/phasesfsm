@@ -377,7 +377,6 @@ namespace Phases
             }
 
             string path = Path.GetDirectoryName(tag.FilePath);
-            string currentName = Path.GetFileName(tag.FilePath);
             string newName = Path.Combine(path, e.Label);
             
             if (treeView.SelectedNode.ImageIndex != 0)  //file
