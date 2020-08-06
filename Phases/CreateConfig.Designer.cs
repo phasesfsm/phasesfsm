@@ -31,14 +31,14 @@
             this.label1 = new System.Windows.Forms.Label();
             this.tbName = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rbC = new System.Windows.Forms.RadioButton();
+            this.tbPreview = new System.Windows.Forms.TextBox();
+            this.rbDefault = new System.Windows.Forms.RadioButton();
+            this.rbPython = new System.Windows.Forms.RadioButton();
+            this.rbJson = new System.Windows.Forms.RadioButton();
+            this.rbCpp = new System.Windows.Forms.RadioButton();
             this.btCancel = new System.Windows.Forms.Button();
             this.btCreate = new System.Windows.Forms.Button();
-            this.rbCpp = new System.Windows.Forms.RadioButton();
-            this.rbJson = new System.Windows.Forms.RadioButton();
-            this.rbPython = new System.Windows.Forms.RadioButton();
-            this.rbDefault = new System.Windows.Forms.RadioButton();
-            this.tbPreview = new System.Windows.Forms.TextBox();
-            this.rbC = new System.Windows.Forms.RadioButton();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -79,6 +79,75 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Load predefined config:";
             // 
+            // rbC
+            // 
+            this.rbC.AutoSize = true;
+            this.rbC.Location = new System.Drawing.Point(16, 65);
+            this.rbC.Name = "rbC";
+            this.rbC.Size = new System.Drawing.Size(32, 17);
+            this.rbC.TabIndex = 5;
+            this.rbC.Text = "C";
+            this.rbC.UseVisualStyleBackColor = true;
+            this.rbC.CheckedChanged += new System.EventHandler(this.rbC_CheckedChanged);
+            // 
+            // tbPreview
+            // 
+            this.tbPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbPreview.Location = new System.Drawing.Point(90, 19);
+            this.tbPreview.Multiline = true;
+            this.tbPreview.Name = "tbPreview";
+            this.tbPreview.ReadOnly = true;
+            this.tbPreview.Size = new System.Drawing.Size(259, 172);
+            this.tbPreview.TabIndex = 4;
+            // 
+            // rbDefault
+            // 
+            this.rbDefault.AutoSize = true;
+            this.rbDefault.Checked = true;
+            this.rbDefault.Location = new System.Drawing.Point(16, 33);
+            this.rbDefault.Name = "rbDefault";
+            this.rbDefault.Size = new System.Drawing.Size(59, 17);
+            this.rbDefault.TabIndex = 3;
+            this.rbDefault.TabStop = true;
+            this.rbDefault.Text = "Default";
+            this.rbDefault.UseVisualStyleBackColor = true;
+            this.rbDefault.CheckedChanged += new System.EventHandler(this.rbDefault_CheckedChanged);
+            // 
+            // rbPython
+            // 
+            this.rbPython.AutoSize = true;
+            this.rbPython.Location = new System.Drawing.Point(16, 161);
+            this.rbPython.Name = "rbPython";
+            this.rbPython.Size = new System.Drawing.Size(58, 17);
+            this.rbPython.TabIndex = 2;
+            this.rbPython.Text = "Phyton";
+            this.rbPython.UseVisualStyleBackColor = true;
+            this.rbPython.CheckedChanged += new System.EventHandler(this.rbPython_CheckedChanged);
+            // 
+            // rbJson
+            // 
+            this.rbJson.AutoSize = true;
+            this.rbJson.Location = new System.Drawing.Point(16, 129);
+            this.rbJson.Name = "rbJson";
+            this.rbJson.Size = new System.Drawing.Size(53, 17);
+            this.rbJson.TabIndex = 1;
+            this.rbJson.Text = "JSON";
+            this.rbJson.UseVisualStyleBackColor = true;
+            this.rbJson.CheckedChanged += new System.EventHandler(this.rbJson_CheckedChanged);
+            // 
+            // rbCpp
+            // 
+            this.rbCpp.AutoSize = true;
+            this.rbCpp.Location = new System.Drawing.Point(16, 96);
+            this.rbCpp.Name = "rbCpp";
+            this.rbCpp.Size = new System.Drawing.Size(44, 17);
+            this.rbCpp.TabIndex = 0;
+            this.rbCpp.Text = "C++";
+            this.rbCpp.UseVisualStyleBackColor = true;
+            this.rbCpp.CheckedChanged += new System.EventHandler(this.rbCpp_CheckedChanged);
+            // 
             // btCancel
             // 
             this.btCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -102,75 +171,6 @@
             this.btCreate.Text = "Create";
             this.btCreate.UseVisualStyleBackColor = true;
             // 
-            // rbCpp
-            // 
-            this.rbCpp.AutoSize = true;
-            this.rbCpp.Location = new System.Drawing.Point(16, 96);
-            this.rbCpp.Name = "rbCpp";
-            this.rbCpp.Size = new System.Drawing.Size(44, 17);
-            this.rbCpp.TabIndex = 0;
-            this.rbCpp.Text = "C++";
-            this.rbCpp.UseVisualStyleBackColor = true;
-            this.rbCpp.CheckedChanged += new System.EventHandler(this.rbCpp_CheckedChanged);
-            // 
-            // rbJson
-            // 
-            this.rbJson.AutoSize = true;
-            this.rbJson.Location = new System.Drawing.Point(16, 129);
-            this.rbJson.Name = "rbJson";
-            this.rbJson.Size = new System.Drawing.Size(53, 17);
-            this.rbJson.TabIndex = 1;
-            this.rbJson.Text = "JSON";
-            this.rbJson.UseVisualStyleBackColor = true;
-            this.rbJson.CheckedChanged += new System.EventHandler(this.rbJson_CheckedChanged);
-            // 
-            // rbPython
-            // 
-            this.rbPython.AutoSize = true;
-            this.rbPython.Location = new System.Drawing.Point(16, 161);
-            this.rbPython.Name = "rbPython";
-            this.rbPython.Size = new System.Drawing.Size(58, 17);
-            this.rbPython.TabIndex = 2;
-            this.rbPython.Text = "Phyton";
-            this.rbPython.UseVisualStyleBackColor = true;
-            this.rbPython.CheckedChanged += new System.EventHandler(this.rbPython_CheckedChanged);
-            // 
-            // rbDefault
-            // 
-            this.rbDefault.AutoSize = true;
-            this.rbDefault.Checked = true;
-            this.rbDefault.Location = new System.Drawing.Point(16, 33);
-            this.rbDefault.Name = "rbDefault";
-            this.rbDefault.Size = new System.Drawing.Size(59, 17);
-            this.rbDefault.TabIndex = 3;
-            this.rbDefault.TabStop = true;
-            this.rbDefault.Text = "Default";
-            this.rbDefault.UseVisualStyleBackColor = true;
-            this.rbDefault.CheckedChanged += new System.EventHandler(this.rbDefault_CheckedChanged);
-            // 
-            // tbPreview
-            // 
-            this.tbPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbPreview.Location = new System.Drawing.Point(90, 19);
-            this.tbPreview.Multiline = true;
-            this.tbPreview.Name = "tbPreview";
-            this.tbPreview.ReadOnly = true;
-            this.tbPreview.Size = new System.Drawing.Size(259, 172);
-            this.tbPreview.TabIndex = 4;
-            // 
-            // rbC
-            // 
-            this.rbC.AutoSize = true;
-            this.rbC.Location = new System.Drawing.Point(16, 65);
-            this.rbC.Name = "rbC";
-            this.rbC.Size = new System.Drawing.Size(32, 17);
-            this.rbC.TabIndex = 5;
-            this.rbC.Text = "C";
-            this.rbC.UseVisualStyleBackColor = true;
-            this.rbC.CheckedChanged += new System.EventHandler(this.rbC_CheckedChanged);
-            // 
             // CreateConfig
             // 
             this.AcceptButton = this.btCreate;
@@ -185,6 +185,7 @@
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "CreateConfig";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Create Code Generation Config";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

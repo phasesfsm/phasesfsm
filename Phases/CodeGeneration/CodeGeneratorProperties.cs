@@ -260,7 +260,7 @@ namespace Phases.CodeGeneration
                         }
                         else if (inputText.Contains(macro.ToUpper()))
                         {
-                            token.Render = MacroRender.LowerCase;
+                            token.Render = MacroRender.UpperCase;
                         }
                         else
                         {
@@ -533,6 +533,25 @@ namespace Phases.CodeGeneration
                                     }
                                 }
                                 break;
+                            case ContextLevel.Machine | ContextLevel.State:
+                                if (contexts.First().Objects.Data == null)
+                                {
+                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
+                                    result.Add(newContext);
+                                }
+                                else
+                                {
+                                    foreach (RenderingContext context in contexts)
+                                    {
+                                        foreach (BasicState state in context.Objects.Machine.StatesList())
+                                        {
+                                            newContext = new RenderingContext(context, RenderMacro(inputText, token, state.Name), context.Level | ContextLevel.State);
+                                            newContext.Objects.State = state;
+                                            result.Add(newContext);
+                                        }
+                                    }
+                                }
+                                break;
                         }
                         inputText = result.First().Value;
                         break;
@@ -653,7 +672,7 @@ namespace Phases.CodeGeneration
         public string MacroBegin { get; set; } = "@";
 
         [Description("Macro end token."), Category("Macro tokens")]
-        public string MacroEnd { get; set; } = ".";
+        public string MacroEnd { get; set; } = "";
 
         [Description("Macro beging token."), Category("Macro tokens")]
         public string MacroContext { get; set; } = "#";

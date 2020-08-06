@@ -75,10 +75,10 @@ namespace Phases.DrawableObjects
             }
         }
 
-        public override void CopyTo(DrawableObject obj)
+        public override void CopyTo(DrawableObject @object)
         {
-            base.CopyTo(obj);
-            Alias alias = (Alias)obj;
+            base.CopyTo(@object);
+            Alias alias = (Alias)@object;
             if (pointing != null) alias.pointing = OwnerDraw.Objects.Find(obj => obj.Name == pointing.Name);
         }
 
