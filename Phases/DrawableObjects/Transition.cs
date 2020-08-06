@@ -14,9 +14,9 @@ namespace Phases.DrawableObjects
         {
             NoDraw,
             DrawInner,
-            DrawOuter
+            DrawOuter,
+            DrawSquareInner,
         }
-        static PriorityDrawModes PriorityDrawMode { get; set; } = PriorityDrawModes.DrawInner;
         public static Font priorityFont = new Font("Arial", 6f);
         static Pen guides = new Pen(Color.LightGray);
         
@@ -203,88 +203,136 @@ namespace Phases.DrawableObjects
             if (startObject == null) return;
             StringFormat textFormat = new StringFormat();
 
-            PriorityDrawModes drawMode = StartObject is Alias || StartObject is StateAlias ? PriorityDrawModes.DrawOuter : PriorityDrawModes.DrawInner;
-            if (drawMode == PriorityDrawModes.DrawInner)
+            PriorityDrawModes drawMode = StartObject is Alias || StartObject is StateAlias ?
+                PriorityDrawModes.DrawOuter : StartObject is SuperState ? PriorityDrawModes.DrawSquareInner : PriorityDrawModes.DrawInner;
+            switch (drawMode)
             {
-                int position = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 8 / (2 * Math.PI));
-                // Horizontal aligment
-                switch (position)
+                case PriorityDrawModes.DrawInner:
                 {
-                    case 0:
-                    case 8:
-                    case 4:
-                        textFormat.Alignment = StringAlignment.Center;
-                        break;
-                    case 1:
-                    case 2:
-                    case 3:
-                        textFormat.Alignment = StringAlignment.Far;
-                        break;
-                    case 5:
-                    case 6:
-                    case 7:
-                        textFormat.Alignment = StringAlignment.Near;
-                        break;
+                    int position = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 8 / (2 * Math.PI));
+                    // Horizontal aligment
+                    switch (position)
+                    {
+                        case 0:
+                        case 8:
+                        case 4:
+                            textFormat.Alignment = StringAlignment.Center;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            textFormat.Alignment = StringAlignment.Far;
+                            break;
+                        case 5:
+                        case 6:
+                        case 7:
+                            textFormat.Alignment = StringAlignment.Near;
+                            break;
+                    }
+                    // Vertical aligment
+                    switch (position)
+                    {
+                        case 7:
+                        case 8:
+                        case 0:
+                        case 1:
+                            textFormat.LineAlignment = StringAlignment.Near;
+                            break;
+                        case 2:
+                        case 6:
+                            textFormat.LineAlignment = StringAlignment.Center;
+                            break;
+                        case 3:
+                        case 4:
+                        case 5:
+                            textFormat.LineAlignment = StringAlignment.Far;
+                            break;
+                    }
+                    //g.DrawString(position.ToString(), font, brush, StartPoint, textFormat);
+                    break;
                 }
-                // Vertical aligment
-                switch (position)
+                case PriorityDrawModes.DrawOuter:
                 {
-                    case 7:
-                    case 8:
-                    case 0:
-                    case 1:
-                        textFormat.LineAlignment = StringAlignment.Near;
-                        break;
-                    case 2:
-                    case 6:
-                        textFormat.LineAlignment = StringAlignment.Center;
-                        break;
-                    case 3:
-                    case 4:
-                    case 5:
-                        textFormat.LineAlignment = StringAlignment.Far;
-                        break;
-                }
-                //g.DrawString(position.ToString(), font, brush, StartPoint, textFormat);
-            }
-            else
-            {
-                int hposition = (int)Math.Floor((StartAngle + 1 * Math.PI / 2) * 10 / (2 * Math.PI));
-                // Horizontal aligment
-                switch (hposition)
-                {
-                    case 0:
-                    case 4:
-                    case 7:
-                        textFormat.Alignment = StringAlignment.Far;
-                        break;
-                    case 1:
-                    case 3:
-                    case 6:
-                    case 8:
-                        textFormat.Alignment = StringAlignment.Center;
-                        break;
-                    case 2:
-                    case 5:
-                    case 9:
-                        textFormat.Alignment = StringAlignment.Near;
-                        break;
-                }
+                    int hposition = (int)Math.Floor((StartAngle + 1 * Math.PI / 2) * 10 / (2 * Math.PI));
+                    // Horizontal aligment
+                    switch (hposition)
+                    {
+                        case 0:
+                        case 4:
+                        case 7:
+                            textFormat.Alignment = StringAlignment.Far;
+                            break;
+                        case 1:
+                        case 3:
+                        case 6:
+                        case 8:
+                            textFormat.Alignment = StringAlignment.Center;
+                            break;
+                        case 2:
+                        case 5:
+                        case 9:
+                            textFormat.Alignment = StringAlignment.Near;
+                            break;
+                    }
 
-                // Vertical aligment
-                int vposition = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 2 / (2 * Math.PI));
-                switch (vposition)
-                {
-                    case 0:
-                    case 2:
-                        textFormat.LineAlignment = StringAlignment.Far;
-                        break;
-                    case 1:
-                        textFormat.LineAlignment = StringAlignment.Near;
-                        break;
+                    // Vertical aligment
+                    int vposition = (int)Math.Round((StartAngle + 1 * Math.PI / 2) * 2 / (2 * Math.PI));
+                    switch (vposition)
+                    {
+                        case 0:
+                        case 2:
+                            textFormat.LineAlignment = StringAlignment.Far;
+                            break;
+                        case 1:
+                            textFormat.LineAlignment = StringAlignment.Near;
+                            break;
+                    }
+                    //g.DrawString(hposition.ToString(), font, brush, StartPoint, textFormat);
+                    //g.DrawString(vposition.ToString(), font, brush, StartPoint, textFormat);
+                    break;
                 }
-                //g.DrawString(hposition.ToString(), font, brush, StartPoint, textFormat);
-                //g.DrawString(vposition.ToString(), font, brush, StartPoint, textFormat);
+                case PriorityDrawModes.DrawSquareInner:
+                {
+                    const double limit = 0.1;
+                    switch (StartAngle)
+                    {
+                        case var ang when ang == 5 || (ang > 1.0 && ang < 1.0 + limit) || (ang > 4.0 && ang < 4.0 + limit): // Left-Up corner
+                            textFormat.Alignment = StringAlignment.Near;
+                            textFormat.LineAlignment = StringAlignment.Near;
+                            break;
+                        case var ang when ang == 7 || (ang > 5.0 - limit && ang < 5.0) || (ang > 2.0 && ang < 2.0 + limit): // Right-Up corner
+                            textFormat.Alignment = StringAlignment.Far;
+                            textFormat.LineAlignment = StringAlignment.Near;
+                            break;
+                        case var ang when ang == 9 || (ang > 2.0 - limit && ang < 2.0) || (ang > 8.0 && ang < 8.0 + limit): // Left-Down corner
+                            textFormat.Alignment = StringAlignment.Near;
+                            textFormat.LineAlignment = StringAlignment.Far;
+                            break;
+                        case var ang when ang == 11 || (ang > 9.0 - limit && ang < 9.0) || (ang > 3.0 - limit && ang < 3.0): // Right-Down corner
+                            textFormat.Alignment = StringAlignment.Far;
+                            textFormat.LineAlignment = StringAlignment.Far;
+                            break;
+                        case var ang when ang > 4.0 && ang < 5.0:   // Up
+                            textFormat.Alignment = StringAlignment.Center;
+                            textFormat.LineAlignment = StringAlignment.Near;
+                            break;
+                        case var ang when ang > 8.0 && ang < 9.0:   // Down
+                            textFormat.Alignment = StringAlignment.Center;
+                            textFormat.LineAlignment = StringAlignment.Far;
+                            break;
+                        case var ang when ang > 1.0 && ang < 2.0:   // Left
+                            textFormat.Alignment = StringAlignment.Near;
+                            textFormat.LineAlignment = StringAlignment.Center;
+                            break;
+                        case var ang when ang > 2.0 && ang < 3.0:   // Right
+                            textFormat.Alignment = StringAlignment.Far;
+                            textFormat.LineAlignment = StringAlignment.Center;
+                            break;
+                    }
+                    break;
+                }
+                default:
+                    return;
             }
             g.DrawString(Priority.ToString(), priorityFont, brush, StartPoint, textFormat);
         }
