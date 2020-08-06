@@ -214,27 +214,38 @@ namespace Phases
 
         private void btNewConfig_Click(object sender, EventArgs e)
         {
-            SaveFileDialog folderBrowser = new SaveFileDialog()
+            if (gData == null)
             {
-                ValidateNames = false,
-                CheckFileExists = false,
-                CheckPathExists = true,
-                FileName = "Folder Selection."
-            };
-
-            if (folderBrowser.ShowDialog() == DialogResult.OK)
-            {
-                string selectedPath = Path.GetDirectoryName(folderBrowser.FileName);
-
-                CreateConfig frm = new CreateConfig();
-                if (frm.ShowDialog() == DialogResult.OK)
+                SaveFileDialog folderBrowser = new SaveFileDialog()
                 {
-                    gProps = frm.Properties;
-                    rootPath = Path.Combine(selectedPath, string.Format("{0}.cottle", frm.ConfigName));
-                    Directory.CreateDirectory(rootPath);
-                    btSaveIni_Click(null, null);
-                    LoadConfiguration();
+                    ValidateNames = false,
+                    CheckFileExists = false,
+                    CheckPathExists = true,
+                    FileName = "Folder Selection."
+                };
+
+                if (folderBrowser.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedPath = Path.GetDirectoryName(folderBrowser.FileName);
+                    CreateNewConfig(selectedPath);
                 }
+            }
+            else
+            {
+                CreateNewConfig(gData.Profile.Path);
+            }
+        }
+
+        private void CreateNewConfig(string selectedPath)
+        {
+            CreateConfig frm = new CreateConfig();
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                gProps = frm.Properties;
+                rootPath = Path.Combine(selectedPath, string.Format("{0}.cottle", frm.ConfigName));
+                Directory.CreateDirectory(rootPath);
+                btSaveIni_Click(null, null);
+                LoadConfiguration();
             }
         }
 
