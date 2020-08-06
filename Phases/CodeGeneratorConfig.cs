@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,7 +23,7 @@ namespace Phases
 
         internal CodeGeneratorConfig(GeneratorData generatorData, string configPath = "")
         {
-            this.gData = generatorData;
+            gData = generatorData;
             InitializeComponent();
             if (!string.IsNullOrEmpty(configPath))
             {
@@ -61,6 +62,21 @@ namespace Phases
             {
                 return Renderings.First();
             }
+        }
+
+        private void LoadConfiguration()
+        {
+            if (gData != null) gData.Profile.Properties = gProps;
+            propertyGrid1.SelectedObject = gProps;
+
+            var folderName = Path.GetFileName(rootPath);
+            var rootNode = new TreeNode(folderName, 0, 0);
+            treeView.Nodes.Clear();
+            treeView.Nodes.Add(rootNode);
+            string iniPath = Path.Combine(rootPath, "cottle.ini");
+            rootNode.Tag = new NodeTag(iniPath, new RenderingContext(ContextLevel.Project, new ContextObjects(gData), rootPath));
+            rootNode.Nodes.Add("cottle.ini", "cottle.ini", 2, 2).Tag = new NodeTag(iniPath, new RenderingContext(ContextLevel.NoContext, null, "cottle.ini"));
+            rootNode.ExpandAll();
         }
 
         private void LoadConfiguration(string path)
@@ -194,6 +210,50 @@ namespace Phases
             CottleEditor cottleEditor = new CottleEditor(rootPath, source, listView.SelectedItems[0].Text, context);
             cottleEditor.ShowDialog();
             cottleEditor.Dispose();
+        }
+
+        private void btNewConfig_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog folderBrowser = new SaveFileDialog()
+            {
+                ValidateNames = false,
+                CheckFileExists = false,
+                CheckPathExists = true,
+                FileName = "Folder Selection."
+            };
+
+            if (folderBrowser.ShowDialog() == DialogResult.OK)
+            {
+                string selectedPath = Path.GetDirectoryName(folderBrowser.FileName);
+
+                CreateConfig frm = new CreateConfig();
+                if (frm.ShowDialog() == DialogResult.OK)
+                {
+                    gProps = frm.Properties;
+                    rootPath = Path.Combine(selectedPath, string.Format("{0}.cottle", frm.ConfigName));
+                    Directory.CreateDirectory(rootPath);
+                    btSaveIni_Click(null, null);
+                    LoadConfiguration();
+                }
+            }
+        }
+
+        private void btSaveIni_Click(object sender, EventArgs e)
+        {
+            StringBuilder st = new StringBuilder();
+
+            // Declaring and intializing object of Type 
+            Type objType = typeof(CodeGeneratorProperties);
+
+            // using GetProperties() Method 
+            PropertyInfo[] type = objType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+            foreach (PropertyInfo propertyInfo in type)
+            {
+                st.AppendFormat("{0}={1}{2}", propertyInfo.Name, propertyInfo.GetValue(gProps), Environment.NewLine);
+            }
+
+            File.WriteAllText(Path.Combine(rootPath, "cottle.ini"), st.ToString());
         }
     }
 }
