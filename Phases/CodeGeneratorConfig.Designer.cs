@@ -31,11 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CodeGeneratorConfig));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.btOpenFolder = new System.Windows.Forms.ToolStripButton();
-            this.btSaveIni = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.btEditCottle = new System.Windows.Forms.ToolStripButton();
-            this.btReloadIni = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.stBar = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -46,6 +42,11 @@
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.btNewConfig = new System.Windows.Forms.ToolStripButton();
+            this.btOpenFolder = new System.Windows.Forms.ToolStripButton();
+            this.btSaveIni = new System.Windows.Forms.ToolStripButton();
+            this.btEditCottle = new System.Windows.Forms.ToolStripButton();
+            this.btReloadIni = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -56,7 +57,9 @@
             // 
             // toolStrip1
             // 
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btNewConfig,
             this.btOpenFolder,
             this.btSaveIni,
             this.toolStripSeparator1,
@@ -68,47 +71,10 @@
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // btOpenFolder
-            // 
-            this.btOpenFolder.Image = global::Phases.Properties.Resources.folder;
-            this.btOpenFolder.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btOpenFolder.Name = "btOpenFolder";
-            this.btOpenFolder.Size = new System.Drawing.Size(56, 22);
-            this.btOpenFolder.Text = "Open";
-            this.btOpenFolder.Click += new System.EventHandler(this.BtOpenFolder_Click);
-            // 
-            // btSaveIni
-            // 
-            this.btSaveIni.Enabled = false;
-            this.btSaveIni.Image = global::Phases.Properties.Resources.save_as;
-            this.btSaveIni.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btSaveIni.Name = "btSaveIni";
-            this.btSaveIni.Size = new System.Drawing.Size(51, 22);
-            this.btSaveIni.Text = "Save";
-            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // btEditCottle
-            // 
-            this.btEditCottle.Enabled = false;
-            this.btEditCottle.Image = global::Phases.Properties.Resources.text;
-            this.btEditCottle.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btEditCottle.Name = "btEditCottle";
-            this.btEditCottle.Size = new System.Drawing.Size(47, 22);
-            this.btEditCottle.Text = "Edit";
-            this.btEditCottle.Click += new System.EventHandler(this.BtEditCottle_Click);
-            // 
-            // btReloadIni
-            // 
-            this.btReloadIni.Enabled = false;
-            this.btReloadIni.Image = global::Phases.Properties.Resources.flipflop1;
-            this.btReloadIni.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btReloadIni.Name = "btReloadIni";
-            this.btReloadIni.Size = new System.Drawing.Size(63, 22);
-            this.btReloadIni.Text = "Reload";
             // 
             // statusStrip1
             // 
@@ -209,6 +175,53 @@
             this.openFileDialog.FileName = "cottle.ini";
             this.openFileDialog.Filter = "Cottle configuration file (cottle.ini)|cottle.ini";
             // 
+            // btNewConfig
+            // 
+            this.btNewConfig.Image = global::Phases.Properties.Resources.file;
+            this.btNewConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btNewConfig.Name = "btNewConfig";
+            this.btNewConfig.Size = new System.Drawing.Size(51, 22);
+            this.btNewConfig.Text = "New";
+            this.btNewConfig.Click += new System.EventHandler(this.btNewConfig_Click);
+            // 
+            // btOpenFolder
+            // 
+            this.btOpenFolder.Image = global::Phases.Properties.Resources.folder;
+            this.btOpenFolder.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btOpenFolder.Name = "btOpenFolder";
+            this.btOpenFolder.Size = new System.Drawing.Size(56, 22);
+            this.btOpenFolder.Text = "Open";
+            this.btOpenFolder.Click += new System.EventHandler(this.BtOpenFolder_Click);
+            // 
+            // btSaveIni
+            // 
+            this.btSaveIni.Enabled = false;
+            this.btSaveIni.Image = global::Phases.Properties.Resources.save_as;
+            this.btSaveIni.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btSaveIni.Name = "btSaveIni";
+            this.btSaveIni.Size = new System.Drawing.Size(51, 22);
+            this.btSaveIni.Text = "Save";
+            this.btSaveIni.Click += new System.EventHandler(this.btSaveIni_Click);
+            // 
+            // btEditCottle
+            // 
+            this.btEditCottle.Enabled = false;
+            this.btEditCottle.Image = global::Phases.Properties.Resources.text;
+            this.btEditCottle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btEditCottle.Name = "btEditCottle";
+            this.btEditCottle.Size = new System.Drawing.Size(47, 22);
+            this.btEditCottle.Text = "Edit";
+            this.btEditCottle.Click += new System.EventHandler(this.BtEditCottle_Click);
+            // 
+            // btReloadIni
+            // 
+            this.btReloadIni.Enabled = false;
+            this.btReloadIni.Image = global::Phases.Properties.Resources.flipflop1;
+            this.btReloadIni.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btReloadIni.Name = "btReloadIni";
+            this.btReloadIni.Size = new System.Drawing.Size(63, 22);
+            this.btReloadIni.Text = "Reload";
+            // 
             // CodeGeneratorConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -254,5 +267,6 @@
         private System.Windows.Forms.ToolStripStatusLabel stBar;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ToolStripButton btNewConfig;
     }
 }

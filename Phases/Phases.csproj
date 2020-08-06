@@ -248,6 +248,12 @@
     <Compile Include="Cottle\Values\ScalarValue.cs" />
     <Compile Include="Cottle\Values\StringValue.cs" />
     <Compile Include="Cottle\Values\VoidValue.cs" />
+    <Compile Include="CreateConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateConfig.Designer.cs">
+      <DependentUpon>CreateConfig.cs</DependentUpon>
+    </Compile>
     <Compile Include="DrawableObjects\IGlobal.cs" />
     <Compile Include="DrawableObjects\Relation.cs" />
     <Compile Include="DrawableObjects\INestedState.cs" />
@@ -395,6 +401,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CottleEditor.resx">
       <DependentUpon>CottleEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateConfig.resx">
+      <DependentUpon>CreateConfig.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DrawStateViewer.resx">
       <DependentUpon>DrawStateViewer.cs</DependentUpon>
@@ -629,14 +638,7 @@
       <FileType>File</FileType>
     </PublishFile>
   </ItemGroup>
-  <ItemGroup>
-    <FileAssociation Include=".pha">
-      <Visible>False</Visible>
-      <Description>Phases FSM project.</Description>
-      <Progid>PhasesFSMprojectFile</Progid>
-      <DefaultIcon>fileicon.ico</DefaultIcon>
-    </FileAssociation>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
