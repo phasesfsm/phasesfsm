@@ -30,6 +30,7 @@ namespace Phases
                 string filePath = Path.Combine(configPath, "cottle.ini");
                 if (File.Exists(filePath)) LoadConfiguration(filePath);
             }
+            treeView.NodeMouseClick += (sender, args) => treeView.SelectedNode = args.Node;
         }
 
         private void BtOpenFolder_Click(object sender, EventArgs e)
@@ -89,7 +90,7 @@ namespace Phases
             rootPath = scriptsFolder;
             var folderName = Path.GetFileName(scriptsFolder);
             var rootNode = new TreeNode(folderName, 0, 0);
-            rootNode.Tag = new NodeTag(path, new RenderingContext(ContextLevel.Project, new ContextObjects(gData), scriptsFolder));
+            rootNode.Tag = new NodeTag(scriptsFolder, new RenderingContext(ContextLevel.Project, new ContextObjects(gData), scriptsFolder));
             treeView.Nodes.Clear();
             treeView.Nodes.Add(rootNode);
 
@@ -157,9 +158,11 @@ namespace Phases
             if (e.Node == treeView.Nodes[0] || e.Node.Text == "cottle.ini")
             {
                 listView.Visible = false;
+                btDelete.Enabled = false;
             }
             else
             {
+                btDelete.Enabled = true;
                 listView.Visible = true;
                 if (gData != null)
                 {
@@ -265,6 +268,166 @@ namespace Phases
             }
 
             File.WriteAllText(Path.Combine(rootPath, "cottle.ini"), st.ToString());
+        }
+
+        private void btAddFolder_Click(object sender, EventArgs e)
+        {
+            QuestionForm frm = new QuestionForm("Create folder", "Enter the new folder name:");
+            frm.KeyPress += Frm_KeyPress;
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                string dirName = frm.Value;
+
+                NodeTag tag = treeView.SelectedNode.Tag as NodeTag;
+                TreeNode treeNode;
+                string path;
+                if (treeView.SelectedNode.ImageIndex != 0)  //file
+                {
+                    path = Path.GetDirectoryName(tag.FilePath);
+                    treeNode = treeView.SelectedNode.Parent;
+                }
+                else    // folder
+                {
+                    path = tag.FilePath;
+                    treeNode = treeView.SelectedNode;
+                }
+                string subdir = Path.Combine(path, dirName);
+                Directory.CreateDirectory(subdir);
+                var newNode = new TreeNode(frm.Value, 0, 0);
+                if (newNode.Text.Contains(gProps.MacroBegin))
+                {
+                    newNode.Tag = new NodeTag(subdir, gProps.RenderMacroDirectory(dirName, (treeNode.Tag as NodeTag).First()));
+                }
+                else
+                {
+                    newNode.Tag = new NodeTag(subdir, new RenderingContext((treeNode.Tag as NodeTag).First().Level, null, dirName));
+                }
+                treeNode.Nodes.Add(newNode);
+                treeView.SelectedNode = newNode;
+            }
+            frm.Dispose();
+        }
+
+        private void Frm_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\b') return;
+            if (e.KeyChar == ' ' || Path.GetInvalidFileNameChars().Any(ch => ch == e.KeyChar))
+            {
+                e.KeyChar = '\0';
+            }
+        }
+
+        private void btAddFile_Click(object sender, EventArgs e)
+        {
+            QuestionForm frm = new QuestionForm("Create file", "Enter the new file name:");
+            frm.KeyPress += Frm_KeyPress;
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = frm.Value;
+
+                NodeTag tag = treeView.SelectedNode.Tag as NodeTag;
+                TreeNode treeNode;
+                string path;
+                if (treeView.SelectedNode.ImageIndex != 0)  //file
+                {
+                    path = Path.GetDirectoryName(tag.FilePath);
+                    treeNode = treeView.SelectedNode.Parent;
+                }
+                else    // folder
+                {
+                    path = tag.FilePath;
+                    treeNode = treeView.SelectedNode;
+                }
+                string subdir = Path.Combine(path, fileName);
+                File.WriteAllText(subdir, "");
+                var newNode = new TreeNode(frm.Value, 1, 1);
+                newNode.Tag = new NodeTag(subdir, gProps.RenderMacroFile(fileName, (treeNode.Tag as NodeTag).Renderings));
+                treeNode.Nodes.Add(newNode);
+                treeView.SelectedNode = newNode;
+            }
+            frm.Dispose();
+        }
+
+        private void btDelete_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("This action cannot be reverted, delete the file?", "Delete file", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                NodeTag tag = treeView.SelectedNode.Tag as NodeTag;
+                if (treeView.SelectedNode.ImageIndex == 0)  //folder
+                {
+                    Directory.Delete(tag.FilePath);
+                }
+                else
+                {
+                    File.Delete(tag.FilePath);
+                }
+                treeView.SelectedNode.Remove();
+            }
+        }
+
+        private void treeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            TreeNode treeNode = treeView.SelectedNode;
+            NodeTag tag = treeNode.Tag as NodeTag;
+
+            if (string.IsNullOrEmpty(e.Label) || e.Label.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                e.CancelEdit = true;
+                return;
+            }
+
+            string path = Path.GetDirectoryName(tag.FilePath);
+            string currentName = Path.GetFileName(tag.FilePath);
+            string newName = Path.Combine(path, e.Label);
+            
+            if (treeView.SelectedNode.ImageIndex != 0)  //file
+            {
+                try
+                {
+                    File.Move(tag.FilePath, newName);
+                }
+                catch
+                {
+                    e.CancelEdit = true;
+                    return;
+                }
+            }
+            else    // folder
+            {
+                try
+                {
+                    Directory.Move(tag.FilePath, newName);
+                }
+                catch
+                {
+                    e.CancelEdit = true;
+                    return;
+                }
+            }
+            tag.FilePath = newName;
+            tag.Renderings = gProps.RenderMacroFile(e.Label, (treeNode.Parent.Tag as NodeTag).Renderings);
+            TreeView_AfterSelect(treeView, new TreeViewEventArgs(e.Node));
+        }
+
+        private void treeView_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            if (e.Node.Level == 0 || e.Node.Text == "cottle.ini") e.CancelEdit = true;
+        }
+
+        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            treeView.SelectedNode.BeginEdit();
+        }
+
+        private void contextMenu_Opening(object sender, CancelEventArgs e)
+        {
+            if (treeView.SelectedNode == null || treeView.SelectedNode.Level == 0 || treeView.SelectedNode.Text == "cottle.ini") e.Cancel = true;
+        }
+
+        private void listView_DoubleClick(object sender, EventArgs e)
+        {
+            if (listView.SelectedItems.Count == 0) return;
+            BtEditCottle_Click(btEditCottle, new EventArgs());
         }
     }
 }
