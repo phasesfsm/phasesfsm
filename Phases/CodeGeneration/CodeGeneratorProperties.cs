@@ -271,7 +271,7 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken MessageFlag = new MacroToken("MessageFlag", ContextLevel.NoFileName);
 
             public static readonly MacroToken Outputs = new MacroToken("Outputs", ContextLevel.Transition);
-            public static readonly MacroToken Output = new MacroToken("Outputs", ContextLevel.Transition);
+            public static readonly MacroToken Output = new MacroToken("Output", ContextLevel.Transition);
             public static readonly MacroToken EnterOutputs = new MacroToken("EnterOutputs", ContextLevel.States);
             public static readonly MacroToken EnterOutput = new MacroToken("EnterOutput", ContextLevel.States);
             public static readonly MacroToken ExitOutputs = new MacroToken("ExitOutputs", ContextLevel.States);
