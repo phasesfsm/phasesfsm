@@ -241,8 +241,8 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken File = new MacroToken("File", ContextLevel.NoFileName);
 
             public static readonly MacroToken Project = new MacroToken("Project", ContextLevel.All);
-            public static readonly MacroToken Machine = new MacroToken("Machines", ContextLevel.NoDirName);
-            public static readonly MacroToken Machines = new MacroToken("Machine", ContextLevel.NoDirName);
+            public static readonly MacroToken Machines = new MacroToken("Machines", ContextLevel.NoDirName);
+            public static readonly MacroToken Machine = new MacroToken("Machine", ContextLevel.NoDirName);
             public static readonly MacroToken Nodes = new MacroToken("Nodes", ContextLevel.NoFileName);
             public static readonly MacroToken Node = new MacroToken("Node", ContextLevel.NoFileName);
             public static readonly MacroToken SuperStates = new MacroToken("SuperStates", ContextLevel.NoFileName);
