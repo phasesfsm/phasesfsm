@@ -268,7 +268,7 @@ namespace DualText
         {
             var vert = vScrollR.Value + offset;
             if (vert < 0) vScrollR.Value = 0;
-            else if (vert > vScrollR.Maximum - vScrollR.LargeChange) vScrollR.Value = vScrollR.Maximum - vScrollR.LargeChange;
+            else if (vert > vScrollR.Maximum - vScrollR.LargeChange) vScrollR.Value = Math.Max(0, vScrollR.Maximum - vScrollR.LargeChange);
             else vScrollR.Value = vert;
         }
 #endregion
@@ -516,6 +516,7 @@ namespace DualText
                 {
                     ActiveView.Cursor.MovingText = tomove;
                     ActiveView.AdjustVisibleArea(ActiveView.Cursor.MovingText.Value.X, ActiveView.Cursor.MovingText.Value.Y);
+                    ActiveView.UpdateLabel(ActiveView.Cursor.MovingText.Value.Y + 1, Math.Min(ActiveView.Text.Lines[ActiveView.Cursor.MovingText.Value.Y].Length, ActiveView.Cursor.MovingText.Value.X) + 1);
                     Invalidate();
                 }
             }

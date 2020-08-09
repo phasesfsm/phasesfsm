@@ -60,11 +60,13 @@ namespace Phases
             dualTextBox1.ProcessText += DualTextBox1_ProcessText;
             dualTextBox1.SetText(File.ReadAllText(Source));
 
+            lbScriptName.Text = Path.GetFileName(source);
+            lbFileName.Text = destFile;
         }
 
         private string DualTextBox1_ProcessText(string source)
         {
-            string render = project.RenderScript(source, DestFile);
+            string render = project.RenderScript(source, DestFile, Context);
             if (render == null)
             {
                 stBar.Text = project.Errors;
@@ -83,6 +85,12 @@ namespace Phases
             }
 
             return render;
+        }
+
+        private void CottleEditor_Resize(object sender, EventArgs e)
+        {
+            lbScriptName.Width = dualTextBox1.Width / 2;
+            lbFileName.Width = dualTextBox1.Width / 2;
         }
 
         private void CottleEditor_Load(object sender, EventArgs e)

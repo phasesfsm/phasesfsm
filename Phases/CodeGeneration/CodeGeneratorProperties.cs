@@ -1,4 +1,5 @@
 ﻿using Phases.BasicObjects;
+using Phases.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -125,6 +126,7 @@ namespace Phases.CodeGeneration
             Transition = 0x20,
             EnterOutputs = 0x40,
             ExitOutputs = 0x80,
+            Variable = 0x400,
 
             // Combos
             All = File | Project | Machine | Node | SuperState | State | Transition | EnterOutputs | ExitOutputs | Directory,
@@ -149,6 +151,7 @@ namespace Phases.CodeGeneration
             public BasicMachine SuperState;
             public BasicState State;
             public BasicTransition Transition;
+            public Variable Variable;
 
             public ContextObjects(GeneratorData data)
             {
@@ -162,33 +165,56 @@ namespace Phases.CodeGeneration
                 SuperState = objects.SuperState;
                 State = objects.State;
                 Transition = objects.Transition;
+                Variable = objects.Variable;
             }
         }
 
         public class RenderingContext
         {
-            public ContextLevel Level { get; }
+            public ContextLevel Level { get; set; }
             public ContextObjects Objects { get; }
             public string Value { get; }
+            public bool First { get; set; }
+            public bool Last { get; set; }
+            public int Index { get; set; }
+            public string File { get; }
 
-            public RenderingContext(ContextLevel level, ContextObjects objects, string value)
+            public RenderingContext(string file, ContextLevel level, GeneratorData data, string value)
             {
+                File = file;
+                Level = level;
+                Objects = new ContextObjects(data);
+                Value = value;
+            }
+
+            public RenderingContext(string file, ContextLevel level, ContextObjects objects, string value)
+            {
+                File = file;
                 Level = level;
                 Objects = objects;
                 Value = value;
             }
 
-            public RenderingContext(RenderingContext context, string newValue = "", ContextLevel newLevel = ContextLevel.NoContext)
+            public RenderingContext(string file, string value, RenderingContext context)
+            {
+                File = file;
+                Value = value;
+                Level = context.Level;
+                Objects = new ContextObjects(context.Objects);
+            }
+
+            public RenderingContext(RenderingContext context, string newValue = "", ContextLevel newLevel = ContextLevel.NoContext, string file = null)
             {
                 if (newLevel == ContextLevel.NoContext)
                     Level = context.Level;
                 else
-                    Level = newLevel;
+                    Level = context.Level | newLevel;
                 if (newValue == "")
                     Value = context.Value;
                 else
                     Value = newValue;
                 Objects = new ContextObjects(context.Objects);
+                File = string.IsNullOrWhiteSpace(file) ? context.File : file;
             }
         }
 
@@ -210,30 +236,56 @@ namespace Phases.CodeGeneration
 
         public sealed class MacroTokens
         {
-            public static readonly MacroToken File = new MacroToken("File", ContextLevel.NoFileName);
             public static readonly MacroToken FileName = new MacroToken("FileName", ContextLevel.NoFileName);
             public static readonly MacroToken FileExt = new MacroToken("FileExt", ContextLevel.NoFileName);
+            public static readonly MacroToken File = new MacroToken("File", ContextLevel.NoFileName);
 
             public static readonly MacroToken Project = new MacroToken("Project", ContextLevel.All);
-            public static readonly MacroToken Machine = new MacroToken("Machine", ContextLevel.NoDirName);
+            public static readonly MacroToken Machine = new MacroToken("Machines", ContextLevel.NoDirName);
+            public static readonly MacroToken Machines = new MacroToken("Machine", ContextLevel.NoDirName);
+            public static readonly MacroToken Nodes = new MacroToken("Nodes", ContextLevel.NoFileName);
             public static readonly MacroToken Node = new MacroToken("Node", ContextLevel.NoFileName);
+            public static readonly MacroToken SuperStates = new MacroToken("SuperStates", ContextLevel.NoFileName);
             public static readonly MacroToken SuperState = new MacroToken("SuperState", ContextLevel.NoFileName);
+            public static readonly MacroToken States = new MacroToken("States", ContextLevel.NoFileName);
             public static readonly MacroToken State = new MacroToken("State", ContextLevel.NoFileName);
+            public static readonly MacroToken Transitions = new MacroToken("Transitions", ContextLevel.NoOutputs);
             public static readonly MacroToken Transition = new MacroToken("Transition", ContextLevel.NoOutputs);
+            public static readonly MacroToken Pointing = new MacroToken("Pointing", ContextLevel.NoOutputs);
 
+            public static readonly MacroToken Variables = new MacroToken("Variables", ContextLevel.NoFileName);
             public static readonly MacroToken Variable = new MacroToken("Variable", ContextLevel.NoFileName);
+            public static readonly MacroToken BoolInputs = new MacroToken("BoolInputs", ContextLevel.NoOutputs);
             public static readonly MacroToken BoolInput = new MacroToken("BoolInput", ContextLevel.NoOutputs);
+            public static readonly MacroToken BoolOutputs = new MacroToken("BoolOutputs", ContextLevel.NoFileName);
             public static readonly MacroToken BoolOutput = new MacroToken("BoolOutput", ContextLevel.NoFileName);
+            public static readonly MacroToken BoolFlags = new MacroToken("BoolFlags", ContextLevel.NoFileName);
             public static readonly MacroToken BoolFlag = new MacroToken("BoolFlag", ContextLevel.NoFileName);
+            public static readonly MacroToken InputEvents = new MacroToken("InputEvents", ContextLevel.NoOutputs);
             public static readonly MacroToken InputEvent = new MacroToken("InputEvent", ContextLevel.NoOutputs);
+            public static readonly MacroToken OutputEvents = new MacroToken("OutputEvents", ContextLevel.NoCondition);
             public static readonly MacroToken OutputEvent = new MacroToken("OutputEvent", ContextLevel.NoCondition);
+            public static readonly MacroToken CounterFlags = new MacroToken("CounterFlags", ContextLevel.NoFileName);
             public static readonly MacroToken CounterFlag = new MacroToken("CounterFlag", ContextLevel.NoFileName);
+            public static readonly MacroToken MessageFlags = new MacroToken("MessageFlags", ContextLevel.NoFileName);
             public static readonly MacroToken MessageFlag = new MacroToken("MessageFlag", ContextLevel.NoFileName);
 
+            public static readonly MacroToken Outputs = new MacroToken("Outputs", ContextLevel.Transition);
+            public static readonly MacroToken Output = new MacroToken("Outputs", ContextLevel.Transition);
             public static readonly MacroToken EnterOutputs = new MacroToken("EnterOutputs", ContextLevel.States);
+            public static readonly MacroToken EnterOutput = new MacroToken("EnterOutput", ContextLevel.States);
             public static readonly MacroToken ExitOutputs = new MacroToken("ExitOutputs", ContextLevel.States);
+            public static readonly MacroToken ExitOutput = new MacroToken("ExitOutput", ContextLevel.States);
+
+            public static readonly MacroToken Default = new MacroToken("Default", ContextLevel.Variable);
 
             public static readonly MacroToken Condition = new MacroToken("Condition(", ContextLevel.Transition);
+
+            // Macro functions tokens
+            public static readonly MacroToken Index = new MacroToken("Index", ContextLevel.All);
+            public static readonly MacroToken Count = new MacroToken("Count", ContextLevel.All);
+            public static readonly MacroToken NoFirst = new MacroToken("nf(", ContextLevel.All);
+            public static readonly MacroToken NoLast = new MacroToken("nl(", ContextLevel.All);
         }
         #endregion
 
@@ -250,7 +302,7 @@ namespace Phases.CodeGeneration
                 if (!fieldInfo.IsLiteral && fieldInfo.IsInitOnly)
                 {
                     MacroToken reference = (MacroToken)fieldInfo.GetValue(null);
-                    if (reference.Context.HasFlag(context) && inputText.ToLower().Contains(MacroBegin + fieldInfo.Name.ToLower() + MacroEnd))
+                    if ((context & reference.Context) > ContextLevel.NoContext && inputText.ToLower().Contains(MacroBegin + reference.Name.ToLower() + MacroEnd))
                     {
                         token = reference;
                         string macro = MacroBegin + fieldInfo.Name + MacroEnd;
@@ -274,24 +326,74 @@ namespace Phases.CodeGeneration
             return false;
         }
 
-        public string RenderMacro(string inputText, MacroToken token, string value)
+        public MacroToken GetBlockToken(string inputText, ContextLevel context)
         {
+            MacroToken token;
+
+            // Declaring and intializing object of Type 
+            Type objType = typeof(MacroTokens);
+
+            // using GetProperties() Method 
+            FieldInfo[] type = objType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+
+            foreach (FieldInfo fieldInfo in type)
+            {
+                if (!fieldInfo.IsLiteral && fieldInfo.IsInitOnly)
+                {
+                    MacroToken reference = (MacroToken)fieldInfo.GetValue(null);
+                    if (reference.Context.HasFlag(context) && inputText.ToLower().Contains(MacroBlockBegin + fieldInfo.Name.ToLower() + MacroEnd))
+                    {
+                        token = reference;
+                        string macro = MacroBegin + fieldInfo.Name + MacroEnd;
+                        if (inputText.Contains(macro.ToLower()))
+                        {
+                            token.Render = MacroRender.LowerCase;
+                        }
+                        else if (inputText.Contains(macro.ToUpper()))
+                        {
+                            token.Render = MacroRender.UpperCase;
+                        }
+                        else
+                        {
+                            token.Render = MacroRender.AsIs;
+                        }
+                        return token;
+                    }
+                }
+            }
+            return MacroToken.Empty;
+        }
+
+        public string RenderMacro(string inputText, MacroToken token, string value, ContextLevel valueContextLevel, RenderingContext currentContext, out RenderingContext newContext)
+        {
+            newContext = null;
             int macroIndex = inputText.ToLower().IndexOf(MacroBegin + token.Name.ToLower() + MacroEnd);
             if (macroIndex == -1) return inputText;
-            string macro = inputText.Substring(macroIndex, MacroBegin.Length + token.Name.Length + MacroEnd.Length);
+            string macro;
+            // Force context
+            if (inputText.Length >= macroIndex + MacroBegin.Length + token.Name.Length + MacroEnd.Length + MacroContext.Length && inputText.Substring(macroIndex + MacroBegin.Length + token.Name.Length + MacroEnd.Length, MacroContext.Length) == MacroContext)
+            {
+                macro = inputText.Substring(macroIndex, MacroBegin.Length + token.Name.Length + MacroEnd.Length + MacroContext.Length);
+                value = MacroBegin;
+                newContext = new RenderingContext(currentContext, value);
+                newContext.Level = valueContextLevel;
+            }
+            else
+            {
+                macro = inputText.Substring(macroIndex, MacroBegin.Length + token.Name.Length + MacroEnd.Length);
 
-            if (token.Render == MacroRender.LowerCase)
-                value = value.ToLower();
-            else if (token.Render == MacroRender.UpperCase)
-                value = value.ToUpper();
-
+                if (token.Render == MacroRender.LowerCase)
+                    value = value.ToLower();
+                else if (token.Render == MacroRender.UpperCase)
+                    value = value.ToUpper();
+                newContext = new RenderingContext(currentContext, value, valueContextLevel);
+            }
             return inputText.Replace(macro, value);
         }
 
         public List<RenderingContext> RenderMacroDirectory(string inputText, RenderingContext context)
         {
             List<RenderingContext> result = new List<RenderingContext>();
-            RenderingContext newContext;
             ContextLevel level = context.Level;
             string origText = "";
 
@@ -303,11 +405,11 @@ namespace Phases.CodeGeneration
                     case "Project":
                         if (context.Objects.Data == null)
                         {
-                            inputText = RenderMacro(inputText, token, token.Name);
+                            inputText = RenderMacro(inputText, token, token.Name, ContextLevel.Project, context, out RenderingContext newContext);
                         }
                         else
                         {
-                            inputText = RenderMacro(inputText, token, context.Objects.Data.Profile.ProjectName);
+                            inputText = RenderMacro(inputText, token, context.Objects.Data.Profile.ProjectName, ContextLevel.Project, context, out RenderingContext newContext);
                         }
                         break;
                     case "Machine":
@@ -316,14 +418,14 @@ namespace Phases.CodeGeneration
                             case ContextLevel.Project:
                                 if (context.Objects.Data == null)
                                 {
-                                    newContext = new RenderingContext(context, RenderMacro(inputText, token, token.Name), ContextLevel.Machine);
+                                    RenderMacro(inputText, token, token.Name, ContextLevel.Machine, context, out RenderingContext newContext);
                                     result.Add(newContext);
                                 }
                                 else
                                 {
                                     foreach (BasicObjectsTree machine in context.Objects.Data.Trees)
                                     {
-                                        newContext = new RenderingContext(context, RenderMacro(inputText, token, machine.Name), ContextLevel.Machine);
+                                        RenderMacro(inputText, token, machine.Name, ContextLevel.Machine, context, out RenderingContext newContext);
                                         newContext.Objects.Machine = machine;
                                         result.Add(newContext);
                                     }
@@ -331,9 +433,35 @@ namespace Phases.CodeGeneration
                                 level = ContextLevel.Machine;
                                 break;
                             case ContextLevel.Machine:
-                                newContext = new RenderingContext(context, RenderMacro(inputText, token, context.Objects.Machine.Name));
+                            {
+                                RenderMacro(inputText, token, context.Objects.Machine.Name, ContextLevel.Machine, context, out RenderingContext newContext);
                                 result.Add(newContext);
                                 break;
+                            }
+                        }
+                        inputText = result.First().Value;
+                        break;
+                    case "State":
+                        if (level.HasFlag(ContextLevel.State))
+                        {
+
+                        }
+                        else if (level.HasFlag(ContextLevel.Machine))
+                        {
+                            foreach (BasicObjectsTree machine in context.Objects.Data.Trees)
+                            {
+                                foreach (BasicState state in machine.States)
+                                {
+                                    RenderMacro(inputText, token, state.Name, ContextLevel.State, context, out RenderingContext newContext);
+                                    newContext.Objects.Machine = machine;
+                                    newContext.Objects.State = state;
+                                    result.Add(newContext);
+                                }
+                            }
+                        }
+                        else if (level.HasFlag(ContextLevel.Project))
+                        {
+
                         }
                         inputText = result.First().Value;
                         break;
@@ -341,7 +469,7 @@ namespace Phases.CodeGeneration
             }
             if (result.Count == 0)
             {
-                newContext = new RenderingContext(context, inputText);
+                RenderingContext newContext = new RenderingContext(context, inputText, ContextLevel.NoContext, Path.Combine(context.File, inputText));
                 result.Add(newContext);
             }
             return result;
@@ -350,208 +478,210 @@ namespace Phases.CodeGeneration
         public List<RenderingContext> RenderMacroFile(string inputText, List<RenderingContext> contexts)
         {
             List<RenderingContext> result = new List<RenderingContext>();
-            RenderingContext newContext;
             ContextLevel level = contexts.First().Level;
             string origText = "";
 
             while (origText != inputText && ContainsToken(inputText, contexts.First().Level, out MacroToken token))
             {
+                if (result.Count > 0)
+                {
+                    contexts = result;
+                    result = new List<RenderingContext>();
+                }
                 origText = inputText;
                 switch (token.Name)
                 {
                     case "Project":
                         if (contexts.First().Objects.Data == null)
                         {
-                            inputText = RenderMacro(inputText, token, token.Name);
+                            inputText = RenderMacro(inputText, token, token.Name, ContextLevel.Project, contexts.First(), out RenderingContext newContext);
                         }
                         else
                         {
-                            inputText = RenderMacro(inputText, token, contexts.First().Objects.Data.Profile.ProjectName);
+                            inputText = RenderMacro(inputText, token, contexts.First().Objects.Data.Profile.ProjectName, ContextLevel.Project, contexts.First(), out RenderingContext newContext);
                         }
                         break;
                     case "Machine":
-                        switch (level)
+                        if (level.HasFlag(ContextLevel.Machine))
                         {
-                            case ContextLevel.Project:
-                                if (contexts.First().Objects.Data == null)
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.Machine, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (RenderingContext context in contexts)
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.Machine);
+                                    RenderMacro(inputText, token, context.Objects.Machine.Name, ContextLevel.Machine, contexts.First(), out RenderingContext newContext);
                                     result.Add(newContext);
                                 }
-                                else
-                                {
-                                    foreach (BasicObjectsTree machine in contexts.First().Objects.Data.Trees)
-                                    {
-                                        foreach (RenderingContext context in contexts)
-                                        {
-                                            newContext = new RenderingContext(context, RenderMacro(inputText, token, machine.Name), ContextLevel.Machine);
-                                            newContext.Objects.Machine = machine;
-                                            result.Add(newContext);
-                                        }
-                                    }
-                                }
-                                level = ContextLevel.Machine;
-                                break;
-                            case ContextLevel.Machine:
-                                if (contexts.First().Objects.Data == null)
-                                {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.Machine);
-                                    result.Add(newContext);
-                                }
-                                else
+                            }
+                        }
+                        else if (level.HasFlag(ContextLevel.Project))
+                        {
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.Machine, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (BasicObjectsTree machine in contexts.First().Objects.Data.Trees)
                                 {
                                     foreach (RenderingContext context in contexts)
                                     {
-                                        newContext = new RenderingContext(context, RenderMacro(inputText, token, context.Objects.Machine.Name));
+                                        RenderMacro(inputText, token, machine.Name, ContextLevel.Machine, contexts.First(), out RenderingContext newContext);
+                                        newContext.Objects.Machine = machine;
                                         result.Add(newContext);
                                     }
                                 }
-                                break;
+                            }
+                            level = ContextLevel.Machine;
                         }
                         inputText = result.First().Value;
                         break;
                     case "Node":
-                        switch (level)
+                        if (level.HasFlag(ContextLevel.Machine))
                         {
-                            case ContextLevel.Project:
-                                if (contexts.First().Objects.Data == null)
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.Node, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (RenderingContext context in contexts)
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
-                                    result.Add(newContext);
-                                }
-                                else
-                                {
-                                    foreach (BasicState state in contexts.First().Objects.Data.BasicStatesList)
+                                    foreach (BasicState state in context.Objects.Machine.BasicStatesList)
                                     {
-                                        newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, state.Name), contexts.First().Level | ContextLevel.State);
+                                        RenderMacro(inputText, token, state.Name, ContextLevel.Node, contexts.First(), out RenderingContext newContext);
                                         newContext.Objects.State = state;
                                         result.Add(newContext);
                                     }
                                 }
-                                level = ContextLevel.Machine;
-                                break;
-                            case ContextLevel.Machine:
-                                if (contexts.First().Objects.Data == null)
+                            }
+                        }
+                        else if (level.HasFlag(ContextLevel.Project))
+                        {
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.Node, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (BasicState state in contexts.First().Objects.Data.BasicStatesList)
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
+                                    RenderMacro(inputText, token, state.Name, ContextLevel.Node, contexts.First(), out RenderingContext newContext);
+                                    newContext.Objects.State = state;
                                     result.Add(newContext);
                                 }
-                                else
-                                {
-                                    foreach (RenderingContext context in contexts)
-                                    {
-                                        foreach (BasicState state in context.Objects.Machine.BasicStatesList)
-                                        {
-                                            newContext = new RenderingContext(context, RenderMacro(inputText, token, state.Name), context.Level | ContextLevel.State);
-                                            newContext.Objects.State = state;
-                                            result.Add(newContext);
-                                        }
-                                    }
-                                }
-                                break;
+                            }
+                            level = ContextLevel.Machine;
                         }
                         inputText = result.First().Value;
                         break;
                     case "SuperState":
-                        switch (level)
+                        if (level.HasFlag(ContextLevel.Machine))
                         {
-                            case ContextLevel.Project:
-                                if (contexts.First().Objects.Data == null)
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.SuperState, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (RenderingContext context in contexts)
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
-                                    result.Add(newContext);
-                                }
-                                else
-                                {
-                                    foreach (BasicState state in contexts.First().Objects.Data.SuperStatesList())
+                                    foreach (BasicState state in context.Objects.Machine.SuperStatesList())
                                     {
-                                        newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, state.Name), contexts.First().Level | ContextLevel.State);
+                                        RenderMacro(inputText, token, state.Name, ContextLevel.SuperState, contexts.First(), out RenderingContext newContext);
                                         newContext.Objects.State = state;
                                         result.Add(newContext);
                                     }
                                 }
-                                level = ContextLevel.Machine;
-                                break;
-                            case ContextLevel.Machine:
-                                if (contexts.First().Objects.Data == null)
+                            }
+                        }
+                        else if (level.HasFlag(ContextLevel.Project))
+                        {
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.SuperState, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (BasicState state in contexts.First().Objects.Data.SuperStatesList())
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
+                                    RenderMacro(inputText, token, state.Name, ContextLevel.SuperState, contexts.First(), out RenderingContext newContext);
+                                    newContext.Objects.State = state;
                                     result.Add(newContext);
                                 }
-                                else
-                                {
-                                    foreach (RenderingContext context in contexts)
-                                    {
-                                        foreach (BasicState state in context.Objects.Machine.SuperStatesList())
-                                        {
-                                            newContext = new RenderingContext(context, RenderMacro(inputText, token, state.Name), context.Level | ContextLevel.State);
-                                            newContext.Objects.State = state;
-                                            result.Add(newContext);
-                                        }
-                                    }
-                                }
-                                break;
+                            }
+                            level = ContextLevel.Machine;
                         }
                         inputText = result.First().Value;
                         break;
                     case "State":
-                        switch (level)
+                        if (level.HasFlag(ContextLevel.State))
                         {
-                            case ContextLevel.Project:
-                                if (contexts.First().Objects.Data == null)
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.State, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (RenderingContext context in contexts)
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
-                                    result.Add(newContext);
-                                }
-                                else
-                                {
-                                    foreach (BasicState state in contexts.First().Objects.Data.StatesList())
+                                    foreach (BasicState state in context.Objects.Machine.StatesList())
                                     {
-                                        newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, state.Name), contexts.First().Level | ContextLevel.State);
+                                        RenderMacro(inputText, token, state.Name, ContextLevel.State, contexts.First(), out RenderingContext newContext);
                                         newContext.Objects.State = state;
                                         result.Add(newContext);
                                     }
                                 }
-                                level = ContextLevel.Machine;
-                                break;
-                            case ContextLevel.Machine:
-                                if (contexts.First().Objects.Data == null)
+                            }
+                        }
+                        else if (level.HasFlag(ContextLevel.Machine))
+                        {
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.State, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (RenderingContext context in contexts)
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
-                                    result.Add(newContext);
-                                }
-                                else
-                                {
-                                    foreach (RenderingContext context in contexts)
+                                    foreach (BasicState state in context.Objects.Machine.StatesList())
                                     {
-                                        foreach (BasicState state in context.Objects.Machine.StatesList())
-                                        {
-                                            newContext = new RenderingContext(context, RenderMacro(inputText, token, state.Name), context.Level | ContextLevel.State);
-                                            newContext.Objects.State = state;
-                                            result.Add(newContext);
-                                        }
+                                        RenderMacro(inputText, token, state.Name, ContextLevel.State, contexts.First(), out RenderingContext newContext);
+                                        newContext.Objects.State = state;
+                                        result.Add(newContext);
                                     }
                                 }
-                                break;
-                            case ContextLevel.Machine | ContextLevel.State:
-                                if (contexts.First().Objects.Data == null)
+                            }
+                            level = ContextLevel.State;
+                        }
+                        else if (level.HasFlag(ContextLevel.Project))
+                        {
+                            if (contexts.First().Objects.Data == null)
+                            {
+                                RenderMacro(inputText, token, token.Name, ContextLevel.State, contexts.First(), out RenderingContext newContext);
+                                result.Add(newContext);
+                            }
+                            else
+                            {
+                                foreach (BasicState state in contexts.First().Objects.Data.StatesList())
                                 {
-                                    newContext = new RenderingContext(contexts.First(), RenderMacro(inputText, token, token.Name), ContextLevel.State);
+                                    RenderMacro(inputText, token, state.Name, ContextLevel.State, contexts.First(), out RenderingContext newContext);
+                                    newContext.Objects.State = state;
                                     result.Add(newContext);
                                 }
-                                else
-                                {
-                                    foreach (RenderingContext context in contexts)
-                                    {
-                                        foreach (BasicState state in context.Objects.Machine.StatesList())
-                                        {
-                                            newContext = new RenderingContext(context, RenderMacro(inputText, token, state.Name), context.Level | ContextLevel.State);
-                                            newContext.Objects.State = state;
-                                            result.Add(newContext);
-                                        }
-                                    }
-                                }
-                                break;
+                            }
+                            level = ContextLevel.Machine;
                         }
                         inputText = result.First().Value;
                         break;
@@ -563,13 +693,13 @@ namespace Phases.CodeGeneration
                 {
                     foreach (RenderingContext context in contexts)
                     {
-                        newContext = new RenderingContext(context, inputText);
+                        RenderingContext newContext = new RenderingContext(context, inputText, ContextLevel.NoContext, Path.Combine(contexts.First().File, inputText));
                         result.Add(newContext);
                     }
                 }
                 else
                 {
-                    newContext = new RenderingContext(contexts.First(), inputText);
+                    RenderingContext newContext = new RenderingContext(contexts.First(), inputText, ContextLevel.NoContext, Path.Combine(contexts.First().File, inputText));
                     result.Add(newContext);
                 }
             }
@@ -588,6 +718,536 @@ namespace Phases.CodeGeneration
             return inputText.Replace(macro, value);
         }
 
+        public string RenderMacroDocument(string documentText, RenderingContext context)
+        {
+            string[] lines = documentText.Split(new string[] { Environment.NewLine, "\r", "\n" }, StringSplitOptions.None);
+            int lineIndex = 0;
+            StringBuilder text = RenderMacroBlock(context, lines, ref lineIndex);
+
+            // Add the rest of the lines at the end: this means there was an error
+            while (lineIndex < lines.Length)
+            {
+                text.AppendLine(lines[lineIndex]);
+                lineIndex++;
+            }
+            text.Remove(text.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+
+            return text.ToString();
+        }
+
+        /// <summary>
+        /// Render with the macro processor a block of text.
+        /// </summary>
+        /// <param name="context">Current context for the block.</param>
+        /// <param name="lines">Full document lines.</param>
+        /// <param name="lineIndex">Index where the block starts, at return is the index where the block ends.</param>
+        /// <returns>The resulting text from the block rendering.</returns>
+        public StringBuilder RenderMacroBlock(RenderingContext context, string[] lines, ref int lineIndex)
+        {
+            StringBuilder text = new StringBuilder();
+
+            while (lineIndex < lines.Length)
+            {
+                string line = lines[lineIndex];
+                if (line.Contains(MacroBlockEnd))
+                {
+                    break;
+                }
+                else if (line.Contains(MacroBlockBegin))
+                {
+                    MacroToken token = GetBlockToken(line, context.Level);
+                    int blockIndex = lineIndex + 1;
+                    switch (token.Name)
+                    {
+                        case "Machine":
+                            if (context.Level.HasFlag(ContextLevel.Machine))
+                            {
+                                text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            }
+                            else
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Machine,
+                                    context.Objects.Data.Trees, (ctx, machine) => ctx.Objects.Machine = machine);
+                            }
+                            break;
+                        case "State":
+                            if (context.Level.HasFlag(ContextLevel.State))
+                            {
+                                text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.SuperState))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.State,
+                                    context.Objects.Data.BasicStatesList, (ctx, state) => ctx.Objects.State = state);
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.Machine))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.State,
+                                    context.Objects.Machine.States, (ctx, state) => ctx.Objects.State = state);
+                            }
+                            else
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.State,
+                                    context.Objects.Data.BasicStatesList, (ctx, state) => ctx.Objects.State = state);
+                            }
+                            break;
+                        case "Transition":
+                            if (context.Level.HasFlag(ContextLevel.Transition))
+                            {
+                                text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.State))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Transition,
+                                    context.Objects.State.Transitions, (ctx, trans) => ctx.Objects.Transition = trans);
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.SuperState))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Transition,
+                                    context.Objects.SuperState.Transitions, (ctx, trans) => ctx.Objects.Transition = trans);
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.Machine))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Transition,
+                                    context.Objects.Machine.BasicTransitionsList, (ctx, trans) => ctx.Objects.Transition = trans);
+                            }
+                            else
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Transition,
+                                    context.Objects.Data.BasicTransitionsList(), (ctx, trans) => ctx.Objects.Transition = trans);
+                            }
+                            break;
+                        case "Variable":
+                            if (context.Level.HasFlag(ContextLevel.Variable))
+                            {
+                                text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.Project))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Variable,
+                                    context.Objects.Data.Variables.All, (ctx, var) => ctx.Objects.Variable = var);
+                            }
+                            break;
+                        case "InputEvent":
+                            if (context.Level.HasFlag(ContextLevel.Variable))
+                            {
+                                text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.Project))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Variable,
+                                    context.Objects.Data.Variables.EventInputs, (ctx, var) => ctx.Objects.Variable = var);
+                            }
+                            break;
+                        case "OutputEvent":
+                            if (context.Level.HasFlag(ContextLevel.Variable))
+                            {
+                                text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            }
+                            else if (context.Level.HasFlag(ContextLevel.Project))
+                            {
+                                RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Variable,
+                                    context.Objects.Data.Variables.EventOutputs, (ctx, var) => ctx.Objects.Variable = var);
+                            }
+                            break;
+                        default:
+                            text.Append(RenderMacroBlock(context, lines, ref blockIndex));
+                            break;
+                    }
+                    lineIndex = blockIndex;
+                }
+                else
+                {
+                    text.Append(RenderMacroLine(context, line));
+                }
+                lineIndex++;
+            }
+            
+            return text;
+        }
+
+        private void RenderGenericBlock<T>(StringBuilder text, RenderingContext context, string[] lines, ref int lineIndex,
+            ContextLevel newLevel, IEnumerable<T> list, Action<RenderingContext, T> load)
+        {
+            int blockIndex = lineIndex;
+            int index = 0;
+            foreach (T obj in list)
+            {
+                var newContext = new RenderingContext(context, lines[lineIndex], newLevel);
+                load(newContext, obj);
+                newContext.First = obj.Equals(list.First());
+                newContext.Last = obj.Equals(list.Last());
+                newContext.Index = index++;
+                blockIndex = lineIndex;
+                text.Append(RenderMacroBlock(newContext, lines, ref blockIndex));
+            }
+            lineIndex = blockIndex;
+        }
+
+
+        public string RenderMacroLine(RenderingContext context, string inputText)
+        {
+            StringBuilder text = new StringBuilder();
+            string origText = "", outputText = inputText;
+            int index1, index2;
+
+            while (origText != outputText && ContainsToken(outputText, context.Level, out MacroToken token))
+            {
+                inputText = outputText;
+                origText = inputText;
+                switch (token.Name)
+                {
+                    case "File":
+                    {
+                        outputText = RenderMacro(inputText, token, context.File, ContextLevel.File, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "FileName":
+                    {
+                        outputText = RenderMacro(inputText, token, Path.GetFileNameWithoutExtension(context.File), ContextLevel.File, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "FileExt":
+                    {
+                        string ext = Path.GetExtension(context.File);
+                        if (ext.StartsWith(".")) ext = ext.Substring(1);
+                        outputText = RenderMacro(inputText, token, ext, ContextLevel.File, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "Project":
+                    {
+                        outputText = RenderMacro(inputText, token, context.Objects.Data.Profile.ProjectName, ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "Machines":
+                    {
+                        outputText = RenderMacro(inputText, token, context.Objects.Data.Trees.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "Machine":
+                        if (context.Level.HasFlag(ContextLevel.Machine))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Machine.Name, ContextLevel.Machine, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(context, outputText));
+                        }
+                        else
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Machine,
+                                context.Objects.Data.Trees, (ctx, mach) => ctx.Objects.Machine = mach, mach => mach.Name);
+                        }
+                        return text.ToString();
+                    case "States":
+                    {
+                        if (context.Level.HasFlag(ContextLevel.SuperState))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.SuperState.States.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Machine))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Machine.States.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Data.BasicStatesList.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        break;
+                    }
+                    case "State":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.State.Name, ContextLevel.State, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(context, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.SuperState))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.State,
+                                context.Objects.SuperState.States, (ctx, state) => ctx.Objects.State = state, state => state.Name);
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Machine))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.State,
+                                context.Objects.Machine.States, (ctx, state) => ctx.Objects.State = state, state => state.Name);
+                        }
+                        else
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.State,
+                                context.Objects.Data.BasicStatesList, (ctx, state) => ctx.Objects.State = state, state => state.Name);
+                        }
+                        return text.ToString();
+                    case "Transitions":
+                    {
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.State.Transitions.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.SuperState))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.SuperState.Transitions.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Machine))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Machine.BasicTransitionsList.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Data.TransitionsList.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        break;
+                    }
+                    case "Transition":
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Transition.Name, ContextLevel.Transition, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(context, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Transition,
+                                context.Objects.State.Transitions, (ctx, trans) => ctx.Objects.Transition = trans, trans => trans.Name);
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.SuperState))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Transition,
+                                context.Objects.SuperState.Transitions, (ctx, trans) => ctx.Objects.Transition = trans, trans => trans.Name);
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Machine))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Transition,
+                                context.Objects.Machine.BasicTransitionsList, (ctx, trans) => ctx.Objects.Transition = trans, trans => trans.Name);
+                        }
+                        else
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Transition,
+                                context.Objects.Data.BasicTransitionsList(), (ctx, trans) => ctx.Objects.Transition = trans, trans => trans.Name);
+                        }
+                        return text.ToString();
+                    case "Pointing":
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Transition.Pointing.Name, ContextLevel.Transition, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(context, outputText));
+                        }
+                        else
+                        {
+                            text.Append(RenderMacroLine(context, inputText));
+                        }
+                        return text.ToString();
+                    case "Outputs":
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Transition.Outputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = RenderMacro(inputText, token, "<??>", ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        break;
+                    case "Output":
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            foreach (BasicOutput output in context.Objects.Transition.Outputs)
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "Variables":
+                    {
+                        outputText = RenderMacro(inputText, token, context.Objects.Data.Variables.All.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "Variable":
+                        if (context.Level.HasFlag(ContextLevel.Variable))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Variable.Name, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Project))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Variable,
+                                context.Objects.Data.Variables.All, (ctx, var) => ctx.Objects.Variable = var, var => var.Name);
+                        }
+                        return text.ToString();
+                    case "InputEvents":
+                    {
+                        outputText = RenderMacro(inputText, token, context.Objects.Data.Variables.EventInputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "InputEvent":
+                        if (context.Level.HasFlag(ContextLevel.Variable) && context.Objects.Variable is EventInput)
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Variable.Name, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Project))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Variable,
+                                context.Objects.Data.Variables.EventInputs, (ctx, var) => ctx.Objects.Variable = var, var => var.Name);
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "OutputEvents":
+                    {
+                        outputText = RenderMacro(inputText, token, context.Objects.Data.Variables.EventOutputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "OutputEvent":
+                        if (context.Level.HasFlag(ContextLevel.Variable) && context.Objects.Variable is EventOutput)
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Variable.Name, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Project))
+                        {
+                            RenderGenericLine(text, context, token, inputText, ContextLevel.Variable,
+                                context.Objects.Data.Variables.EventOutputs, (ctx, var) => ctx.Objects.Variable = var, var => var.Name);
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "Default":
+                        if (context.Level.HasFlag(ContextLevel.Variable))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Variable.Default, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "EnterOutputs":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.State.EnterOutputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = RenderMacro(inputText, token, "<??>", ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        break;
+                    case "EnterOutput":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            foreach (BasicOutput output in context.Objects.State.EnterOutputs)
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "ExitOutputs":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.State.ExitOutputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = RenderMacro(inputText, token, "<??>", ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        break;
+                    case "ExitOutput":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            foreach (BasicOutput output in context.Objects.State.ExitOutputs)
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "Condition(":
+                    {
+                        index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        index2 = inputText.IndexOf(")", index1);
+                        if (index2 == -1) break;
+                        string macro = inputText.Substring(index1, index2 - index1 + 1);
+                        string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length - token.Name.Length - 1);
+                        if (string.IsNullOrWhiteSpace(content)) break;
+
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            outputText = inputText.Replace(macro, context.Objects.Transition.GetCondition("", content));
+                            text.Append(RenderMacroLine(context, outputText));
+                        }
+                        return text.ToString();
+                    }
+                    case "Index":
+                    {
+                        outputText = RenderMacro(inputText, token, context.Index.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "Count":
+                    {
+                        outputText = RenderMacro(inputText, token, (context.Index + 1).ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                        break;
+                    }
+                    case "nf(":
+                        index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        while (index1 > 0)
+                        {
+                            index2 = inputText.IndexOf(MacroBegin + ")", index1);
+                            if (index2 == -1) break;
+                            string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
+                            string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
+                            if (!context.First) outputText = inputText.Replace(macro, content);
+                            else outputText = inputText.Replace(macro, "");
+                            index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
+                        }
+                        break;
+                    case "nl(":
+                        index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        while (index1 > 0)
+                        {
+                            index2 = inputText.IndexOf(MacroBegin + ")", index1);
+                            if (index2 == -1) break;
+                            string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
+                            string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
+                            if (!context.Last) outputText = inputText.Replace(macro, content);
+                            else outputText = inputText.Replace(macro, "");
+                            index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
+                        }
+                        break;
+                }
+            }
+            text.AppendLine(outputText);
+
+            return text.ToString();
+        }
+
+        void RenderGenericLine<T>(StringBuilder text, RenderingContext context, MacroToken token, string inputText,
+            ContextLevel newLevel, IEnumerable<T> list, Action<RenderingContext, T> load, Func<T, string> value)
+        {
+            int index = 0;
+            foreach (T obj in list)
+            {
+                string outputText = RenderMacro(inputText, token, value(obj), newLevel, context, out RenderingContext newContext);
+                load(newContext, obj);
+                newContext.First = obj.Equals(list.First());
+                newContext.Last = obj.Equals(list.Last());
+                newContext.Index = index++;
+                text.Append(RenderMacroLine(newContext, outputText));
+            }
+        }
+
         #region "General"
 
         [Description("Path relative to phases file where the files will be generated."), Category("General")]
@@ -597,6 +1257,9 @@ namespace Phases.CodeGeneration
 
 
         #region "Primary Cottle Tokens"
+
+        [Description("Enable Cottle block tokens."), Category("Primary Cottle tokens")]
+        public bool EnableCottle { get; set; } = true;
 
         [Description("Cottle block begin token."), Category("Primary Cottle tokens")]
         public string BlockBegin { get; set; } = "{";

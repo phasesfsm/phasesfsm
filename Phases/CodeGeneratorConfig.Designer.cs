@@ -31,38 +31,38 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CodeGeneratorConfig));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.btNewConfig = new System.Windows.Forms.ToolStripButton();
+            this.btOpenFolder = new System.Windows.Forms.ToolStripButton();
+            this.btSaveIni = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btEditCottle = new System.Windows.Forms.ToolStripButton();
+            this.btReloadIni = new System.Windows.Forms.ToolStripButton();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.stBar = new System.Windows.Forms.ToolStripStatusLabel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.btAddFolder = new System.Windows.Forms.ToolStripButton();
+            this.btAddFile = new System.Windows.Forms.ToolStripButton();
+            this.btDelete = new System.Windows.Forms.ToolStripButton();
             this.listView = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.btAddFolder = new System.Windows.Forms.ToolStripButton();
-            this.btAddFile = new System.Windows.Forms.ToolStripButton();
-            this.btDelete = new System.Windows.Forms.ToolStripButton();
-            this.btNewConfig = new System.Windows.Forms.ToolStripButton();
-            this.btOpenFolder = new System.Windows.Forms.ToolStripButton();
-            this.btSaveIni = new System.Windows.Forms.ToolStripButton();
-            this.btEditCottle = new System.Windows.Forms.ToolStripButton();
-            this.btReloadIni = new System.Windows.Forms.ToolStripButton();
-            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.toolStrip2.SuspendLayout();
             this.contextMenu.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -80,10 +80,57 @@
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // btNewConfig
+            // 
+            this.btNewConfig.Image = global::Phases.Properties.Resources.file;
+            this.btNewConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btNewConfig.Name = "btNewConfig";
+            this.btNewConfig.Size = new System.Drawing.Size(51, 22);
+            this.btNewConfig.Text = "New";
+            this.btNewConfig.Click += new System.EventHandler(this.btNewConfig_Click);
+            // 
+            // btOpenFolder
+            // 
+            this.btOpenFolder.Image = global::Phases.Properties.Resources.folder;
+            this.btOpenFolder.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btOpenFolder.Name = "btOpenFolder";
+            this.btOpenFolder.Size = new System.Drawing.Size(56, 22);
+            this.btOpenFolder.Text = "Open";
+            this.btOpenFolder.Click += new System.EventHandler(this.BtOpenFolder_Click);
+            // 
+            // btSaveIni
+            // 
+            this.btSaveIni.Enabled = false;
+            this.btSaveIni.Image = global::Phases.Properties.Resources.save_as;
+            this.btSaveIni.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btSaveIni.Name = "btSaveIni";
+            this.btSaveIni.Size = new System.Drawing.Size(51, 22);
+            this.btSaveIni.Text = "Save";
+            this.btSaveIni.Click += new System.EventHandler(this.btSaveIni_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // btEditCottle
+            // 
+            this.btEditCottle.Enabled = false;
+            this.btEditCottle.Image = global::Phases.Properties.Resources.text;
+            this.btEditCottle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btEditCottle.Name = "btEditCottle";
+            this.btEditCottle.Size = new System.Drawing.Size(47, 22);
+            this.btEditCottle.Text = "Edit";
+            this.btEditCottle.Click += new System.EventHandler(this.BtEditCottle_Click);
+            // 
+            // btReloadIni
+            // 
+            this.btReloadIni.Enabled = false;
+            this.btReloadIni.Image = global::Phases.Properties.Resources.flipflop1;
+            this.btReloadIni.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btReloadIni.Name = "btReloadIni";
+            this.btReloadIni.Size = new System.Drawing.Size(63, 22);
+            this.btReloadIni.Text = "Reload";
             // 
             // statusStrip1
             // 
@@ -140,6 +187,38 @@
             this.treeView.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_BeforeLabelEdit);
             this.treeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView_AfterLabelEdit);
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView_AfterSelect);
+            this.treeView.DoubleClick += new System.EventHandler(this.treeView_DoubleClick);
+            // 
+            // contextMenu
+            // 
+            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.renameToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.deleteToolStripMenuItem});
+            this.contextMenu.Name = "contextMenu";
+            this.contextMenu.Size = new System.Drawing.Size(137, 54);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            // 
+            // renameToolStripMenuItem
+            // 
+            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
+            this.renameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.renameToolStripMenuItem.Text = "&Rename";
+            this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(133, 6);
+            // 
+            // deleteToolStripMenuItem
+            // 
+            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+            this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
+            this.deleteToolStripMenuItem.Text = "&Delete";
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.btDelete_Click);
             // 
             // imageList
             // 
@@ -148,47 +227,6 @@
             this.imageList.Images.SetKeyName(0, "Folder-32.png");
             this.imageList.Images.SetKeyName(1, "File-Document-32.png");
             this.imageList.Images.SetKeyName(2, "Configuration-32.png");
-            // 
-            // listView
-            // 
-            this.listView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.listView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView.HideSelection = false;
-            this.listView.Location = new System.Drawing.Point(0, 0);
-            this.listView.MultiSelect = false;
-            this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(587, 403);
-            this.listView.SmallImageList = this.imageList;
-            this.listView.TabIndex = 1;
-            this.listView.UseCompatibleStateImageBehavior = false;
-            this.listView.View = System.Windows.Forms.View.Details;
-            this.listView.SelectedIndexChanged += new System.EventHandler(this.ListView_SelectedIndexChanged);
-            this.listView.DoubleClick += new System.EventHandler(this.listView_DoubleClick);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Files to be generated";
-            this.columnHeader1.Width = 300;
-            // 
-            // columnHeader2
-            // 
-            this.columnHeader2.Text = "Render context";
-            this.columnHeader2.Width = 250;
-            // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(587, 403);
-            this.propertyGrid1.TabIndex = 0;
-            // 
-            // openFileDialog
-            // 
-            this.openFileDialog.FileName = "cottle.ini";
-            this.openFileDialog.Filter = "Cottle configuration file (cottle.ini)|cottle.ini";
             // 
             // toolStrip2
             // 
@@ -231,83 +269,47 @@
             this.btDelete.Text = "Delete";
             this.btDelete.Click += new System.EventHandler(this.btDelete_Click);
             // 
-            // btNewConfig
+            // listView
             // 
-            this.btNewConfig.Image = global::Phases.Properties.Resources.file;
-            this.btNewConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btNewConfig.Name = "btNewConfig";
-            this.btNewConfig.Size = new System.Drawing.Size(51, 22);
-            this.btNewConfig.Text = "New";
-            this.btNewConfig.Click += new System.EventHandler(this.btNewConfig_Click);
+            this.listView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2});
+            this.listView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView.HideSelection = false;
+            this.listView.Location = new System.Drawing.Point(0, 0);
+            this.listView.MultiSelect = false;
+            this.listView.Name = "listView";
+            this.listView.Size = new System.Drawing.Size(587, 403);
+            this.listView.SmallImageList = this.imageList;
+            this.listView.TabIndex = 1;
+            this.listView.UseCompatibleStateImageBehavior = false;
+            this.listView.View = System.Windows.Forms.View.Details;
+            this.listView.SelectedIndexChanged += new System.EventHandler(this.ListView_SelectedIndexChanged);
+            this.listView.DoubleClick += new System.EventHandler(this.listView_DoubleClick);
             // 
-            // btOpenFolder
+            // columnHeader1
             // 
-            this.btOpenFolder.Image = global::Phases.Properties.Resources.folder;
-            this.btOpenFolder.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btOpenFolder.Name = "btOpenFolder";
-            this.btOpenFolder.Size = new System.Drawing.Size(56, 22);
-            this.btOpenFolder.Text = "Open";
-            this.btOpenFolder.Click += new System.EventHandler(this.BtOpenFolder_Click);
+            this.columnHeader1.Text = "Files to be generated";
+            this.columnHeader1.Width = 300;
             // 
-            // btSaveIni
+            // columnHeader2
             // 
-            this.btSaveIni.Enabled = false;
-            this.btSaveIni.Image = global::Phases.Properties.Resources.save_as;
-            this.btSaveIni.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btSaveIni.Name = "btSaveIni";
-            this.btSaveIni.Size = new System.Drawing.Size(51, 22);
-            this.btSaveIni.Text = "Save";
-            this.btSaveIni.Click += new System.EventHandler(this.btSaveIni_Click);
+            this.columnHeader2.Text = "Render context";
+            this.columnHeader2.Width = 250;
             // 
-            // btEditCottle
+            // propertyGrid1
             // 
-            this.btEditCottle.Enabled = false;
-            this.btEditCottle.Image = global::Phases.Properties.Resources.text;
-            this.btEditCottle.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btEditCottle.Name = "btEditCottle";
-            this.btEditCottle.Size = new System.Drawing.Size(47, 22);
-            this.btEditCottle.Text = "Edit";
-            this.btEditCottle.Click += new System.EventHandler(this.BtEditCottle_Click);
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(587, 403);
+            this.propertyGrid1.TabIndex = 0;
+            this.propertyGrid1.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGrid1_PropertyValueChanged);
             // 
-            // btReloadIni
+            // openFileDialog
             // 
-            this.btReloadIni.Enabled = false;
-            this.btReloadIni.Image = global::Phases.Properties.Resources.flipflop1;
-            this.btReloadIni.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btReloadIni.Name = "btReloadIni";
-            this.btReloadIni.Size = new System.Drawing.Size(63, 22);
-            this.btReloadIni.Text = "Reload";
-            // 
-            // contextMenu
-            // 
-            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.renameToolStripMenuItem,
-            this.toolStripMenuItem1,
-            this.deleteToolStripMenuItem});
-            this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(137, 54);
-            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
-            // 
-            // renameToolStripMenuItem
-            // 
-            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
-            this.renameToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
-            this.renameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.renameToolStripMenuItem.Text = "&Rename";
-            this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // deleteToolStripMenuItem
-            // 
-            this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-            this.deleteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.deleteToolStripMenuItem.Text = "&Delete";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.btDelete_Click);
+            this.openFileDialog.FileName = "cottle.ini";
+            this.openFileDialog.Filter = "Cottle configuration file (cottle.ini)|cottle.ini";
             // 
             // CodeGeneratorConfig
             // 
@@ -332,9 +334,9 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.contextMenu.ResumeLayout(false);
             this.toolStrip2.ResumeLayout(false);
             this.toolStrip2.PerformLayout();
-            this.contextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

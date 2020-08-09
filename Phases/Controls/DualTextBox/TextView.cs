@@ -129,8 +129,9 @@ namespace DualText
             VScroll.SuspendLayout();
             HScroll.SuspendLayout();
             Label.SuspendLayout();
-            AdjustVisibleArea(Cursor.Selection.X, Cursor.Selection.Y);
-            AdjustVisibleArea(Cursor.Location.X, Cursor.Location.Y);
+            AdjustVisibleArea(Cursor.Selection.X, Cursor.GetRealY(Cursor.Selection.Y));
+            AdjustVisibleArea(Cursor.Location.X, Cursor.GetRealY(Cursor.Location.Y));
+            UpdateLabel(Cursor.Location.Y + 1, Math.Min(Text.Lines[Cursor.Location.Y].Length, Cursor.Location.X) + 1);
             VScroll.ResumeLayout();
             VScroll.ResumeLayout();
             HScroll.ResumeLayout();
@@ -139,10 +140,10 @@ namespace DualText
         public void AdjustVisibleArea(int x, int y)
         {
             // Vertical adjust
-            if (VScroll.Value < y * BaseFormat.FontHeight - TextArea.Height + 2 * BaseFormat.FontHeight + 1)
+            if (VScroll.Value < y * BaseFormat.FontHeight - TextArea.Height + BaseFormat.FontHeight + 1)
             {
                 // Going down
-                VScroll.Value = y * BaseFormat.FontHeight - TextArea.Height + 2 * BaseFormat.FontHeight + 1;
+                VScroll.Value = y * BaseFormat.FontHeight - TextArea.Height + BaseFormat.FontHeight + 1;
             }
             else if (VScroll.Value > y * BaseFormat.FontHeight)
             {
@@ -164,9 +165,8 @@ namespace DualText
                 // Going left
                 HScroll.Value = Math.Max(x * BaseFormat.FontWidth, 0);
             }
-            UpdateLabel(y + 1, Math.Min(Text.Lines[y].Length, x) + 1);
         }
-        private void UpdateLabel(int line, int column)
+        internal void UpdateLabel(int line, int column)
         {
             if (Label == null) return;
             //label.Text = string.Format("    Ln: {0}    Ch: {1}        ", Y + 1, Math.Min(LineEnd, X) + 1);

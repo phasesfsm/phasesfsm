@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Phases.CodeGeneration.CodeGeneratorProperties;
 
 namespace Phases.CodeGeneration.Interpreter
 {
@@ -255,37 +256,11 @@ namespace Phases.CodeGeneration.Interpreter
             return document;
         }
 
-        private IDocument CreateDocument(string templateText)
+        private IDocument CreateDocument(string templateText, RenderingContext context)
         {
-            string[] lines = templateText.Split(new string[]{ Environment.NewLine, "\r", "\n" }, StringSplitOptions.None);
-
-            StringBuilder text = new StringBuilder();
-            foreach (string line in lines)
-            {
-                string textLine;
-                if (line.Contains("@project"))
-                {
-                    textLine = line.Replace("@project", Name);
-                }
-                else
-                {
-                    textLine = line;
-                }
-                if (textLine.Contains("@machine"))
-                {
-                    foreach (BasicObjectsTree tree in Data.Trees)
-                    {
-                        text.AppendLine(textLine.Replace("@machine", tree.Name));
-                    }
-                }
-                else
-                {
-                    text.AppendLine(textLine);
-                }
-            }
-
+            // Render cottle
             IDocument document;
-            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(text.ToString())))
+            using (var stream = new MemoryStream(Encoding.ASCII.GetBytes(templateText)))
             {
                 using (var reader = new StreamReader(stream, Encoding.UTF8))
                 {
@@ -434,22 +409,35 @@ namespace Phases.CodeGeneration.Interpreter
             return true;
         }
 
-        public string RenderScript(string scriptText, string fileName)
+        public string RenderScript(string scriptText, string fileName, RenderingContext context)
         {
             dateTime = DateTime.Now;
             
             BuildStore();
             if (LoadSettings() == false) return null;
+            string result;
 
-            IDocument document = CreateDocument(scriptText);
-            if (document == null) return null;
+            // Render preprocessor.
+            string macroResult = Data.Profile.Properties.RenderMacroDocument(scriptText, context);
 
-            BuiltinStore store = BuildStore();
+            // Render cottle
+            if (Data.Profile.Properties.EnableCottle)
+            {
+                IDocument document = CreateDocument(macroResult, context);
+                if (document == null) return null;
 
-            loadFunctions(store, fileName);
-            loadFileMacros(store, fileName);
+                BuiltinStore store = BuildStore();
 
-            return RenderDocument(document, store, fileName);
+                loadFunctions(store, fileName);
+                loadFileMacros(store, fileName);
+
+                result = RenderDocument(document, store, fileName);
+            }
+            else
+            {
+                result = macroResult;
+            }
+            return result;
         }
 
         private void RenewFolder()

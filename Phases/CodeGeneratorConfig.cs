@@ -43,8 +43,8 @@ namespace Phases
 
         private class NodeTag
         {
-            public List<RenderingContext> Renderings;
-            public string FilePath;
+            public List<RenderingContext> Renderings { get; set; }
+            public string FilePath { get; set; }
 
             public NodeTag(string filePath, RenderingContext rendering)
             {
@@ -75,8 +75,8 @@ namespace Phases
             treeView.Nodes.Clear();
             treeView.Nodes.Add(rootNode);
             string iniPath = Path.Combine(rootPath, "cottle.ini");
-            rootNode.Tag = new NodeTag(iniPath, new RenderingContext(ContextLevel.Project, new ContextObjects(gData), rootPath));
-            rootNode.Nodes.Add("cottle.ini", "cottle.ini", 2, 2).Tag = new NodeTag(iniPath, new RenderingContext(ContextLevel.NoContext, null, "cottle.ini"));
+            rootNode.Tag = new NodeTag(rootPath, new RenderingContext(rootPath, ContextLevel.Project, gData, rootPath));
+            rootNode.Nodes.Add("cottle.ini", "cottle.ini", 2, 2).Tag = new NodeTag(iniPath, new RenderingContext(iniPath, ContextLevel.NoContext, gData, "cottle.ini"));
             rootNode.ExpandAll();
         }
 
@@ -90,7 +90,7 @@ namespace Phases
             rootPath = scriptsFolder;
             var folderName = Path.GetFileName(scriptsFolder);
             var rootNode = new TreeNode(folderName, 0, 0);
-            rootNode.Tag = new NodeTag(scriptsFolder, new RenderingContext(ContextLevel.Project, new ContextObjects(gData), scriptsFolder));
+            rootNode.Tag = new NodeTag(scriptsFolder, new RenderingContext(scriptsFolder, ContextLevel.Project, gData, scriptsFolder));
             treeView.Nodes.Clear();
             treeView.Nodes.Add(rootNode);
 
@@ -105,7 +105,7 @@ namespace Phases
                 }
                 else if (fileName == "cottle.ini")
                 {
-                    rootNode.Nodes.Add(fileName, fileName, 2, 2).Tag = new NodeTag(filePath, new RenderingContext(ContextLevel.NoContext, null, fileName));
+                    rootNode.Nodes.Add(fileName, fileName, 2, 2).Tag = new NodeTag(filePath, new RenderingContext(filePath, ContextLevel.NoContext, gData, fileName));
                 }
                 else
                 {
@@ -128,7 +128,7 @@ namespace Phases
                 }
                 else
                 {
-                    newNode.Tag = new NodeTag(subdir, new RenderingContext((treeNode.Tag as NodeTag).First().Level, null, dirName));
+                    newNode.Tag = new NodeTag(subdir, new RenderingContext(subdir, dirName, (treeNode.Tag as NodeTag).First()));
                 }
                 treeNode.Nodes.Add(newNode);
                 ProccessDirs(subdir, newNode);
@@ -184,6 +184,7 @@ namespace Phases
                         listView.Items.Add(item);
                         item.SubItems.Add(context.Level.ToString());
                         item.Tag = context;
+                        //item.Tag = new RenderingContext(context.Value, context);
                     }
                 }
                 else
@@ -268,6 +269,7 @@ namespace Phases
             }
 
             File.WriteAllText(Path.Combine(rootPath, "cottle.ini"), st.ToString());
+            btSaveIni.Enabled = false;
         }
 
         private void btAddFolder_Click(object sender, EventArgs e)
@@ -300,7 +302,7 @@ namespace Phases
                 }
                 else
                 {
-                    newNode.Tag = new NodeTag(subdir, new RenderingContext((treeNode.Tag as NodeTag).First().Level, null, dirName));
+                    newNode.Tag = new NodeTag(subdir, new RenderingContext(subdir, dirName, (treeNode.Tag as NodeTag).First()));
                 }
                 treeNode.Nodes.Add(newNode);
                 treeView.SelectedNode = newNode;
@@ -355,7 +357,7 @@ namespace Phases
                 NodeTag tag = treeView.SelectedNode.Tag as NodeTag;
                 if (treeView.SelectedNode.ImageIndex == 0)  //folder
                 {
-                    Directory.Delete(tag.FilePath);
+                    Directory.Delete(tag.FilePath, true);
                 }
                 else
                 {
@@ -427,6 +429,18 @@ namespace Phases
         {
             if (listView.SelectedItems.Count == 0) return;
             BtEditCottle_Click(btEditCottle, new EventArgs());
+        }
+
+        private void treeView_DoubleClick(object sender, EventArgs e)
+        {
+            if (treeView.SelectedNode == null || listView.Items.Count == 0) return;
+            if (listView.SelectedItems.Count == 0) listView.Items[0].Selected = true;
+            if (btEditCottle.Enabled) BtEditCottle_Click(btEditCottle, new EventArgs());
+        }
+
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            btSaveIni.Enabled = true;
         }
     }
 }
