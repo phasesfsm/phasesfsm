@@ -271,11 +271,14 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken MessageFlag = new MacroToken("MessageFlag", ContextLevel.NoFileName);
 
             public static readonly MacroToken Outputs = new MacroToken("Outputs", ContextLevel.Transition);
-            public static readonly MacroToken Output = new MacroToken("Output", ContextLevel.Transition);
+            public static readonly MacroToken Events = new MacroToken("Events", ContextLevel.Transition);
+            public static readonly MacroToken Messages = new MacroToken("Messages", ContextLevel.Transition);
             public static readonly MacroToken EnterOutputs = new MacroToken("EnterOutputs", ContextLevel.States);
-            public static readonly MacroToken EnterOutput = new MacroToken("EnterOutput", ContextLevel.States);
+            public static readonly MacroToken EnterEvents = new MacroToken("EnterEvents", ContextLevel.States);
+            public static readonly MacroToken EnterMessages = new MacroToken("EnterMessages", ContextLevel.States);
             public static readonly MacroToken ExitOutputs = new MacroToken("ExitOutputs", ContextLevel.States);
-            public static readonly MacroToken ExitOutput = new MacroToken("ExitOutput", ContextLevel.States);
+            public static readonly MacroToken ExitEvents = new MacroToken("ExitEvents", ContextLevel.States);
+            public static readonly MacroToken ExitMessages = new MacroToken("ExitMessages", ContextLevel.States);
 
             public static readonly MacroToken Default = new MacroToken("Default", ContextLevel.Variable);
 
@@ -1035,19 +1038,37 @@ namespace Phases.CodeGeneration
                     case "Outputs":
                         if (context.Level.HasFlag(ContextLevel.Transition))
                         {
-                            outputText = RenderMacro(inputText, token, context.Objects.Transition.Outputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                            foreach (BasicOutput output in context.Objects.Transition.Outputs.FindAll(var => var.Output is IBooleanValue))
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
                         }
                         else
                         {
-                            outputText = RenderMacro(inputText, token, "<??>", ContextLevel.Project, context, out RenderingContext newContext);
+                            text.Append(inputText);
                         }
-                        break;
-                    case "Output":
+                        return text.ToString();
+                    case "Events":
                         if (context.Level.HasFlag(ContextLevel.Transition))
                         {
-                            foreach (BasicOutput output in context.Objects.Transition.Outputs)
+                            foreach (BasicOutput output in context.Objects.Transition.Outputs.FindAll(var => var.Output is EventOutput))
                             {
-                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                outputText = RenderMacro(inputText, token, output.Output.Name, ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "Messages":
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            foreach (BasicOutput output in context.Objects.Transition.Outputs.FindAll(var => var.Output is MessageFlag))
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.Name, ContextLevel.ExitOutputs, context, out RenderingContext newContext);
                                 text.Append(RenderMacroLine(context, outputText));
                             }
                         }
@@ -1129,19 +1150,37 @@ namespace Phases.CodeGeneration
                     case "EnterOutputs":
                         if (context.Level.HasFlag(ContextLevel.State))
                         {
-                            outputText = RenderMacro(inputText, token, context.Objects.State.EnterOutputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                            foreach (BasicOutput output in context.Objects.State.EnterOutputs.FindAll(var => var.Output is IBooleanValue))
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
                         }
                         else
                         {
-                            outputText = RenderMacro(inputText, token, "<??>", ContextLevel.Project, context, out RenderingContext newContext);
+                            text.Append(inputText);
                         }
-                        break;
-                    case "EnterOutput":
+                        return text.ToString();
+                    case "EnterMessages":
                         if (context.Level.HasFlag(ContextLevel.State))
                         {
-                            foreach (BasicOutput output in context.Objects.State.EnterOutputs)
+                            foreach (BasicOutput output in context.Objects.State.EnterOutputs.FindAll(var => var.Output is IBooleanValue))
                             {
-                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                outputText = RenderMacro(inputText, token, output.Output.Name, ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "EnterFlags":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            foreach (BasicOutput output in context.Objects.State.EnterOutputs.FindAll(var => var.Output is IBooleanValue))
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.Name, ContextLevel.ExitOutputs, context, out RenderingContext newContext);
                                 text.Append(RenderMacroLine(context, outputText));
                             }
                         }
@@ -1153,19 +1192,37 @@ namespace Phases.CodeGeneration
                     case "ExitOutputs":
                         if (context.Level.HasFlag(ContextLevel.State))
                         {
-                            outputText = RenderMacro(inputText, token, context.Objects.State.ExitOutputs.Count.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
+                            foreach (BasicOutput output in context.Objects.State.ExitOutputs.FindAll(var => var.Output is IBooleanValue))
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
                         }
                         else
                         {
-                            outputText = RenderMacro(inputText, token, "<??>", ContextLevel.Project, context, out RenderingContext newContext);
+                            text.Append(inputText);
                         }
-                        break;
-                    case "ExitOutput":
+                        return text.ToString();
+                    case "ExitEvents":
                         if (context.Level.HasFlag(ContextLevel.State))
                         {
-                            foreach (BasicOutput output in context.Objects.State.ExitOutputs)
+                            foreach (BasicOutput output in context.Objects.State.ExitOutputs.FindAll(var => var.Output is EventOutput))
                             {
-                                outputText = RenderMacro(inputText, token, output.Output.GetOperationCode(output.Operation), ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                outputText = RenderMacro(inputText, token, output.Output.Name, ContextLevel.ExitOutputs, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
+                    case "ExitMessages":
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            foreach (BasicOutput output in context.Objects.State.ExitOutputs.FindAll(var => var.Output is MessageFlag))
+                            {
+                                outputText = RenderMacro(inputText, token, output.Output.Name, ContextLevel.ExitOutputs, context, out RenderingContext newContext);
                                 text.Append(RenderMacroLine(context, outputText));
                             }
                         }
