@@ -59,6 +59,9 @@ namespace DualText
                 }
             }
         }
+
+        public int GetRealY(int y) => Text.Lines[y].LinePosition;
+
         public bool Selecting;
         public bool SideSelecting { get; private set; }
         private int sideSelectionStartLine = 0;
@@ -326,6 +329,7 @@ namespace DualText
             string reversed = new string(Text.Lines[line].Substring(0, column).Reverse().ToArray());
             var tokens = wordsRegex.Matches(fromIndex);
             int right = 0;
+            if (tokens.Count == 0) return;
             Match match = tokens[0];
             if (match.Groups[TOKENS_GROUP].Success || (match.Groups[UNGROUPED_OTHER].Success && !match.Groups[SPACES_GROUP].Success))
             {
@@ -513,11 +517,13 @@ namespace DualText
             {
                 action = Actions.PeekOrAdd(this, TextAction.ActionType.Insert_new_line);
             }
-            Text.Builder.Insert(SelectionIndex, BaseFormat.NewLine);
+            int identation = Text.Lines[Y].Chars.TakeWhile(ch => ch.Char == ' ').Count();
+            Text.Builder.Insert(SelectionIndex, BaseFormat.NewLine + new string(' ', identation));
             action.AfterText.Append(BaseFormat.NewLine);
             Text.Rebuild_From_Builder();
             //Box.recalcBoundaries();
-            MoveX(+1);
+            MoveX(+ 1);
+            MoveX(identation);
             Selection = Location;
             action.SaveAfter();
         }

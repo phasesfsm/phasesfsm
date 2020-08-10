@@ -125,81 +125,23 @@ namespace Phases.DrawableObjects
 
         public override void Intersect(Point position, ref Point point, ref double angle)
         {
-            Rectangle exterior = rect, interior = rect;
-            exterior.Inflate(3, 3);
-            interior.Inflate(-Math.Max(10, rect.Width/2), -Math.Max(10, rect.Width / 2));
-            if (!exterior.Contains(position) || interior.Contains(position)) return;
-            int left, right, top, bottom;
-            left = position.X - rect.Left;
-            right = rect.Right - position.X;
-            top = position.Y - rect.Top;
-            bottom = rect.Bottom - position.Y;
-            if(left < right)
+            if (position.X >= rect.Left - SelectionBorderMargin && position.X <= rect.Left + SelectionBorderMargin * 2 && position.Y >= rect.Top && position.Y <= rect.Bottom)
             {
-                if(top < bottom)
-                {
-                    if(left < top)
-                    {
-                        point = new Point(rect.Left, position.Y);
-                    }
-                    else if (top < left)
-                    {
-                        point = new Point(position.X, rect.Top);
-                    }
-                    else
-                    {
-                        point = new Point(rect.Left, rect.Top);
-                    }
-                }
-                else
-                {
-                    if (left < bottom)
-                    {
-                        point = new Point(rect.Left, position.Y);
-                    }
-                    else if (bottom < left)
-                    {
-                        point = new Point(position.X, rect.Bottom);
-                    }
-                    else
-                    {
-                        point = new Point(rect.Left, rect.Bottom);
-                    }
-                }
+                point = new Point(rect.Left, position.Y);
             }
-            else
+            else if (position.X >= rect.Right - SelectionBorderMargin * 2 && position.X <= rect.Right + SelectionBorderMargin && position.Y >= rect.Top && position.Y <= rect.Bottom)
             {
-                if (top < bottom)
-                {
-                    if (right < top)
-                    {
-                        point = new Point(rect.Right, position.Y);
-                    }
-                    else if (top < right)
-                    {
-                        point = new Point(position.X, rect.Top);
-                    }
-                    else
-                    {
-                        point = new Point(rect.Right, rect.Top);
-                    }
-                }
-                else
-                {
-                    if (right < bottom)
-                    {
-                        point = new Point(rect.Right, position.Y);
-                    }
-                    else if (bottom < right)
-                    {
-                        point = new Point(position.X, rect.Bottom);
-                    }
-                    else
-                    {
-                        point = new Point(rect.Right, rect.Bottom);
-                    }
-                }
+                point = new Point(rect.Right, position.Y);
             }
+            else if (position.Y >= rect.Top - SelectionBorderMargin && position.Y <= rect.Top + SelectionBorderMargin * 2 && position.X >= rect.Left && position.X <= rect.Right)
+            {
+                point = new Point(position.X, rect.Top);
+            }
+            else if (position.Y >= rect.Bottom - SelectionBorderMargin * 2 && position.Y <= rect.Bottom + SelectionBorderMargin && position.X >= rect.Left && position.X <= rect.Right)
+            {
+                point = new Point(position.X, rect.Bottom);
+            }
+            OutDir(point, out angle);
         }
 
         public Point PointFromOffset(MouseTool.ResizingTypes resizingType, Point location, double angle)

@@ -88,7 +88,7 @@ namespace DualText
                 linedText.Append(index);
                 linedText.Append(BaseFormat.LinedChar);
                 linedText.Append(line.ToString());
-                linedText.Append(BaseFormat.NewLine);
+                if (line != Lines.Last()) linedText.Append(BaseFormat.NewLine);
                 index++;
             }
             return linedText.ToString();
@@ -125,6 +125,10 @@ namespace DualText
                 {
                     emptyLines++;
                 }
+            }
+            if (emptyLines > 0)
+            {
+                DrawEmptyLines(g, new Rectangle(startX, y, endX, BaseFormat.FontHeight * emptyLines));
             }
         }
 

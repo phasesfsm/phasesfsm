@@ -76,7 +76,7 @@ namespace Phases.BasicObjects
             }
             else
             {
-                if (Transition.Condition == "") str.Append("0");
+                if (Transition.Condition == "") str.Append("1");
             }
             if(Transition.Condition != "")
             {

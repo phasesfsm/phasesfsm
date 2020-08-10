@@ -86,10 +86,9 @@ namespace Phases.Variables
                     {
                         case OperationType.Clear:
                             return name + " = 0";
-                        case OperationType.None:
+                        default:
                             return name + " = 1";
                     }
-                    break;
                 case IIntegerValue intVar:
                     switch (operationType)
                     {
