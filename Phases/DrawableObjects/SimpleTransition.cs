@@ -27,12 +27,55 @@ namespace Phases.DrawableObjects
 
         }
 
+        [Category("General")]
+        public bool DefaultTransition
+        {
+            get
+            {
+                if (StartObject == null)
+                {
+                    return false;
+                }
+                else if (StartObject is Origin)
+                {
+                    return true;
+                }
+                else
+                {
+                    return this == StartObject.outTransitions.Last() && Condition == "" &&
+                        Timeout == 0 && TransitionTrigger == TransitionTriggerType.ConditionOrTimeout;
+                }
+            }
+            set
+            {
+                if (value == DefaultTransition || StartObject == null)
+                {
+                    return;
+                }
+                else if (value)
+                {
+                    Priority = StartObject.outTransitions.Count - 1;
+                    Condition = "";
+                    Timeout = 0;
+                    TransitionTrigger = TransitionTriggerType.ConditionOrTimeout;
+                }
+                else
+                {
+                    TransitionTrigger = TransitionTriggerType.ConditionAndTimeout;
+                }
+            }
+        }
+
         public override string Text
         {
             get
             {
                 string up;
-                if(Condition == "" && timeout == 0)
+                if (DefaultTransition && !(StartObject is Origin))
+                {
+                    return "(default)";
+                }
+                else if(Condition == "" && timeout == 0)
                 {
                     up = StartObject is Origin && Output == "" ? "" : name;
                 }
