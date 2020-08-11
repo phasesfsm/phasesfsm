@@ -84,7 +84,14 @@ namespace Phases.DrawableObjects
             }
             if (value != null)
             {
-                value.outTransitions.Add(trans);
+                if (!(value is Origin) && value.outTransitions.Count > 0 && value.outTransitions.Last() is SimpleTransition strans && strans.DefaultTransition)
+                {
+                    value.outTransitions.Insert(value.outTransitions.Count - 1, trans);
+                }
+                else
+                {
+                    value.outTransitions.Add(trans);
+                }
                 if (value is Alias alias && alias.Pointing != null) alias.AliasOutTransitions.Add(trans);
                 else if (value is StateAlias salias && salias.Pointing != null) salias.AliasOutTransitions.Add(trans);
             }

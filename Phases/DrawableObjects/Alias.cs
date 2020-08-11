@@ -45,7 +45,14 @@ namespace Phases.DrawableObjects
                 pointing = OwnerDraw.Objects.Find(obj => obj.Name == value);
                 if (pointing != null)
                 {
-                    outTransitions.AddRange(base.outTransitions);
+                    if (outTransitions.Count > 0 && outTransitions.Last() is SimpleTransition strans && strans.DefaultTransition)
+                    {
+                        outTransitions.InsertRange(outTransitions.Count - 1, base.outTransitions);
+                    }
+                    else
+                    {
+                        outTransitions.AddRange(base.outTransitions);
+                    }
                 }
             }
         }
