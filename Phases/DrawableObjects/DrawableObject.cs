@@ -291,7 +291,7 @@ namespace Phases.DrawableObjects
                         MessageBox.Show(string.Format("'{0}' is a reserved name.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
                     }
-                    else if (OwnerDraw.OwnerSheet.ExistsName(value))
+                    else if (!(this is Abort || this is End) && OwnerDraw.OwnerSheet.ExistsName(value))
                     {
                         MessageBox.Show(string.Format("The name '{0}' already exists.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
