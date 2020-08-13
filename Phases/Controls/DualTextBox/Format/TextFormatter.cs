@@ -24,11 +24,11 @@ namespace DualText
         {
             GroupsFormats = new List<GroupsFormat>();
         }
-        public GroupsFormat AddGroup(string groupName, string regexString, Color color, FontStyle style)
+        public GroupsFormat AddGroup(string groupName, string regexString, Color color, FontStyle style, bool caseSensitive = true)
         {
             if (groupName == UNGROUPED || UNGROUPED_OTHER == "") throw new Exception("Reserved group name.");
             if (GroupsFormats.Exists(g => g.GroupName == groupName)) throw new Exception("Group name repeated.");
-            var group = new GroupsFormat(groupName, regexString, color, style);
+            var group = new GroupsFormat(groupName, regexString, color, style, caseSensitive);
             GroupsFormats.Add(group);
             return group;
         }
@@ -73,9 +73,14 @@ namespace DualText
                         //AppendString(formattedText, format, match.Value);
                         formattedText.Lines.Add(new TextLine());
                     }
-                    else if (match.Groups[TOKENS_GROUP].Success && format.KeywordsFormats.Any(gk => gk.Keywords.Contains(match.Value)))
+                    else if (format.CaseSensitive && match.Groups[TOKENS_GROUP].Success && format.KeywordsFormats.Any(gk => gk.Keywords.Contains(match.Value)))
                     {
                         var keyword = format.KeywordsFormats.First(gk => gk.Keywords.Contains(match.Value));
+                        AppendString(formattedText, keyword, match.Value);
+                    }
+                    else if (!format.CaseSensitive && match.Groups[TOKENS_GROUP].Success && format.KeywordsFormats.Any(gk => gk.Keywords.Any(kw => kw.ToLower() == match.Value.ToLower())))
+                    {
+                        var keyword = format.KeywordsFormats.First(gk => gk.Keywords.Any(kw => kw.ToLower() == match.Value.ToLower()));
                         AppendString(formattedText, keyword, match.Value);
                     }
                     else

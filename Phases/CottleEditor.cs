@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -36,9 +37,20 @@ namespace Phases
 
             dualTextBox1.SourceFormat.Color = Color.DarkGreen;
             dualTextBox1.SourceFormat.Style = FontStyle.Regular;
-            string[] macros_keywords = { "project", "machine" };
-            var macros = dualTextBox1.ResultFormat.AddGroup("macros", @"@\w+", Color.Black, FontStyle.Regular);
-            macros.AddKeywords(macros_keywords, Color.DarkGreen, FontStyle.Bold | FontStyle.Italic);
+
+            // Declaring and intializing object of Type 
+            Type objType = typeof(MacroTokens);
+
+            //string[] macros_keywords = { "Project", "Machine" };
+            string[] macros_keywords = typeof(MacroTokens)
+                .GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+                .ToList()
+                .FindAll(fi => !fi.IsLiteral && fi.IsInitOnly)
+                .ConvertAll(fi => ((MacroToken)fi.GetValue(null)).Name.Replace("(", ""))
+                .ToArray();
+
+            var macros = dualTextBox1.SourceFormat.AddGroup("macros", Data.Profile.Properties.MacroBegin + @"([A-Za-z]+\(?)|" + Data.Profile.Properties.MacroBegin + @"\)", Color.Brown, FontStyle.Bold, false);
+            macros.AddKeywords(macros_keywords, Color.Brown, FontStyle.Bold | FontStyle.Italic);
 
             string[] cottle_keywords = { "echo", "if", "for", "set", "while", "dump" };
             string[] cottle_functions = { "and", "cmp", "default", "defined", "eq", "ge", "gt", "has", "le", "lt", "ne", "not", "or", "xor", "when",

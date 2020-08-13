@@ -281,14 +281,18 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken ExitMessages = new MacroToken("ExitMessages", ContextLevel.States);
 
             public static readonly MacroToken Default = new MacroToken("Default", ContextLevel.Variable);
+            public static readonly MacroToken Description = new MacroToken("Description", ContextLevel.Variable);
 
             public static readonly MacroToken Condition = new MacroToken("Condition(", ContextLevel.Transition);
+            public static readonly MacroToken ConditionT = new MacroToken("Condition", ContextLevel.Transition);
 
             // Macro functions tokens
             public static readonly MacroToken Index = new MacroToken("Index", ContextLevel.All);
             public static readonly MacroToken Count = new MacroToken("Count", ContextLevel.All);
             public static readonly MacroToken NoFirst = new MacroToken("nf(", ContextLevel.All);
             public static readonly MacroToken NoLast = new MacroToken("nl(", ContextLevel.All);
+            public static readonly MacroToken OnlyFirst = new MacroToken("of(", ContextLevel.All);
+            public static readonly MacroToken OnlyLast = new MacroToken("ol(", ContextLevel.All);
         }
         #endregion
 
@@ -888,7 +892,7 @@ namespace Phases.CodeGeneration
         }
 
 
-        public string RenderMacroLine(RenderingContext context, string inputText)
+        public string RenderMacroLine(RenderingContext context, string inputText, bool appendNewLine = true)
         {
             StringBuilder text = new StringBuilder();
             string origText = "", outputText = inputText;
@@ -1027,12 +1031,21 @@ namespace Phases.CodeGeneration
                     case "Pointing":
                         if (context.Level.HasFlag(ContextLevel.Transition))
                         {
-                            outputText = RenderMacro(inputText, token, context.Objects.Transition.Pointing.Name, ContextLevel.Transition, context, out RenderingContext newContext);
-                            text.Append(RenderMacroLine(context, outputText));
+                            if (context.Objects.Transition.Pointing == null)
+                            {
+                                outputText = RenderMacro(inputText, token, context.Objects.Transition.Transition.EndObject.Name, ContextLevel.File, context, out RenderingContext newContext);
+                                break;
+                            }
+                            else
+                            {
+                                outputText = RenderMacro(inputText, token, context.Objects.Transition.Pointing.Name, ContextLevel.Transition, context, out RenderingContext newContext);
+                                text.Append(RenderMacroLine(context, outputText));
+                            }
                         }
                         else
                         {
-                            text.Append(RenderMacroLine(context, inputText));
+                            outputText = RenderMacro(inputText, token, "??", ContextLevel.File, context, out RenderingContext newContext);
+                            break;
                         }
                         return text.ToString();
                     case "Outputs":
@@ -1147,6 +1160,28 @@ namespace Phases.CodeGeneration
                             text.Append(inputText);
                         }
                         return text.ToString();
+                    case "Description":
+                        // TODO: Handle redundance if the macro is inside the description.
+                        if (context.Level.HasFlag(ContextLevel.State))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.State.State.Description, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.SuperState))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.SuperState.State.Description, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Transition.Transition.Description, ContextLevel.Variable, context, out RenderingContext newContext);
+                            text.Append(RenderMacroLine(newContext, outputText));
+                        }
+                        else
+                        {
+                            text.Append(inputText);
+                        }
+                        return text.ToString();
                     case "EnterOutputs":
                         if (context.Level.HasFlag(ContextLevel.State))
                         {
@@ -1247,6 +1282,18 @@ namespace Phases.CodeGeneration
                         }
                         return text.ToString();
                     }
+                    case "Condition":
+                    {
+                        if (context.Level.HasFlag(ContextLevel.Transition))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Transition.GetCondition("", "t"), ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = "??";
+                        }
+                        break;
+                    }
                     case "Index":
                     {
                         outputText = RenderMacro(inputText, token, context.Index.ToString(), ContextLevel.Project, context, out RenderingContext newContext);
@@ -1258,36 +1305,107 @@ namespace Phases.CodeGeneration
                         break;
                     }
                     case "nf(":
-                        index1 = inputText.IndexOf(MacroBegin + token.Name);
-                        while (index1 > 0)
-                        {
-                            index2 = inputText.IndexOf(MacroBegin + ")", index1);
-                            if (index2 == -1) break;
-                            string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
-                            string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
-                            if (!context.First) outputText = inputText.Replace(macro, content);
-                            else outputText = inputText.Replace(macro, "");
-                            index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
-                        }
+                        //index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        //while (index1 > 0)
+                        //{
+                        //    index2 = inputText.IndexOf(MacroBegin + ")", index1);
+                        //    if (index2 == -1) break;
+                        //    string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
+                        //    string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
+                        //    if (!context.First) outputText = inputText.Replace(macro, content);
+                        //    else outputText = inputText.Replace(macro, "");
+                        //    index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
+                        //}
+                        outputText = RenderGenericCondition(context, token, inputText, () => !context.First);
                         break;
                     case "nl(":
-                        index1 = inputText.IndexOf(MacroBegin + token.Name);
-                        while (index1 > 0)
-                        {
-                            index2 = inputText.IndexOf(MacroBegin + ")", index1);
-                            if (index2 == -1) break;
-                            string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
-                            string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
-                            if (!context.Last) outputText = inputText.Replace(macro, content);
-                            else outputText = inputText.Replace(macro, "");
-                            index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
-                        }
+                        //index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        //while (index1 > 0)
+                        //{
+                        //    index2 = inputText.IndexOf(MacroBegin + ")", index1);
+                        //    if (index2 == -1) break;
+                        //    string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
+                        //    string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
+                        //    if (!context.Last) outputText = inputText.Replace(macro, content);
+                        //    else outputText = inputText.Replace(macro, "");
+                        //    index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
+                        //}
+                        outputText = RenderGenericCondition(context, token, inputText, () => !context.Last);
+                        break;
+                    case "of(":
+                        //index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        //while (index1 > 0)
+                        //{
+                        //    index2 = inputText.IndexOf(MacroBegin + ")", index1);
+                        //    if (index2 == -1) break;
+                        //    string macro = inputText.Substring(index1, index2 - index1 + MacroBegin.Length + 1);
+                        //    string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
+                        //    if (context.First) outputText = inputText.Replace(macro, content);
+                        //    else outputText = inputText.Replace(macro, "");
+                        //    index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
+                        //}
+                        outputText = RenderGenericCondition(context, token, inputText, () => context.First);
+                        break;
+                    case "ol(":
+                        //index1 = inputText.IndexOf(MacroBegin + token.Name);
+                        //while (index1 > 0)
+                        //{
+                        //    index2 = inputText.IndexOf(MacroBegin + ")", index1);
+                        //    if (index2 == -1) break;
+
+
+                        //    string content = macro.Substring(MacroBegin.Length + token.Name.Length, macro.Length - MacroBegin.Length * 2 - token.Name.Length - 1);
+                        //    if (context.Last) outputText = inputText.Replace(macro, content);
+                        //    else outputText = inputText.Replace(macro, "");
+                        //    index1 = inputText.IndexOf(MacroBegin + token.Name, index2);
+                        //}
+                        outputText = RenderGenericCondition(context, token, inputText, () => context.Last);
                         break;
                 }
             }
-            text.AppendLine(outputText);
+            if (appendNewLine) text.AppendLine(outputText);
+            else text.Append(outputText);
 
             return text.ToString();
+        }
+
+        string RenderGenericCondition(RenderingContext context, MacroToken token, string inputText, Func<bool> check)
+        {
+            string outputText;
+            int tokenIndex = inputText.IndexOf(MacroBegin + token.Name);
+            int afterTokenIndex = tokenIndex + MacroBegin.Length + token.Name.Length;
+
+            inputText = inputText.Substring(0, afterTokenIndex) + RenderMacroLine(context, inputText.Substring(afterTokenIndex), false);
+            int closeIndex = inputText.IndexOf(MacroBegin + ")", afterTokenIndex);
+            if (closeIndex >= 0)
+            {
+                int endIndex = closeIndex + MacroBegin.Length + ")".Length;
+                int fullContentCount = closeIndex - afterTokenIndex;
+                int divisorIndex = inputText.IndexOf(MacroBegin + "|", afterTokenIndex, fullContentCount);
+                string trueValue, falseValue;
+                if (divisorIndex >= 0)
+                {
+                    int divisorLength = MacroBegin.Length + "|".Length;
+                    int otherContentCount = closeIndex - divisorIndex - divisorLength;
+                    int contentCount = fullContentCount - otherContentCount - divisorLength;
+                    trueValue = inputText.Substring(afterTokenIndex, contentCount);
+                    falseValue = inputText.Substring(divisorIndex + divisorLength, otherContentCount);
+                }
+                else
+                {
+                    trueValue = inputText.Substring(afterTokenIndex, fullContentCount);
+                    falseValue = "";
+                }
+                int fullMacroCount = endIndex - tokenIndex;
+                string macro = inputText.Substring(tokenIndex, fullMacroCount);
+                if (check()) outputText = inputText.Replace(macro, trueValue);
+                else outputText = inputText.Replace(macro, falseValue);
+            }
+            else
+            {
+                return inputText;
+            }
+            return outputText;
         }
 
         void RenderGenericLine<T>(StringBuilder text, RenderingContext context, MacroToken token, string inputText,
@@ -1399,6 +1517,9 @@ namespace Phases.CodeGeneration
 
         [Description("Macro block begin token."), Category("Macro block tokens")]
         public string MacroBlockBegin { get; set; } = "<@";
+
+        [Description("Macro block continue token."), Category("Macro block tokens")]
+        public string MacroBlockContinue { get; set; } = "<#";
 
         [Description("Macro block end token."), Category("Macro block tokens")]
         public string MacroBlockEnd { get; set; } = "@>";
