@@ -856,13 +856,18 @@ namespace Phases
 
         private void pBox_Paint(object sender, PaintEventArgs e)
         {
+            DrawToGraphics(e.Graphics);
+        }
+
+        private void DrawToGraphics(Graphics g)
+        {
             //Scaling
-            e.Graphics.Transform = DrawTransform;
-            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+            g.Transform = DrawTransform;
+            g.SmoothingMode = SmoothingMode.HighQuality;
 
             //Draw sheet
-            book.SelectedSheet.Draw(e.Graphics);
-            book.SelectedSheet.DrawFeatures(e.Graphics, DrawScale);
+            book.SelectedSheet.Draw(g);
+            book.SelectedSheet.DrawFeatures(g, DrawScale);
 
             ////Visual center circle
             //Point center = Util.ScalePoint(new Point(pBox.Width / 2, pBox.Height / 2), DrawTransform);
@@ -872,10 +877,10 @@ namespace Phases
             Pen pen = new Pen(Color.Black, 1.8f);
 
             //Draw objects
-            book.SelectedSheet.Sketch.PaintShadow(e.Graphics, new DrawAttributes(Pens.WhiteSmoke, DrawScale, true));
-            mouse.DrawSelectionsBack(e.Graphics);
-            book.SelectedSheet.Sketch.Paint(e.Graphics, new DrawAttributes(pen, DrawScale));
-            mouse.DrawSelections(e.Graphics, DrawTransform);
+            book.SelectedSheet.Sketch.PaintShadow(g, new DrawAttributes(Pens.WhiteSmoke, DrawScale, true));
+            mouse.DrawSelectionsBack(g);
+            book.SelectedSheet.Sketch.Paint(g, new DrawAttributes(pen, DrawScale));
+            mouse.DrawSelections(g, DrawTransform);
         }
 
         private Rectangle GetRectangleView() => new Rectangle(Util.ScalePoint(Point.Empty, DrawTransform), Util.ScaleSize(pBox.Size, DrawScale));
@@ -2440,6 +2445,24 @@ namespace Phases
             CodeGeneratorConfig codeGeneratorConfig = new CodeGeneratorConfig(book.BuildData, book.ScriptsFolder);
             codeGeneratorConfig.ShowDialog();
             codeGeneratorConfig.Dispose();
+        }
+
+        private void pNGImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            float scale = zoomScales[zoomStripComboBox.SelectedIndex] / 100;
+            Bitmap bitmap = new Bitmap((int)((book.SelectedSheet.Size.Width - 1) * scale), (int)((book.SelectedSheet.Size.Width - 1) * scale), PixelFormat.Format32bppArgb);
+            Graphics g = Graphics.FromImage(bitmap);
+
+            DrawToGraphics(g);
+
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Filter = "Portable Network Graphics (*.png)|*.png";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    bitmap.Save(dialog.FileName, ImageFormat.Png);
+                }
+            }
         }
     }
 }

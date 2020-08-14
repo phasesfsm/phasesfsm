@@ -324,7 +324,11 @@ namespace Phases.Simulation
         private void MakeTransition()
         {
             if (PreviousTransition != null) PreviousTransition.SimulationMark = SimulationMark.None;
-            if (TargetState.Father != Node)
+            if (TargetState is null)
+            {
+                StepState = SimulationState.EndOfCycle;
+            }
+            else if (TargetState.Father != Node)
             {
                 PreviousState = CurrentState;
                 CurrentState.SimulationMark = SimulationMark.LeavingObject;

@@ -317,7 +317,7 @@ namespace Phases.CodeGeneration
                                 MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "One shot machine Transition should have a condition.", trans));
                             }
                         }
-                        else
+                        else if (!strans.DefaultTransition)
                         {
                             MessagesList.Add(new CheckMessage(CheckMessage.MessageTypes.Error, "Transition does not have condition or timeout value.", trans));
                         }

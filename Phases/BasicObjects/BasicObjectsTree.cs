@@ -121,11 +121,7 @@ namespace Phases.BasicObjects
                     return null;
                 case Abort abort:
                     var astate = abort.Father;
-                    if (astate != null)
-                    {
-                        return AddMachine(dest, astate);
-                    }
-                    Messages.Add(new CheckMessage(CheckMessage.MessageTypes.Warning, "Abort is outside a super state.", abort));
+                    if (astate != null) return AddMachine(dest, astate);
                     return null;
                 case Nested nested:
                     var bMach = AddMachine(dest, nested);

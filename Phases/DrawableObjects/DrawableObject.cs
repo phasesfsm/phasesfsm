@@ -84,7 +84,14 @@ namespace Phases.DrawableObjects
             }
             if (value != null)
             {
-                value.outTransitions.Add(trans);
+                if (!(value is Origin) && value.outTransitions.Count > 0 && value.outTransitions.Last() is SimpleTransition strans && strans.DefaultTransition)
+                {
+                    value.outTransitions.Insert(value.outTransitions.Count - 1, trans);
+                }
+                else
+                {
+                    value.outTransitions.Add(trans);
+                }
                 if (value is Alias alias && alias.Pointing != null) alias.AliasOutTransitions.Add(trans);
                 else if (value is StateAlias salias && salias.Pointing != null) salias.AliasOutTransitions.Add(trans);
             }
@@ -284,7 +291,7 @@ namespace Phases.DrawableObjects
                         MessageBox.Show(string.Format("'{0}' is a reserved name.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
                     }
-                    else if (OwnerDraw.OwnerSheet.ExistsName(value))
+                    else if (!(this is Abort || this is End) && OwnerDraw.OwnerSheet.ExistsName(value))
                     {
                         MessageBox.Show(string.Format("The name '{0}' already exists.", value), "Value error.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return;
