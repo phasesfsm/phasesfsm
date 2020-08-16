@@ -45,6 +45,7 @@ namespace Phases
         private bool simulationMode = false;
         private SimulationState simulationStatus;
         private SignalsDraw signalsDraw;
+        private MouseEventArgs lastMouseState;
 
         public fDraw()
         {
@@ -497,6 +498,7 @@ namespace Phases
 
         private void pBox_MouseMove(object sender, MouseEventArgs e)
         {
+            lastMouseState = e;
             mouse.Location = Util.ScalePoint(e.Location, DrawTransform);
             if (mouse.Scrolling)
             {
@@ -2462,6 +2464,22 @@ namespace Phases
                 {
                     bitmap.Save(dialog.FileName, ImageFormat.Png);
                 }
+            }
+        }
+
+        private void fDraw_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (lastMouseState != null && pBox.Bounds.Contains(MousePosition))
+            {
+                pBox_MouseMove(pBox, lastMouseState);
+            }
+        }
+
+        private void fDraw_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (lastMouseState != null && pBox.Bounds.Contains(MousePosition))
+            {
+                pBox_MouseMove(pBox, lastMouseState);
             }
         }
     }

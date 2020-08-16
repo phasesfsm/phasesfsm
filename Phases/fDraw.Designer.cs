@@ -97,6 +97,8 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pNGImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stateCADFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
@@ -266,8 +268,6 @@
             this.dialogImport = new System.Windows.Forms.OpenFileDialog();
             this.openSimDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveSimDialog = new System.Windows.Forms.SaveFileDialog();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pNGImageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.standardTools.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
@@ -906,6 +906,21 @@
             this.toolStripMenuItem8.Name = "toolStripMenuItem8";
             this.toolStripMenuItem8.Size = new System.Drawing.Size(177, 6);
             // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pNGImageToolStripMenuItem});
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Text = "Export to";
+            // 
+            // pNGImageToolStripMenuItem
+            // 
+            this.pNGImageToolStripMenuItem.Name = "pNGImageToolStripMenuItem";
+            this.pNGImageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pNGImageToolStripMenuItem.Text = "PNG image";
+            this.pNGImageToolStripMenuItem.Click += new System.EventHandler(this.pNGImageToolStripMenuItem_Click);
+            // 
             // importToolStripMenuItem
             // 
             this.importToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -917,7 +932,7 @@
             // stateCADFileToolStripMenuItem
             // 
             this.stateCADFileToolStripMenuItem.Name = "stateCADFileToolStripMenuItem";
-            this.stateCADFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.stateCADFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.stateCADFileToolStripMenuItem.Text = "StateCAD file ...";
             this.stateCADFileToolStripMenuItem.Click += new System.EventHandler(this.stateCADFileToolStripMenuItem_Click);
             // 
@@ -2483,21 +2498,6 @@
             // 
             this.saveSimDialog.Filter = "Text file (*.txt)|*.txt";
             // 
-            // exportToolStripMenuItem
-            // 
-            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pNGImageToolStripMenuItem});
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exportToolStripMenuItem.Text = "Export to";
-            // 
-            // pNGImageToolStripMenuItem
-            // 
-            this.pNGImageToolStripMenuItem.Name = "pNGImageToolStripMenuItem";
-            this.pNGImageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.pNGImageToolStripMenuItem.Text = "PNG image";
-            this.pNGImageToolStripMenuItem.Click += new System.EventHandler(this.pNGImageToolStripMenuItem_Click);
-            // 
             // fDraw
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2509,6 +2509,7 @@
             this.Controls.Add(this.standardTools);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "fDraw";
             this.Text = "Phases FSM";
@@ -2518,6 +2519,8 @@
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.fDraw_FormClosed);
             this.Load += new System.EventHandler(this.fDraw_Load);
             this.ResizeEnd += new System.EventHandler(this.fDraw_ResizeEnd);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.fDraw_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.fDraw_KeyUp);
             this.Resize += new System.EventHandler(this.fDraw_Resize);
             this.standardTools.ResumeLayout(false);
             this.standardTools.PerformLayout();
