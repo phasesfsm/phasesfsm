@@ -20,6 +20,7 @@ namespace Phases.DrawableObjects
         public static Font priorityFont = new Font("Arial", 6f);
         static Pen guides = new Pen(Color.LightGray);
 
+        [Description("Forces to draw the transition as a straight line.")]
         public bool ForceStraight { get; set; }
 
         private Point[] points;
