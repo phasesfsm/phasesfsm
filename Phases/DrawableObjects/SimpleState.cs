@@ -21,6 +21,22 @@ namespace Phases.DrawableObjects
 
         }
 
+        [Description("Forces the state to be drawn as a circle.")]
+        public bool ForceCircle 
+        {
+            get => forceCircle;
+            set
+            {
+                forceCircle = value;
+                if (value)
+                {
+                    rect = Util.SquareRectangle(rect);
+                    AdjustSize();
+                }
+            }
+        }
+        private bool forceCircle = false;
+
         protected override void DrawText(Graphics g, Brush brush)
         {
             if(SimulationMark == SimulationMark.ExecutingObjectExitOutputs)
@@ -45,6 +61,74 @@ namespace Phases.DrawableObjects
         {
             if(!att.IsShadow) g.FillEllipse(Brushes.White, rect);
             g.DrawEllipse(att.Pen, rect);
+        }
+
+        public override void ResizeCheck(ref Point offset, MouseTool.ResizingTypes dir)
+        {
+            if (ForceCircle)
+            {
+                switch (dir)
+                {
+                    case MouseTool.ResizingTypes.Left_Top:
+                        if (offset.X > offset.Y) offset.Y = offset.X;
+                        else offset.X = offset.Y;
+                        break;
+                    case MouseTool.ResizingTypes.Right_Top:
+                        if (offset.X < -offset.Y) offset.Y = -offset.X;
+                        else offset.X = -offset.Y;
+                        break;
+                    case MouseTool.ResizingTypes.Left_Bottom:
+                        if (offset.X > -offset.Y) offset.Y = -offset.X;
+                        else offset.X = -offset.Y;
+                        break;
+                    case MouseTool.ResizingTypes.Right_Bottom:
+                        if (offset.X < offset.Y) offset.Y = offset.X;
+                        else offset.X = offset.Y;
+                        break;
+                }
+            }
+            base.ResizeCheck(ref offset, dir);
+            if (ForceCircle)
+            {
+                switch (dir)
+                {
+                    case MouseTool.ResizingTypes.Left_Top:
+                        if (offset.X < offset.Y) offset.Y = offset.X;
+                        else offset.X = offset.Y;
+                        break;
+                    case MouseTool.ResizingTypes.Right_Top:
+                        if (offset.X > -offset.Y) offset.Y = -offset.X;
+                        else offset.X = -offset.Y;
+                        break;
+                    case MouseTool.ResizingTypes.Left_Bottom:
+                        if (offset.X < -offset.Y) offset.Y = -offset.X;
+                        else offset.X = -offset.Y;
+                        break;
+                    case MouseTool.ResizingTypes.Right_Bottom:
+                        if (offset.X > offset.Y) offset.Y = offset.X;
+                        else offset.X = offset.Y;
+                        break;
+                }
+            }
+        }
+
+        public override List<MouseTool.SelectionRectangle> DrawSelection(Graphics g, bool focused)
+        {
+            Rectangle sel = rect;
+            sel.Inflate(5, 5);
+            List<MouseTool.SelectionRectangle> srs = new List<MouseTool.SelectionRectangle>();
+            if (!ForceCircle)
+            {
+                srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Top, new Point(sel.X + sel.Width / 2, sel.Y), focused));
+                srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Left, new Point(sel.X, sel.Y + sel.Height / 2), focused));
+                srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Right, new Point(sel.Right, sel.Y + sel.Height / 2), focused));
+                srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Bottom, new Point(sel.X + sel.Width / 2, sel.Bottom), focused));
+            }
+            srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Left_Top, sel.Location, focused));
+            srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Right_Top, new Point(sel.Right, sel.Y), focused));
+            srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Left_Bottom, new Point(sel.X, sel.Bottom), focused));
+            srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Right_Bottom, new Point(sel.Right, sel.Bottom), focused));
+            return srs;
         }
 
         public override void DrawSimulationMark(Graphics g)
@@ -105,7 +189,22 @@ namespace Phases.DrawableObjects
         public override void CopyTo(DrawableObject obj)
         {
             base.CopyTo(obj);
-            var state = (SimpleState)obj;
+            var state = obj as SimpleState;
+            state.ForceCircle = ForceCircle;
+        }
+
+        public override byte[] SerializeSpecifics()
+        {
+            var data = new List<byte>(base.SerializeSpecifics());
+            data.AddRange(Serialization.SerializeParameter(ForceCircle));
+            return data.ToArray();
+        }
+
+        public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
+        {
+            if (!base.DeserializeObjectSpecifics(data, ref index)) return false;
+            if (Serialization.DeserializeParameter(data, ref index, out bool circle)) ForceCircle = circle;
+            return true;
         }
     }
 }

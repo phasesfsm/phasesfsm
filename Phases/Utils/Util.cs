@@ -131,6 +131,21 @@ namespace Phases
             }
         }
 
+        public static Rectangle SquareRectangle(Rectangle rect)
+        {
+            if (rect.Width > rect.Height)
+            {
+                rect.Y -= (rect.Width - rect.Height) / 2;
+                rect.Height = rect.Width;
+            }
+            else
+            {
+                rect.X -= (rect.Height - rect.Width) / 2;
+                rect.Width = rect.Height;
+            }
+            return rect;
+        }
+
         public static RectangleF GetRectangleF(PointF center, SizeF size)
         {
             return new RectangleF(center.X - size.Width / 2, center.Y - size.Height / 2, size.Width, size.Height);
