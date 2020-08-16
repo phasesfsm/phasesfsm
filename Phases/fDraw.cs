@@ -623,7 +623,7 @@ namespace Phases
                     }
                     break;
                 case MouseTool.MouseDoing.Selecting:
-                    mouse.SelectionArea = MouseTool.GetRectangle(mouse.FirstPoint, mouse.Location);
+                    mouse.SelectionArea = Util.GetRectangle(mouse.FirstPoint, mouse.Location);
                     mouse.InclusiveSelection = mouse.FirstPoint.X > mouse.Location.X;
                     RefreshSelection(mouse.SelectionResult(mouse.FirstPoint, mouse.Location));
                     pBox.Refresh();
