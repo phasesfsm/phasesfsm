@@ -46,6 +46,7 @@ namespace Phases
         private SimulationState simulationStatus;
         private SignalsDraw signalsDraw;
         private MouseEventArgs lastMouseState;
+        private Keys ForceStraightLineKey = Keys.Control;
 
         public fDraw()
         {
@@ -605,6 +606,7 @@ namespace Phases
                             else
                             {
                                 mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, mouse.Location);
+                                if (mouse.DrawingObject is Transition trans) trans.ForceStraight = ModifierKeys.HasFlag(ForceStraightLineKey);
                             }
                             pBox.Refresh();
                             break;
