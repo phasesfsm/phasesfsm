@@ -19,7 +19,9 @@ namespace Phases.DrawableObjects
         }
         public static Font priorityFont = new Font("Arial", 6f);
         static Pen guides = new Pen(Color.LightGray);
-        
+
+        public bool ForceStraight { get; set; }
+
         private Point[] points;
         private Point textPointOffset;
 
@@ -80,7 +82,7 @@ namespace Phases.DrawableObjects
         {
             get
             {
-                if(startObject == null)
+                if (startObject == null)
                 {
                     return 0;
                 }
@@ -375,7 +377,10 @@ namespace Phases.DrawableObjects
                 bigArrow = new AdjustableArrowCap(4, 8);
             }
             pen2.CustomEndCap = bigArrow;
-            g.DrawBezier(pen2, points[0], points[1], points[2], points[3]);
+            if (ForceStraight)
+                g.DrawLine(pen2, points[0], points[3]);
+            else
+                g.DrawBezier(pen2, points[0], points[1], points[2], points[3]);
             //draw arrow
             //DrawArrow(g, pen);
         }
@@ -424,8 +429,11 @@ namespace Phases.DrawableObjects
         public override void DrawSelectionBack(Graphics g)
         {
             //draw curve guide lines
-            g.DrawLine(guides, points[0], points[1]);
-            g.DrawLine(guides, points[2], points[3]);
+            if (!ForceStraight)
+            {
+                g.DrawLine(guides, points[0], points[1]);
+                g.DrawLine(guides, points[2], points[3]);
+            }
             //draw text rectangle
             g.DrawRectangle(guides, Util.GetRectangle(TextPoint, g.MeasureString(Text, font, Center, TextFormat).ToSize()));
         }
@@ -434,8 +442,11 @@ namespace Phases.DrawableObjects
         {
             List<MouseTool.SelectionRectangle> srs = new List<MouseTool.SelectionRectangle>();
             srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Spline0, points[0], focused));
-            srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Spline1, points[1], focused));
-            srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Spline2, points[2], focused));
+            if (!ForceStraight)
+            {
+                srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Spline1, points[1], focused));
+                srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Spline2, points[2], focused));
+            }
             srs.Add(new MouseTool.SelectionRectangle(this, MouseTool.ResizingTypes.Spline3, points[3], focused));
             return srs;
         }
@@ -470,19 +481,26 @@ namespace Phases.DrawableObjects
 
         public override Rectangle GetSelectionRectangle()
         {
-            int x1, y1, x2, y2;
-            x1 = points[0].X;
-            y1 = points[0].Y;
-            x2 = x1;
-            y2 = y1;
-            for (int i = 1; i < 4; i++)
+            if (ForceStraight)
             {
-                if (points[i].X < x1) x1 = points[i].X;
-                else if (points[i].X > x2) x2 = points[i].X;
-                if (points[i].Y < y1) y1 = points[i].Y;
-                else if (points[i].Y > y2) y2 = points[i].Y;
+                return Util.GetRectangle(points[0], points[3]);
             }
-            return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+            else
+            {
+                int x1, y1, x2, y2;
+                x1 = points[0].X;
+                y1 = points[0].Y;
+                x2 = x1;
+                y2 = y1;
+                for (int i = 1; i < 4; i++)
+                {
+                    if (points[i].X < x1) x1 = points[i].X;
+                    else if (points[i].X > x2) x2 = points[i].X;
+                    if (points[i].Y < y1) y1 = points[i].Y;
+                    else if (points[i].Y > y2) y2 = points[i].Y;
+                }
+                return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+            }
         }
 
         public void OutDir(Point position, int index)
@@ -490,7 +508,7 @@ namespace Phases.DrawableObjects
             points[index] = position;
         }
 
-        public override void Move(System.Drawing.Point offset)
+        public override void Move(Point offset)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -529,7 +547,7 @@ namespace Phases.DrawableObjects
 
         public void SizeCheckAndFix()
         {
-            if(startObject != null && startObject == endObject)
+            if (startObject != null && startObject == endObject)
             {
                 double diffAngle;
                 switch (startObject)
@@ -554,17 +572,17 @@ namespace Phases.DrawableObjects
                         break;
                 }
             }
-            else if(Util.Distance(points[0], points[3]) <= 10)
+            else if (Util.Distance(points[0], points[3]) <= 10)
             {
                 points[3].X += 100;
             }
         }
 
-        public override void ResizeCheck(ref System.Drawing.Point offset, MouseTool.ResizingTypes dir)
+        public override void ResizeCheck(ref Point offset, MouseTool.ResizingTypes dir)
         {
         }
 
-        public override void Resize(System.Drawing.Point offset, MouseTool.ResizingTypes dir)
+        public override void Resize(Point offset, MouseTool.ResizingTypes dir)
         {
             int idx = (int)Math.Log((double)dir, 2d) - 4;
             if (idx == 0 || idx == 3)
@@ -587,22 +605,25 @@ namespace Phases.DrawableObjects
             return textRect.Contains(position);
         }
 
-        public override bool IsSelectablePoint(System.Drawing.Point position)
+        public override bool IsSelectablePoint(Point position)
         {
             if (IsTextSelectable(position)) return true;
             Pen wpen = new Pen(Brushes.Black, 10);
             GraphicsPath gp = new GraphicsPath();
-            gp.AddBezier(points[0], points[1], points[2], points[3]);
+            if (ForceStraight)
+                gp.AddLine(points[0], points[3]);
+            else
+                gp.AddBezier(points[0], points[1], points[2], points[3]);
             return gp.IsOutlineVisible(position, wpen);
         }
 
-        public override bool IsCovered(System.Drawing.Rectangle area)
+        public override bool IsCovered(Rectangle area)
         {
             if (area.Contains(points[0]) && area.Contains(points[3])) return true;
             return false;
         }
 
-        public override bool IsSelectable(System.Drawing.Rectangle area)
+        public override bool IsSelectable(Rectangle area)
         {
             if (area.Contains(points[0]) || area.Contains(points[3])) return true;
             return false;
@@ -619,6 +640,7 @@ namespace Phases.DrawableObjects
             trans.EndAngle = EndAngle;
             trans.StartAngle = StartAngle;
             trans.textPointOffset = textPointOffset;
+            trans.ForceStraight = ForceStraight;
         }
 
         public override object Clone()
@@ -645,21 +667,23 @@ namespace Phases.DrawableObjects
             data.AddRange(Serialization.SerializeParameter(StartAngle));
             data.AddRange(Serialization.SerializeParameter(EndAngle));
             data.AddRange(Serialization.SerializeParameter(Priority));
+            data.AddRange(Serialization.SerializeParameter(ForceStraight));
             return data.ToArray();
         }
 
         public override bool DeserializeObjectSpecifics(byte[] data, ref int index)
         {
-            if(!Serialization.DeserializeParameter(data, ref index, out points[0])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out points[1])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out points[2])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out points[3])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out textPointOffset)) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out maxDist[0])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out maxDist[1])) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out StartAngle)) return false;
-            if(!Serialization.DeserializeParameter(data, ref index, out EndAngle)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out points[0])) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out points[1])) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out points[2])) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out points[3])) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out textPointOffset)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out maxDist[0])) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out maxDist[1])) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out StartAngle)) return false;
+            if (!Serialization.DeserializeParameter(data, ref index, out EndAngle)) return false;
             if (!Serialization.DeserializeParameter(data, ref index, out priority)) return false;
+            if (Serialization.DeserializeParameter(data, ref index, out bool straight)) ForceStraight = straight;
             return true;
         }
 
