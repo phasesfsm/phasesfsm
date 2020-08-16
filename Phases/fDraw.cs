@@ -47,6 +47,7 @@ namespace Phases
         private SignalsDraw signalsDraw;
         private MouseEventArgs lastMouseState;
         private Keys ForceStraightLineKey = Keys.Control;
+        private Keys ForceStateCircleKey = Keys.Control;
 
         public fDraw()
         {
@@ -505,147 +506,156 @@ namespace Phases
             {
                 ScrollOffset(mouse.Location.X - mouse.ScrollPoint.X, mouse.Location.Y - mouse.ScrollPoint.Y);
             }
-            else switch (mouse.Doing)
-            {
-                case MouseTool.MouseDoing.Nothing:
-                    mouse.PreviousObject = mouse.OnObject;
-                    mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
-                    mouse.OnTransition = book.SelectedSheet.Sketch.OnTransition(mouse.Location);
-                    if (mouse.CursorType != MouseTool.CursorTypes.Paint && !simulationMode) pBox.Cursor = mouse.Moving(mouse.Location, DrawTransform);
-                    switch (mouse.DrawingObjectType)
-                    {
-                        case DrawableObject.ObjectType.SimpleTransition:
-                            if (mouse.OnObject != null)
-                            {
-                                if(mouse.OnObject is Origin)
+            else
+                switch (mouse.Doing)
+                {
+                    case MouseTool.MouseDoing.Nothing:
+                        mouse.PreviousObject = mouse.OnObject;
+                        mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
+                        mouse.OnTransition = book.SelectedSheet.Sketch.OnTransition(mouse.Location);
+                        if (mouse.CursorType != MouseTool.CursorTypes.Paint && !simulationMode) pBox.Cursor = mouse.Moving(mouse.Location, DrawTransform);
+                        switch (mouse.DrawingObjectType)
+                        {
+                            case DrawableObject.ObjectType.SimpleTransition:
+                                if (mouse.OnObject != null)
                                 {
-                                    Origin origin = (Origin)mouse.OnObject;
-                                    if(origin.OutTransitions.Length == 0)
+                                    if (mouse.OnObject is Origin)
                                     {
-                                        mouse.StartDrawPoint = origin.Location;
+                                        Origin origin = (Origin)mouse.OnObject;
+                                        if (origin.OutTransitions.Length == 0)
+                                        {
+                                            mouse.StartDrawPoint = origin.Location;
+                                        }
+                                        else
+                                        {
+                                            mouse.StartDrawPoint = Point.Empty;
+                                            mouse.OnObject = null;
+                                        }
                                     }
-                                    else
-                                    {
-                                        mouse.StartDrawPoint = Point.Empty;
-                                        mouse.OnObject = null;
-                                    }
-                                }
-                                else if(mouse.OnObject is End || mouse.OnObject is Abort || mouse.OnObject is Relation)
-                                {
-                                    mouse.StartDrawPoint = Point.Empty;
-                                    mouse.OnObject = null;
-                                }
-                                else
-                                {
-                                    mouse.OnObject.Intersect(mouse.Location, ref mouse.StartDrawPoint, ref dAngle);
-                                }
-                            }
-                            else
-                            {
-                                mouse.StartDrawPoint = Point.Empty;
-                            }
-                            pBox.Refresh();
-                            break;
-                        case DrawableObject.ObjectType.SuperTransition:
-                            if (mouse.OnObject != null)
-                            {
-                                if (mouse.OnObject is Origin)
-                                {
-                                    Origin origin = (Origin)mouse.OnObject;
-                                    if (origin.OutTransitions.Length == 0)
-                                    {
-                                        mouse.StartDrawPoint = origin.Location;
-                                    }
-                                    else
+                                    else if (mouse.OnObject is End || mouse.OnObject is Abort || mouse.OnObject is Relation)
                                     {
                                         mouse.StartDrawPoint = Point.Empty;
                                         mouse.OnObject = null;
                                     }
+                                    else
+                                    {
+                                        mouse.OnObject.Intersect(mouse.Location, ref mouse.StartDrawPoint, ref dAngle);
+                                    }
                                 }
-                                else if (mouse.OnObject is End || mouse.OnObject is Abort)
+                                else
                                 {
                                     mouse.StartDrawPoint = Point.Empty;
-                                    mouse.OnObject = null;
+                                }
+                                pBox.Refresh();
+                                break;
+                            case DrawableObject.ObjectType.SuperTransition:
+                                if (mouse.OnObject != null)
+                                {
+                                    if (mouse.OnObject is Origin)
+                                    {
+                                        Origin origin = (Origin)mouse.OnObject;
+                                        if (origin.OutTransitions.Length == 0)
+                                        {
+                                            mouse.StartDrawPoint = origin.Location;
+                                        }
+                                        else
+                                        {
+                                            mouse.StartDrawPoint = Point.Empty;
+                                            mouse.OnObject = null;
+                                        }
+                                    }
+                                    else if (mouse.OnObject is End || mouse.OnObject is Abort)
+                                    {
+                                        mouse.StartDrawPoint = Point.Empty;
+                                        mouse.OnObject = null;
+                                    }
+                                    else
+                                    {
+                                        mouse.OnObject.Intersect(mouse.Location, ref mouse.StartDrawPoint, ref dAngle);
+                                    }
                                 }
                                 else
                                 {
-                                    mouse.OnObject.Intersect(mouse.Location, ref mouse.StartDrawPoint, ref dAngle);
+                                    mouse.StartDrawPoint = Point.Empty;
                                 }
-                            }
-                            else
-                            {
-                                mouse.StartDrawPoint = Point.Empty;
-                            }
-                            pBox.Refresh();
-                            break;
-                    }
-                    break;
-                case MouseTool.MouseDoing.Drawing:
-                    mouse.PreviousObject = mouse.OnObject;
-                    mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
-                    switch (mouse.DrawingObjectType)
-                    {
-                        case DrawableObject.ObjectType.SimpleTransition:
-                        case DrawableObject.ObjectType.SuperTransition:
-                            if (mouse.OnObject != null)
-                            {
-                                if(mouse.OnObject is Origin || mouse.OnObject is Relation)
+                                pBox.Refresh();
+                                break;
+                        }
+                        break;
+                    case MouseTool.MouseDoing.Drawing:
+                        mouse.PreviousObject = mouse.OnObject;
+                        mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
+                        switch (mouse.DrawingObjectType)
+                        {
+                            case DrawableObject.ObjectType.SimpleTransition:
+                            case DrawableObject.ObjectType.SuperTransition:
+                                if (mouse.OnObject != null)
                                 {
-                                    mouse.OnObject = null;
+                                    if (mouse.OnObject is Origin || mouse.OnObject is Relation)
+                                    {
+                                        mouse.OnObject = null;
+                                    }
+                                    else
+                                    {
+                                        Transition transition = (Transition)mouse.DrawingObject;
+                                        double prev = transition.EndAngle;
+                                        mouse.OnObject.Intersect(mouse.Location, ref mouse.StartDrawPoint, ref transition.EndAngle);
+                                        if (mouse.StartDrawPoint.X > 1000 || mouse.StartDrawPoint.X < -1000) System.Diagnostics.Debugger.Break();
+                                        mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, mouse.StartDrawPoint);
+                                        transition.OutDir(mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), 2);
+                                    }
                                 }
                                 else
                                 {
-                                    Transition transition = (Transition)mouse.DrawingObject;
-                                    double prev = transition.EndAngle;
-                                    mouse.OnObject.Intersect(mouse.Location, ref mouse.StartDrawPoint, ref transition.EndAngle);
-                                    if (mouse.StartDrawPoint.X > 1000 || mouse.StartDrawPoint.X < -1000) System.Diagnostics.Debugger.Break();
-                                    mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, mouse.StartDrawPoint);
-                                    transition.OutDir(mouse.OnObject.OutDir(mouse.StartDrawPoint, out dAngle), 2);
+                                    mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, mouse.Location);
+                                    if (mouse.DrawingObject is Transition trans) trans.ForceStraight = ModifierKeys.HasFlag(ForceStraightLineKey);
                                 }
-                            }
-                            else
-                            {
+                                pBox.Refresh();
+                                break;
+                            case DrawableObject.ObjectType.SimpleState:
+                                var state = mouse.DrawingObject as SimpleState;
+                                Point endPoint;
+                                if (ModifierKeys.HasFlag(ForceStateCircleKey)) endPoint = Util.GetDiagonal(mouse.FirstPoint, mouse.Location);
+                                else endPoint = mouse.Location;
+                                mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, endPoint);
+                                state.ForceCircle = ModifierKeys.HasFlag(ForceStateCircleKey);
+                                pBox.Refresh();
+                                break;
+                            case DrawableObject.ObjectType.Origin:
+                            case DrawableObject.ObjectType.Relation:
+                            case DrawableObject.ObjectType.End:
+                            case DrawableObject.ObjectType.Alias:
+                            case DrawableObject.ObjectType.Abort:
+                            case DrawableObject.ObjectType.StateAlias:
+                            case DrawableObject.ObjectType.SuperState:
+                            case DrawableObject.ObjectType.Nested:
+                            case DrawableObject.ObjectType.Text:
+                            case DrawableObject.ObjectType.Equation:
                                 mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, mouse.Location);
-                                if (mouse.DrawingObject is Transition trans) trans.ForceStraight = ModifierKeys.HasFlag(ForceStraightLineKey);
-                            }
-                            pBox.Refresh();
-                            break;
-                        case DrawableObject.ObjectType.Origin:
-                        case DrawableObject.ObjectType.Relation:
-                        case DrawableObject.ObjectType.End:
-                        case DrawableObject.ObjectType.Alias:
-                        case DrawableObject.ObjectType.Abort:
-                        case DrawableObject.ObjectType.SimpleState:
-                        case DrawableObject.ObjectType.StateAlias:
-                        case DrawableObject.ObjectType.SuperState:
-                        case DrawableObject.ObjectType.Nested:
-                        case DrawableObject.ObjectType.Text:
-                        case DrawableObject.ObjectType.Equation:
-                            mouse.DrawingObject.DrawingRectangle(mouse.FirstPoint, mouse.Location);
-                            pBox.Refresh();
-                            break;
-                    }
-                    break;
-                case MouseTool.MouseDoing.Selecting:
-                    mouse.SelectionArea = Util.GetRectangle(mouse.FirstPoint, mouse.Location);
-                    mouse.InclusiveSelection = mouse.FirstPoint.X > mouse.Location.X;
-                    RefreshSelection(mouse.SelectionResult(mouse.FirstPoint, mouse.Location));
-                    pBox.Refresh();
-                    break;
-                case MouseTool.MouseDoing.Moving:
-                    mouse.MoveObjects(mouse.Location);
-                    ScrollOffset(Util.GetOutOffset(GetRectangleView(), mouse.Location));
-                    pBox.Refresh();
-                    break;
-                case MouseTool.MouseDoing.MovingText:
-                    mouse.MoveText(mouse.Location);
-                    pBox.Refresh();
-                    break;
-                case MouseTool.MouseDoing.Resizing:
-                    mouse.ResizeObjects(mouse.Location);
-                    pBox.Refresh();
-                    break;
-            }
+                                pBox.Refresh();
+                                break;
+                        }
+                        break;
+                    case MouseTool.MouseDoing.Selecting:
+                        mouse.SelectionArea = Util.GetRectangle(mouse.FirstPoint, mouse.Location);
+                        mouse.InclusiveSelection = mouse.FirstPoint.X > mouse.Location.X;
+                        RefreshSelection(mouse.SelectionResult(mouse.FirstPoint, mouse.Location));
+                        pBox.Refresh();
+                        break;
+                    case MouseTool.MouseDoing.Moving:
+                        mouse.MoveObjects(mouse.Location);
+                        ScrollOffset(Util.GetOutOffset(GetRectangleView(), mouse.Location));
+                        pBox.Refresh();
+                        break;
+                    case MouseTool.MouseDoing.MovingText:
+                        mouse.MoveText(mouse.Location);
+                        pBox.Refresh();
+                        break;
+                    case MouseTool.MouseDoing.Resizing:
+                        mouse.ResizeObjects(mouse.Location);
+                        pBox.Refresh();
+                        break;
+                }
             RefreshStatusBar(mouse.Location);
         }
 

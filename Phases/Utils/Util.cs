@@ -146,6 +146,15 @@ namespace Phases
             return rect;
         }
 
+        public static Point GetDiagonal(Point startPoint, Point endPoint)
+        {
+            int width = endPoint.X - startPoint.X;
+            int height = endPoint.Y - startPoint.Y;
+            if (width > height) height = width;
+            else width = height;
+            return new Point(startPoint.X + width, startPoint.Y + height);
+        }
+
         public static RectangleF GetRectangleF(PointF center, SizeF size)
         {
             return new RectangleF(center.X - size.Width / 2, center.Y - size.Height / 2, size.Width, size.Height);
