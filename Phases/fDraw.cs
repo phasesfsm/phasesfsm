@@ -522,7 +522,7 @@ namespace Phases
                         mouse.OnTransition = book.SelectedSheet.Sketch.OnTransition(mouse.Location);
                         if (mouse.CursorType == MouseTool.CursorTypes.Paint)
                         {
-                            if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                            if (ModifierKeys.HasFlag(ForceSnapCursorKey) ^ mnuSnapToGrid.Checked)
                             {
                                 mouse.SnapLocation = Util.SnapPoint(mouse.Location, DrawingSheet.gridSeparation);
                             }
@@ -605,7 +605,7 @@ namespace Phases
                         }
                         break;
                     case MouseTool.MouseDoing.Drawing:
-                        if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                        if (ModifierKeys.HasFlag(ForceSnapCursorKey) ^ mnuSnapToGrid.Checked)
                         {
                             mouse.Location = Util.SnapPoint(mouse.Location, DrawingSheet.gridSeparation);
                         }
@@ -669,7 +669,7 @@ namespace Phases
                         pBox.Refresh();
                         break;
                     case MouseTool.MouseDoing.Moving:
-                        if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                        if (ModifierKeys.HasFlag(ForceSnapCursorKey) ^ mnuSnapToGrid.Checked)
                         {
                             if (mouse.SelectionFocusState == null)
                             {
@@ -689,7 +689,7 @@ namespace Phases
                         pBox.Refresh();
                         break;
                     case MouseTool.MouseDoing.Resizing:
-                        if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                        if (ModifierKeys.HasFlag(ForceSnapCursorKey) ^ mnuSnapToGrid.Checked)
                         {
                             mouse.Location = Util.SnapGripPoint(mouse.Location, DrawingSheet.gridSeparation);
                         }
