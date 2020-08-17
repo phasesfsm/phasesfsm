@@ -14,7 +14,7 @@ namespace Phases
     abstract class DrawingSheet : SheetParameters, IDisposable
     {
         readonly int crossSize = 20;
-        readonly int gridSeparation = 10;
+        public const int gridSeparation = 10;
 
         public PhasesBook OwnerBook;
         public TreeNode sheetTree;

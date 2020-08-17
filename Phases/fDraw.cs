@@ -48,6 +48,7 @@ namespace Phases
         private MouseEventArgs lastMouseState;
         private Keys ForceStraightLineKey = Keys.Control;
         private Keys ForceStateCircleKey = Keys.Control;
+        private Keys ForceSnapCursorKey = Keys.Shift;
 
         public fDraw()
         {
@@ -144,7 +145,13 @@ namespace Phases
             }
             else if(e.Button == MouseButtons.Left)
             {
-                mouse.FirstPoint = mouse.Location;
+                if (mouse.SnapLocation == null)
+                    mouse.FirstPoint = mouse.Location;
+                else
+                {
+                    mouse.FirstPoint = mouse.SnapLocation.Value;
+                    mouse.SnapLocation = null;
+                }
                 switch (mouse.Doing)
                 {
                     case MouseTool.MouseDoing.Nothing:
@@ -153,7 +160,7 @@ namespace Phases
                         {
                             case MouseTool.CursorTypes.Default:
                                 //Sumar a la seleccion
-                                if (Control.ModifierKeys == Keys.Control)
+                                if (ModifierKeys == Keys.Control)
                                 {
                                     if (mouse.OnObject != null)
                                     {
@@ -220,8 +227,8 @@ namespace Phases
                                 pBox.Refresh();
                                 break;
                             case MouseTool.CursorTypes.Move:
-                                //Sumar a la seleccion
-                                if (Control.ModifierKeys == Keys.Control)
+                                //Add to selection
+                                if (ModifierKeys == Keys.Control)
                                 {
                                     if (mouse.OnObject != null)
                                     {
@@ -513,7 +520,22 @@ namespace Phases
                         mouse.PreviousObject = mouse.OnObject;
                         mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
                         mouse.OnTransition = book.SelectedSheet.Sketch.OnTransition(mouse.Location);
-                        if (mouse.CursorType != MouseTool.CursorTypes.Paint && !simulationMode) pBox.Cursor = mouse.Moving(mouse.Location, DrawTransform);
+                        if (mouse.CursorType == MouseTool.CursorTypes.Paint)
+                        {
+                            if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                            {
+                                mouse.SnapLocation = Util.SnapPoint(mouse.Location, DrawingSheet.gridSeparation);
+                            }
+                            else
+                            {
+                                mouse.SnapLocation = null;
+                            }
+                            pBox.Invalidate();
+                        }
+                        else if (!simulationMode)
+                        {
+                            pBox.Cursor = mouse.Moving(mouse.Location, DrawTransform);
+                        }
                         switch (mouse.DrawingObjectType)
                         {
                             case DrawableObject.ObjectType.SimpleTransition:
@@ -583,6 +605,10 @@ namespace Phases
                         }
                         break;
                     case MouseTool.MouseDoing.Drawing:
+                        if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                        {
+                            mouse.Location = Util.SnapPoint(mouse.Location, DrawingSheet.gridSeparation);
+                        }
                         mouse.PreviousObject = mouse.OnObject;
                         mouse.OnObject = book.SelectedSheet.Sketch.GetOnObject(mouse.Location);
                         switch (mouse.DrawingObjectType)
@@ -643,6 +669,17 @@ namespace Phases
                         pBox.Refresh();
                         break;
                     case MouseTool.MouseDoing.Moving:
+                        if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                        {
+                            if (mouse.SelectionFocusState == null)
+                            {
+                                mouse.Location = Util.SnapPoint(mouse.FirstPoint, mouse.Location, DrawingSheet.gridSeparation);
+                            }
+                            else
+                            {
+                                mouse.Location = Util.SnapPoint(mouse.SelectionFocusState, mouse.FirstPoint, mouse.Location, DrawingSheet.gridSeparation);
+                            }
+                        }
                         mouse.MoveObjects(mouse.Location);
                         ScrollOffset(Util.GetOutOffset(GetRectangleView(), mouse.Location));
                         pBox.Refresh();
@@ -652,6 +689,10 @@ namespace Phases
                         pBox.Refresh();
                         break;
                     case MouseTool.MouseDoing.Resizing:
+                        if (ModifierKeys.HasFlag(ForceSnapCursorKey))
+                        {
+                            mouse.Location = Util.SnapGripPoint(mouse.Location, DrawingSheet.gridSeparation);
+                        }
                         mouse.ResizeObjects(mouse.Location);
                         pBox.Refresh();
                         break;
@@ -895,6 +936,14 @@ namespace Phases
             mouse.DrawSelectionsBack(g);
             book.SelectedSheet.Sketch.Paint(g, new DrawAttributes(pen, DrawScale));
             mouse.DrawSelections(g, DrawTransform);
+
+            //Draw snap cursor
+            if (mouse.SnapLocation != null)
+            {
+                const int crossSize = 15;
+                g.DrawLine(Pens.Black, mouse.SnapLocation.Value.X - crossSize, mouse.SnapLocation.Value.Y, mouse.SnapLocation.Value.X + crossSize, mouse.SnapLocation.Value.Y);
+                g.DrawLine(Pens.Black, mouse.SnapLocation.Value.X, mouse.SnapLocation.Value.Y - crossSize, mouse.SnapLocation.Value.X, mouse.SnapLocation.Value.Y + crossSize);
+            }
         }
 
         private Rectangle GetRectangleView() => new Rectangle(Util.ScalePoint(Point.Empty, DrawTransform), Util.ScaleSize(pBox.Size, DrawScale));
@@ -987,6 +1036,7 @@ namespace Phases
                 mouse.ClearSelection();
             }
             pBox.Refresh();
+            pBox.Focus();
         }
 
         private void btMouseTool_DoubleClick(object sender, EventArgs e)
@@ -2479,8 +2529,12 @@ namespace Phases
             }
         }
 
+        private Keys lastKeyDown = Keys.None;
+
         private void fDraw_KeyDown(object sender, KeyEventArgs e)
         {
+            if (lastKeyDown == e.KeyCode) return;
+            lastKeyDown = e.KeyCode;
             if (lastMouseState != null && pBox.Bounds.Contains(MousePosition))
             {
                 pBox_MouseMove(pBox, lastMouseState);
@@ -2493,6 +2547,7 @@ namespace Phases
             {
                 pBox_MouseMove(pBox, lastMouseState);
             }
+            if (lastKeyDown == e.KeyCode) lastKeyDown = Keys.None;
         }
     }
 }

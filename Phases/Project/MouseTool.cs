@@ -87,6 +87,7 @@ namespace Phases
         private int pastedTimes;
         public Rectangle SelectionArea;
         public Point Location, FirstPoint, MovingPoint, StartDrawPoint;
+        public Point? SnapLocation = null;
         public ResizingTypes ResizingType;
         public DrawableCollection draw;
         private PictureBox pBox;
@@ -256,6 +257,8 @@ namespace Phases
             if (@object == null || !(@object is State || @object is SuperState)) return;
             selectedObjectFocusedIndex = selectedObjects.IndexOf(@object);
         }
+
+        public State SelectionFocusState => selectedObjectFocusedIndex >= 0 ? selectedObjects[selectedObjectFocusedIndex] as State : null;
 
         public bool SelectionResult(Point startPoint, Point endPoint)
         {

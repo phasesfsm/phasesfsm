@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.IO;
 using System.IO.Compression;
+using Phases.DrawableObjects;
 
 namespace Phases
 {
@@ -302,6 +303,35 @@ namespace Phases
         public static string CounterName(string name)
         {
             return name + "_ct";
+        }
+
+        public static Point SnapGripPoint(Point location, int span)
+        {
+            int x = location.X / span * span + Math.Sign(location.X) * span / 2;
+            int y = location.Y / span * span + Math.Sign(location.Y) * span / 2;
+            return new Point(x, y);
+        }
+
+        public static Point SnapPoint(Point location, int span)
+        {
+            int x = (location.X + Math.Sign(location.X) * span / 2) / span * span;
+            int y = (location.Y + Math.Sign(location.Y) * span / 2) / span * span;
+            return new Point(x, y);
+        }
+
+        public static Point SnapPoint(Point startPoint, Point location, int span)
+        {
+            int x = (location.X + Math.Sign(location.X) * span / 2) / span * span + startPoint.X % span;
+            int y = (location.Y + Math.Sign(location.Y) * span / 2) / span * span + startPoint.Y % span;
+            return new Point(x, y);
+        }
+
+        public static Point SnapPoint(DrawableObject obj, Point startPoint, Point location, int span)
+        {
+            DrawableObject shadow = obj.OwnerDraw.Shadow.First(sh => sh.Equals(obj));
+            int x = (location.X + Math.Sign(location.X) * span / 2) / span * span + startPoint.X % span + shadow.Center.X % span;
+            int y = (location.Y + Math.Sign(location.Y) * span / 2) / span * span + startPoint.Y % span + shadow.Center.Y % span;
+            return new Point(x, y);
         }
     }
 }
