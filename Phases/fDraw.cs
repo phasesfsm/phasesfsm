@@ -2549,5 +2549,11 @@ namespace Phases
             }
             if (lastKeyDown == e.KeyCode) lastKeyDown = Keys.None;
         }
+
+        private void pBox_MouseLeave(object sender, EventArgs e)
+        {
+            mouse.SnapLocation = null;
+            pBox.Invalidate();
+        }
     }
 }

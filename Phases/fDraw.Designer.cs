@@ -30,18 +30,18 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(fDraw));
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("States", 1, 1);
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Transitions", 2, 2);
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Inputs");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Outputs");
-            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Interfaces");
-            System.Windows.Forms.TreeNode treeNode14 = new System.Windows.Forms.TreeNode("Events");
-            System.Windows.Forms.TreeNode treeNode15 = new System.Windows.Forms.TreeNode("Constants");
-            System.Windows.Forms.TreeNode treeNode16 = new System.Windows.Forms.TreeNode("Variables");
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("States", 1, 1);
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Transitions", 2, 2);
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Inputs");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Outputs");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Interfaces");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Events");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Constants");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Variables");
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.standardTools = new System.Windows.Forms.ToolStrip();
             this.btNew = new System.Windows.Forms.ToolStripButton();
             this.btOpen = new System.Windows.Forms.ToolStripButton();
@@ -1074,21 +1074,21 @@
             // 
             this.centerSheetToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("centerSheetToolStripMenuItem.Image")));
             this.centerSheetToolStripMenuItem.Name = "centerSheetToolStripMenuItem";
-            this.centerSheetToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.centerSheetToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.centerSheetToolStripMenuItem.Text = "&Center sheet";
             this.centerSheetToolStripMenuItem.Click += new System.EventHandler(this.centerSheetToolStripMenuItem_Click);
             // 
             // restoreViewToolStripMenuItem
             // 
             this.restoreViewToolStripMenuItem.Name = "restoreViewToolStripMenuItem";
-            this.restoreViewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.restoreViewToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.restoreViewToolStripMenuItem.Text = "&Restore view";
             this.restoreViewToolStripMenuItem.Click += new System.EventHandler(this.restoreViewToolStripMenuItem_Click);
             // 
             // toolStripSeparator7
             // 
             this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator7.Size = new System.Drawing.Size(137, 6);
             // 
             // gridToolStripMenuItem
             // 
@@ -1097,7 +1097,7 @@
             this.gridPointsToolStripMenuItem,
             this.gridSquaresToolStripMenuItem});
             this.gridToolStripMenuItem.Name = "gridToolStripMenuItem";
-            this.gridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gridToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.gridToolStripMenuItem.Text = "Show &grid";
             // 
             // gridHideToolStripMenuItem
@@ -1105,7 +1105,7 @@
             this.gridHideToolStripMenuItem.Checked = true;
             this.gridHideToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.gridHideToolStripMenuItem.Name = "gridHideToolStripMenuItem";
-            this.gridHideToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gridHideToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.gridHideToolStripMenuItem.Tag = "Hide";
             this.gridHideToolStripMenuItem.Text = "No";
             this.gridHideToolStripMenuItem.Click += new System.EventHandler(this.gridOptionsToolStripMenuItem_Click);
@@ -1113,7 +1113,7 @@
             // gridPointsToolStripMenuItem
             // 
             this.gridPointsToolStripMenuItem.Name = "gridPointsToolStripMenuItem";
-            this.gridPointsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gridPointsToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.gridPointsToolStripMenuItem.Tag = "Points";
             this.gridPointsToolStripMenuItem.Text = "Points";
             this.gridPointsToolStripMenuItem.Click += new System.EventHandler(this.gridOptionsToolStripMenuItem_Click);
@@ -1121,7 +1121,7 @@
             // gridSquaresToolStripMenuItem
             // 
             this.gridSquaresToolStripMenuItem.Name = "gridSquaresToolStripMenuItem";
-            this.gridSquaresToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gridSquaresToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.gridSquaresToolStripMenuItem.Tag = "Squares";
             this.gridSquaresToolStripMenuItem.Text = "Squares";
             this.gridSquaresToolStripMenuItem.Click += new System.EventHandler(this.gridOptionsToolStripMenuItem_Click);
@@ -1130,13 +1130,13 @@
             // 
             this.mnuSnapToGrid.CheckOnClick = true;
             this.mnuSnapToGrid.Name = "mnuSnapToGrid";
-            this.mnuSnapToGrid.Size = new System.Drawing.Size(180, 22);
+            this.mnuSnapToGrid.Size = new System.Drawing.Size(140, 22);
             this.mnuSnapToGrid.Text = "&Snap to grid";
             // 
             // toolStripSeparator11
             // 
             this.toolStripSeparator11.Name = "toolStripSeparator11";
-            this.toolStripSeparator11.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator11.Size = new System.Drawing.Size(137, 6);
             // 
             // logsViewToolStripMenuItem
             // 
@@ -1144,7 +1144,7 @@
             this.logsViewToolStripMenuItem.CheckOnClick = true;
             this.logsViewToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.logsViewToolStripMenuItem.Name = "logsViewToolStripMenuItem";
-            this.logsViewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.logsViewToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.logsViewToolStripMenuItem.Text = "&Logs view";
             this.logsViewToolStripMenuItem.CheckedChanged += new System.EventHandler(this.logsViewToolStripMenuItem_CheckedChanged);
             // 
@@ -1164,19 +1164,19 @@
             // iOTableToolStripMenuItem
             // 
             this.iOTableToolStripMenuItem.Name = "iOTableToolStripMenuItem";
-            this.iOTableToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.iOTableToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.iOTableToolStripMenuItem.Text = "&Variables ...";
             this.iOTableToolStripMenuItem.Click += new System.EventHandler(this.btVariables_Click);
             // 
             // toolStripSeparator8
             // 
             this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(159, 6);
+            this.toolStripSeparator8.Size = new System.Drawing.Size(177, 6);
             // 
             // checkToolStripMenuItem
             // 
             this.checkToolStripMenuItem.Name = "checkToolStripMenuItem";
-            this.checkToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.checkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.checkToolStripMenuItem.Text = "&Check";
             this.checkToolStripMenuItem.Click += new System.EventHandler(this.btChecks_Click);
             // 
@@ -1188,7 +1188,7 @@
             this.toolStripMenuItem4,
             this.generateCodeToolStripMenuItem});
             this.codeGenerationToolStripMenuItem.Name = "codeGenerationToolStripMenuItem";
-            this.codeGenerationToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.codeGenerationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.codeGenerationToolStripMenuItem.Text = "Code &generation";
             // 
             // languageToolStripMenuItem
@@ -1229,7 +1229,7 @@
             this.stepToolStripMenuItem});
             this.simulationToolStripMenuItem.Enabled = false;
             this.simulationToolStripMenuItem.Name = "simulationToolStripMenuItem";
-            this.simulationToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.simulationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.simulationToolStripMenuItem.Text = "&Simulation";
             // 
             // configurationToolStripMenuItem1
@@ -1301,7 +1301,7 @@
             this.stopToolStripMenuItem1});
             this.emulationToolStripMenuItem.Enabled = false;
             this.emulationToolStripMenuItem.Name = "emulationToolStripMenuItem";
-            this.emulationToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.emulationToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.emulationToolStripMenuItem.Text = "&Emulation";
             // 
             // configurationToolStripMenuItem2
@@ -1463,39 +1463,39 @@
             this.tvObjects.ImageList = this.iconsImageList;
             this.tvObjects.Location = new System.Drawing.Point(3, 3);
             this.tvObjects.Name = "tvObjects";
-            treeNode9.ImageIndex = 1;
-            treeNode9.Name = "Node0";
-            treeNode9.SelectedImageIndex = 1;
-            treeNode9.Text = "States";
-            treeNode10.ImageIndex = 2;
-            treeNode10.Name = "Node0";
-            treeNode10.SelectedImageIndex = 2;
-            treeNode10.Text = "Transitions";
-            treeNode11.ImageIndex = 3;
-            treeNode11.Name = "Node1";
-            treeNode11.SelectedImageKey = "tin.png";
-            treeNode11.Text = "Inputs";
-            treeNode12.ImageIndex = 4;
-            treeNode12.Name = "Node2";
-            treeNode12.SelectedImageKey = "tout.png";
-            treeNode12.Text = "Outputs";
-            treeNode13.Name = "Node3";
-            treeNode13.Text = "Interfaces";
-            treeNode14.Name = "Node4";
-            treeNode14.Text = "Events";
-            treeNode15.Name = "Node1";
-            treeNode15.Text = "Constants";
-            treeNode16.Name = "Node2";
-            treeNode16.Text = "Variables";
+            treeNode1.ImageIndex = 1;
+            treeNode1.Name = "Node0";
+            treeNode1.SelectedImageIndex = 1;
+            treeNode1.Text = "States";
+            treeNode2.ImageIndex = 2;
+            treeNode2.Name = "Node0";
+            treeNode2.SelectedImageIndex = 2;
+            treeNode2.Text = "Transitions";
+            treeNode3.ImageIndex = 3;
+            treeNode3.Name = "Node1";
+            treeNode3.SelectedImageKey = "tin.png";
+            treeNode3.Text = "Inputs";
+            treeNode4.ImageIndex = 4;
+            treeNode4.Name = "Node2";
+            treeNode4.SelectedImageKey = "tout.png";
+            treeNode4.Text = "Outputs";
+            treeNode5.Name = "Node3";
+            treeNode5.Text = "Interfaces";
+            treeNode6.Name = "Node4";
+            treeNode6.Text = "Events";
+            treeNode7.Name = "Node1";
+            treeNode7.Text = "Constants";
+            treeNode8.Name = "Node2";
+            treeNode8.Text = "Variables";
             this.tvObjects.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode9,
-            treeNode10,
-            treeNode11,
-            treeNode12,
-            treeNode13,
-            treeNode14,
-            treeNode15,
-            treeNode16});
+            treeNode1,
+            treeNode2,
+            treeNode3,
+            treeNode4,
+            treeNode5,
+            treeNode6,
+            treeNode7,
+            treeNode8});
             this.tvObjects.SelectedImageIndex = 0;
             this.tvObjects.Size = new System.Drawing.Size(225, 398);
             this.tvObjects.TabIndex = 4;
@@ -1676,8 +1676,8 @@
             // 
             // cnVarType
             // 
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.cnVarType.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.cnVarType.DefaultCellStyle = dataGridViewCellStyle1;
             this.cnVarType.HeaderText = "T";
             this.cnVarType.Name = "cnVarType";
             this.cnVarType.ReadOnly = true;
@@ -1702,8 +1702,8 @@
             // 
             // realValueCn
             // 
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.realValueCn.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.realValueCn.DefaultCellStyle = dataGridViewCellStyle2;
             this.realValueCn.HeaderText = "Value";
             this.realValueCn.Name = "realValueCn";
             this.realValueCn.ReadOnly = true;
@@ -1732,8 +1732,8 @@
             // 
             // dataGridViewTextBoxColumn1
             // 
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridViewTextBoxColumn1.HeaderText = "T";
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ReadOnly = true;
@@ -1750,8 +1750,8 @@
             // 
             // dataGridViewCheckBoxColumn1
             // 
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dataGridViewCheckBoxColumn1.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dataGridViewCheckBoxColumn1.DefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridViewCheckBoxColumn1.HeaderText = "Value";
             this.dataGridViewCheckBoxColumn1.Name = "dataGridViewCheckBoxColumn1";
             this.dataGridViewCheckBoxColumn1.ReadOnly = true;
@@ -1774,6 +1774,7 @@
             this.pBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pBox_Paint);
             this.pBox.DoubleClick += new System.EventHandler(this.pBox_DoubleClick);
             this.pBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pBox_MouseDown);
+            this.pBox.MouseLeave += new System.EventHandler(this.pBox_MouseLeave);
             this.pBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pBox_MouseMove);
             this.pBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pBox_MouseUp);
             this.pBox.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.pBox_MouseWheel);
