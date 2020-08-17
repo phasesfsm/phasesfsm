@@ -86,7 +86,7 @@ namespace Phases.DrawableObjects
 
         public override void DrawingRectangle(Point startPoint, Point endPoint)
         {
-            rect = MouseTool.GetRectangle(startPoint, endPoint);
+            rect = Util.GetRectangle(startPoint, endPoint);
         }
 
         public override Rectangle GetSelectionRectangle()

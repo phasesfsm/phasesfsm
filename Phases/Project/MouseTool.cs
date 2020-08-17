@@ -87,6 +87,7 @@ namespace Phases
         private int pastedTimes;
         public Rectangle SelectionArea;
         public Point Location, FirstPoint, MovingPoint, StartDrawPoint;
+        public Point? SnapLocation = null;
         public ResizingTypes ResizingType;
         public DrawableCollection draw;
         private PictureBox pBox;
@@ -257,6 +258,8 @@ namespace Phases
             selectedObjectFocusedIndex = selectedObjects.IndexOf(@object);
         }
 
+        public State SelectionFocusState => selectedObjectFocusedIndex >= 0 ? selectedObjects[selectedObjectFocusedIndex] as State : null;
+
         public bool SelectionResult(Point startPoint, Point endPoint)
         {
             if (startPoint.X == endPoint.X && startPoint.Y == endPoint.Y)
@@ -277,7 +280,7 @@ namespace Phases
                 //Inclusive selection
                 foreach (DrawableObject obj in draw.Objects)
                 {
-                    if (obj.IsSelectable(MouseTool.GetRectangle(startPoint, endPoint)))
+                    if (obj.IsSelectable(Util.GetRectangle(startPoint, endPoint)))
                     {
                         if(!selectedObjects.Contains(obj)) AddToSelection(obj);
                     }
@@ -292,7 +295,7 @@ namespace Phases
                 //Exclusive selection
                 foreach (DrawableObject obj in draw.Objects)
                 {
-                    if (obj.IsCovered(MouseTool.GetRectangle(startPoint, endPoint)))
+                    if (obj.IsCovered(Util.GetRectangle(startPoint, endPoint)))
                     {
                         if (!selectedObjects.Contains(obj)) AddToSelection(obj);
                     }
@@ -734,47 +737,6 @@ namespace Phases
                 {
                     MessageBox.Show("Error MouseTool.DrawSelections:" + e.Message);
                 }
-            }
-        }
-
-        //Util functions
-        public static Rectangle GetRectangle(Point startPoint, Point endPoint)
-        {
-            Rectangle rect = new Rectangle();
-            if (endPoint.X >= startPoint.X)
-            {
-                rect.X = startPoint.X;
-                rect.Width = endPoint.X - startPoint.X;
-            }
-            else
-            {
-                rect.X = endPoint.X;
-                rect.Width = startPoint.X - endPoint.X;
-            }
-            if (endPoint.Y >= startPoint.Y)
-            {
-                rect.Y = startPoint.Y;
-                rect.Height = endPoint.Y - startPoint.Y;
-            }
-            else
-            {
-                rect.Y = endPoint.Y;
-                rect.Height = startPoint.Y - endPoint.Y;
-            }
-            return rect;
-        }
-
-        public static void FixRectangle(ref Rectangle rect)
-        {
-            if (rect.Width < 0)
-            {
-                rect.X = rect.X + rect.Width;
-                rect.Width = -rect.Width;
-            }
-            if (rect.Height < 0)
-            {
-                rect.Y = rect.Y + rect.Height;
-                rect.Height = -rect.Height;
             }
         }
     }

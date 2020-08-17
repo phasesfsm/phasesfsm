@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.IO;
 using System.IO.Compression;
+using Phases.DrawableObjects;
 
 namespace Phases
 {
@@ -89,6 +90,70 @@ namespace Phases
         public static Rectangle GetRectangle(int x1, int y1, int x2, int y2)
         {
             return new Rectangle(x1, y2, x2 - x1, y2 - y1);
+        }
+
+        public static Rectangle GetRectangle(Point startPoint, Point endPoint)
+        {
+            Rectangle rect = new Rectangle();
+            if (endPoint.X >= startPoint.X)
+            {
+                rect.X = startPoint.X;
+                rect.Width = endPoint.X - startPoint.X;
+            }
+            else
+            {
+                rect.X = endPoint.X;
+                rect.Width = startPoint.X - endPoint.X;
+            }
+            if (endPoint.Y >= startPoint.Y)
+            {
+                rect.Y = startPoint.Y;
+                rect.Height = endPoint.Y - startPoint.Y;
+            }
+            else
+            {
+                rect.Y = endPoint.Y;
+                rect.Height = startPoint.Y - endPoint.Y;
+            }
+            return rect;
+        }
+
+        public static void FixRectangle(ref Rectangle rect)
+        {
+            if (rect.Width < 0)
+            {
+                rect.X = rect.X + rect.Width;
+                rect.Width = -rect.Width;
+            }
+            if (rect.Height < 0)
+            {
+                rect.Y = rect.Y + rect.Height;
+                rect.Height = -rect.Height;
+            }
+        }
+
+        public static Rectangle SquareRectangle(Rectangle rect)
+        {
+            if (rect.Width > rect.Height)
+            {
+                rect.Y -= (rect.Width - rect.Height) / 2;
+                rect.Height = rect.Width;
+            }
+            else
+            {
+                rect.X -= (rect.Height - rect.Width) / 2;
+                rect.Width = rect.Height;
+            }
+            return rect;
+        }
+
+        public static Point GetDiagonal(Point startPoint, Point endPoint)
+        {
+            int width = endPoint.X - startPoint.X;
+            int height = endPoint.Y - startPoint.Y;
+            if (width > height) height = width;
+            else width = height;
+            return new Point(startPoint.X + width, startPoint.Y + height);
         }
 
         public static RectangleF GetRectangleF(PointF center, SizeF size)
@@ -238,6 +303,35 @@ namespace Phases
         public static string CounterName(string name)
         {
             return name + "_ct";
+        }
+
+        public static Point SnapGripPoint(Point location, int span)
+        {
+            int x = location.X / span * span + Math.Sign(location.X) * span / 2;
+            int y = location.Y / span * span + Math.Sign(location.Y) * span / 2;
+            return new Point(x, y);
+        }
+
+        public static Point SnapPoint(Point location, int span)
+        {
+            int x = (location.X + Math.Sign(location.X) * span / 2) / span * span;
+            int y = (location.Y + Math.Sign(location.Y) * span / 2) / span * span;
+            return new Point(x, y);
+        }
+
+        public static Point SnapPoint(Point startPoint, Point location, int span)
+        {
+            int x = (location.X + Math.Sign(location.X) * span / 2) / span * span + startPoint.X % span;
+            int y = (location.Y + Math.Sign(location.Y) * span / 2) / span * span + startPoint.Y % span;
+            return new Point(x, y);
+        }
+
+        public static Point SnapPoint(DrawableObject obj, Point startPoint, Point location, int span)
+        {
+            DrawableObject shadow = obj.OwnerDraw.Shadow.First(sh => sh.Equals(obj));
+            int x = (location.X + Math.Sign(location.X) * span / 2) / span * span + startPoint.X % span + shadow.Center.X % span;
+            int y = (location.Y + Math.Sign(location.Y) * span / 2) / span * span + startPoint.Y % span + shadow.Center.Y % span;
+            return new Point(x, y);
         }
     }
 }

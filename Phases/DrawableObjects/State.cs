@@ -192,7 +192,7 @@ namespace Phases.DrawableObjects
 
         public override void DrawingRectangle(Point startPoint, Point endPoint)
         {
-            rect = MouseTool.GetRectangle(startPoint, endPoint);
+            rect = Util.GetRectangle(startPoint, endPoint);
         }
 
         public override Rectangle GetSelectionRectangle()
@@ -388,11 +388,12 @@ namespace Phases.DrawableObjects
         public override void CopyTo(DrawableObject obj)
         {
             base.CopyTo(obj);
-            State state = (State)obj;
+            State state = obj as State;
             state.rect = rect;
             state.inTransitions = new List<Transition>(inTransitions);
             state.enterOutput = enterOutput;
             state.exitOutput = exitOutput;
+            state.Track = Track;
         }
 
         public override object Clone()
