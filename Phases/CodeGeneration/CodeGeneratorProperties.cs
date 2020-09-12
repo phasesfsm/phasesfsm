@@ -1,4 +1,5 @@
 ﻿using Phases.BasicObjects;
+using Phases.DrawableObjects;
 using Phases.Variables;
 using System;
 using System.Collections.Generic;
@@ -127,9 +128,14 @@ namespace Phases.CodeGeneration
             EnterOutputs = 0x40,
             ExitOutputs = 0x80,
             Variable = 0x400,
+            Pointing = 0x800,
+
+            // Ignore line
+            Ignore = 0x8000,
 
             // Combos
-            All = File | Project | Machine | Node | SuperState | State | Transition | EnterOutputs | ExitOutputs | Directory,
+            All = File | Project | Machine | Node | SuperState | State | Transition
+                | EnterOutputs | ExitOutputs | Directory | Pointing | Ignore,
             NoDirName = All - Directory,
             NoFileName = All - File - Directory,
             NoOutputs = NoFileName - EnterOutputs - ExitOutputs,
@@ -152,6 +158,7 @@ namespace Phases.CodeGeneration
             public BasicState State;
             public BasicTransition Transition;
             public Variable Variable;
+            public DrawableObject Pointing;
 
             public ContextObjects(GeneratorData data)
             {
@@ -251,7 +258,9 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken State = new MacroToken("State", ContextLevel.NoFileName);
             public static readonly MacroToken Transitions = new MacroToken("Transitions", ContextLevel.NoOutputs);
             public static readonly MacroToken Transition = new MacroToken("Transition", ContextLevel.NoOutputs);
-            public static readonly MacroToken Pointing = new MacroToken("Pointing", ContextLevel.NoOutputs);
+            public static readonly MacroToken Pointing = new MacroToken("Pointing:", ContextLevel.NoOutputs);
+            public static readonly MacroToken Abort = new MacroToken("Abort", ContextLevel.NoOutputs);
+            public static readonly MacroToken End = new MacroToken("End", ContextLevel.NoOutputs);
 
             public static readonly MacroToken Variables = new MacroToken("Variables", ContextLevel.NoFileName);
             public static readonly MacroToken Variable = new MacroToken("Variable", ContextLevel.NoFileName);
@@ -857,6 +866,37 @@ namespace Phases.CodeGeneration
                                     context.Objects.Data.Variables.EventOutputs, (ctx, var) => ctx.Objects.Variable = var);
                             }
                             break;
+                        case "Pointing:":
+                            if (context.Level.HasFlag(ContextLevel.Transition))
+                            {
+                                int tokenIndex = line.IndexOf(MacroBlockBegin + token.Name);
+                                if (tokenIndex < 0) break;
+                                int afterTokenIndex = tokenIndex + MacroBlockBegin.Length + token.Name.Length;
+                                int spaceIndex = line.IndexOf(' ', afterTokenIndex);
+                                if (spaceIndex < 0) spaceIndex = line.Length;
+                                string objType = line.Substring(afterTokenIndex, spaceIndex - afterTokenIndex);
+
+                                if (context.Objects.Transition.Transition.EndObject.GetType().ToString().EndsWith(objType))
+                                {
+                                    if (context.Level.HasFlag(ContextLevel.Ignore)) context.Level -= ContextLevel.Ignore;
+                                    if (context.Level.HasFlag(ContextLevel.Pointing))
+                                    {
+                                        context.Objects.Pointing = context.Objects.Transition.Transition.EndObject;
+                                        RenderMacroBlock(context, lines, ref lineIndex);
+                                    }
+                                    else
+                                    {
+                                        RenderGenericBlock(text, context, lines, ref blockIndex, ContextLevel.Pointing,
+                                            new DrawableObject[] { context.Objects.Transition.Transition.EndObject }, (ctx, obj) => ctx.Objects.Pointing = obj);
+                                    }
+                                }
+                                else
+                                {
+                                    context.Objects.Pointing = null;
+                                    context.Level |= ContextLevel.Ignore;
+                                }
+                            }
+                            break;
                         default:
                             text.Append(RenderMacroBlock(context, lines, ref blockIndex));
                             break;
@@ -865,7 +905,7 @@ namespace Phases.CodeGeneration
                 }
                 else
                 {
-                    text.Append(RenderMacroLine(context, line));
+                    if (!context.Level.HasFlag(ContextLevel.Ignore)) text.Append(RenderMacroLine(context, line));
                 }
                 lineIndex++;
             }
@@ -981,6 +1021,18 @@ namespace Phases.CodeGeneration
                                 context.Objects.Data.BasicStatesList, (ctx, state) => ctx.Objects.State = state, state => state.Name);
                         }
                         return text.ToString();
+                    case "Abort":
+                    case "End":
+                    {
+                        if (context.Level.HasFlag(ContextLevel.Pointing) && context.Objects.Pointing.GetType().ToString().EndsWith(token.Name))
+                        {
+                            string macro = MacroBegin + token.Name;
+                            string result = context.Objects.Pointing.Name;
+                            outputText = inputText.Replace(macro, result);
+                            text.Append(RenderMacroLine(context, outputText));
+                        }
+                        return text.ToString();
+                    }
                     case "Transitions":
                     {
                         if (context.Level.HasFlag(ContextLevel.State))
@@ -1517,9 +1569,6 @@ namespace Phases.CodeGeneration
 
         [Description("Macro block begin token."), Category("Macro block tokens")]
         public string MacroBlockBegin { get; set; } = "<@";
-
-        [Description("Macro block continue token."), Category("Macro block tokens")]
-        public string MacroBlockContinue { get; set; } = "<#";
 
         [Description("Macro block end token."), Category("Macro block tokens")]
         public string MacroBlockEnd { get; set; } = "@>";
