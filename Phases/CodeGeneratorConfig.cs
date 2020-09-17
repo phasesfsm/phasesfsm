@@ -155,6 +155,8 @@ namespace Phases
             stBar.Text = tag.FilePath;
             listView.Items.Clear();
             listView.Groups.Clear();
+            btAddFile.Enabled = true;
+            btAddFolder.Enabled = true;
             if (e.Node == treeView.Nodes[0] || e.Node.Text == "cottle.ini")
             {
                 listView.Visible = false;

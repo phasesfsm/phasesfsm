@@ -244,6 +244,7 @@
             // 
             // btAddFolder
             // 
+            this.btAddFolder.Enabled = false;
             this.btAddFolder.Image = global::Phases.Properties.Resources.Add_Folder_32;
             this.btAddFolder.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btAddFolder.Name = "btAddFolder";
@@ -253,6 +254,7 @@
             // 
             // btAddFile
             // 
+            this.btAddFile.Enabled = false;
             this.btAddFile.Image = global::Phases.Properties.Resources.Add_File_32;
             this.btAddFile.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btAddFile.Name = "btAddFile";
@@ -262,6 +264,7 @@
             // 
             // btDelete
             // 
+            this.btDelete.Enabled = false;
             this.btDelete.Image = global::Phases.Properties.Resources.delete;
             this.btDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btDelete.Name = "btDelete";
