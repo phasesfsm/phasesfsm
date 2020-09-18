@@ -188,6 +188,7 @@ namespace Phases
                         item.Tag = context;
                         //item.Tag = new RenderingContext(context.Value, context);
                     }
+                    if (listView.Items.Count > 0 && listView.SelectedItems.Count == 0) listView.Items[0].Selected = true;
                 }
                 else
                 {
@@ -200,7 +201,7 @@ namespace Phases
 
         private void ListView_SelectedIndexChanged(object sender, EventArgs e)
         {
-            btEditCottle.Enabled = !(listView.SelectedItems.Count == 0);
+            btEditCottle.Enabled = treeView.SelectedNode.ImageIndex == 1 && !(listView.SelectedItems.Count == 0);
         }
 
         private void BtEditCottle_Click(object sender, EventArgs e)
@@ -374,6 +375,9 @@ namespace Phases
             TreeNode treeNode = treeView.SelectedNode;
             NodeTag tag = treeNode.Tag as NodeTag;
 
+            deleteToolStripMenuItem.Enabled = true;
+            
+
             if (string.IsNullOrEmpty(e.Label) || e.Label.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
             {
                 e.CancelEdit = true;
@@ -415,6 +419,7 @@ namespace Phases
         private void treeView_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
             if (e.Node.Level == 0 || e.Node.Text == "cottle.ini") e.CancelEdit = true;
+            deleteToolStripMenuItem.Enabled = false;
         }
 
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)

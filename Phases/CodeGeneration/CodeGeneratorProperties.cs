@@ -385,12 +385,13 @@ namespace Phases.CodeGeneration
             newContext = null;
             int macroIndex = inputText.ToLower().IndexOf(MacroBegin + token.Name.ToLower() + MacroEnd);
             if (macroIndex == -1) return inputText;
-            string macro;
+            string macro, result;
             // Force context
             if (inputText.Length >= macroIndex + MacroBegin.Length + token.Name.Length + MacroEnd.Length + MacroContext.Length && inputText.Substring(macroIndex + MacroBegin.Length + token.Name.Length + MacroEnd.Length, MacroContext.Length) == MacroContext)
             {
                 macro = inputText.Substring(macroIndex, MacroBegin.Length + token.Name.Length + MacroEnd.Length + MacroContext.Length);
                 value = MacroBegin;
+                result = value;
                 newContext = new RenderingContext(currentContext, value);
                 newContext.Level = valueContextLevel;
             }
@@ -402,9 +403,10 @@ namespace Phases.CodeGeneration
                     value = value.ToLower();
                 else if (token.Render == MacroRender.UpperCase)
                     value = value.ToUpper();
-                newContext = new RenderingContext(currentContext, value, valueContextLevel);
+                result = inputText.Replace(macro, value);
+                newContext = new RenderingContext(currentContext, result, valueContextLevel);
             }
-            return inputText.Replace(macro, value);
+            return result;
         }
 
         public List<RenderingContext> RenderMacroDirectory(string inputText, RenderingContext context)
@@ -916,6 +918,7 @@ namespace Phases.CodeGeneration
         private void RenderGenericBlock<T>(StringBuilder text, RenderingContext context, string[] lines, ref int lineIndex,
             ContextLevel newLevel, IEnumerable<T> list, Action<RenderingContext, T> load)
         {
+            if (lineIndex >= lines.Length) return;
             int blockIndex = lineIndex;
             int index = 0;
             foreach (T obj in list)
