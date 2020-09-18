@@ -250,6 +250,7 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken Project = new MacroToken("Project", ContextLevel.All);
             public static readonly MacroToken Machines = new MacroToken("Machines", ContextLevel.NoDirName);
             public static readonly MacroToken Machine = new MacroToken("Machine", ContextLevel.NoDirName);
+            public static readonly MacroToken Entry = new MacroToken("Entry", ContextLevel.NoDirName);
             public static readonly MacroToken Nodes = new MacroToken("Nodes", ContextLevel.NoFileName);
             public static readonly MacroToken Node = new MacroToken("Node", ContextLevel.NoFileName);
             public static readonly MacroToken SuperStates = new MacroToken("SuperStates", ContextLevel.NoFileName);
@@ -987,6 +988,25 @@ namespace Phases.CodeGeneration
                                 context.Objects.Data.Trees, (ctx, mach) => ctx.Objects.Machine = mach, mach => mach.Name);
                         }
                         return text.ToString();
+                    case "Entry":
+                    {
+                        if (context.Level.HasFlag(ContextLevel.SuperState))
+                        {
+                            if (context.Objects.SuperState.HasOrigin())
+                            {
+                                outputText = RenderMacro(inputText, token, context.Objects.SuperState.Origin.Transition.EndObject.Name, ContextLevel.Project, context, out RenderingContext newContext);
+                            }
+                        }
+                        else if (context.Level.HasFlag(ContextLevel.Machine))
+                        {
+                            outputText = RenderMacro(inputText, token, context.Objects.Machine.Origin.Transition.EndObject.Name, ContextLevel.Project, context, out RenderingContext newContext);
+                        }
+                        else
+                        {
+                            outputText = RenderMacro(inputText, token, "??", ContextLevel.File, context, out RenderingContext newContext);
+                        }
+                        break;
+                    }
                     case "States":
                     {
                         if (context.Level.HasFlag(ContextLevel.SuperState))
