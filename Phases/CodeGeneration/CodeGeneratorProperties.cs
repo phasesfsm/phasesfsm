@@ -259,7 +259,8 @@ namespace Phases.CodeGeneration
             public static readonly MacroToken State = new MacroToken("State", ContextLevel.NoFileName);
             public static readonly MacroToken Transitions = new MacroToken("Transitions", ContextLevel.NoOutputs);
             public static readonly MacroToken Transition = new MacroToken("Transition", ContextLevel.NoOutputs);
-            public static readonly MacroToken Pointing = new MacroToken("Pointing:", ContextLevel.NoOutputs);
+            public static readonly MacroToken PointingBlock = new MacroToken("Pointing:", ContextLevel.NoOutputs);
+            public static readonly MacroToken Pointing = new MacroToken("Pointing", ContextLevel.NoOutputs);
             public static readonly MacroToken Abort = new MacroToken("Abort", ContextLevel.NoOutputs);
             public static readonly MacroToken End = new MacroToken("End", ContextLevel.NoOutputs);
 
