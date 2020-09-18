@@ -184,7 +184,7 @@ namespace Phases.CodeGeneration
             public bool First { get; set; }
             public bool Last { get; set; }
             public int Index { get; set; }
-            public string File { get; }
+            public string File { get; set; }
 
             public RenderingContext(string file, ContextLevel level, GeneratorData data, string value)
             {
@@ -549,7 +549,8 @@ namespace Phases.CodeGeneration
                                 {
                                     foreach (RenderingContext context in contexts)
                                     {
-                                        RenderMacro(inputText, token, machine.Name, ContextLevel.Machine, contexts.First(), out RenderingContext newContext);
+                                        string fileName = RenderMacro(inputText, token, machine.Name, ContextLevel.Machine, context, out RenderingContext newContext);
+                                        newContext.File = Path.Combine(context.File, fileName);
                                         newContext.Objects.Machine = machine;
                                         result.Add(newContext);
                                     }
