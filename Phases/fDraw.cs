@@ -2513,11 +2513,20 @@ namespace Phases
 
         private void pNGImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            float scale = zoomScales[zoomStripComboBox.SelectedIndex] / 100;
-            Bitmap bitmap = new Bitmap((int)((book.SelectedSheet.Size.Width - 1) * scale), (int)((book.SelectedSheet.Size.Width - 1) * scale), PixelFormat.Format32bppArgb);
+            Bitmap bitmap = new Bitmap(book.SelectedSheet.Size.Width, book.SelectedSheet.Size.Height, PixelFormat.Format24bppRgb);
             Graphics g = Graphics.FromImage(bitmap);
 
-            DrawToGraphics(g);
+            // Draw white background
+            g.FillRectangle(Brushes.White, new Rectangle(Point.Empty, bitmap.Size));
+
+            // Scaling
+            Matrix pngTransform = new Matrix();
+            pngTransform.Translate((float)book.SelectedSheet.Size.Width / 2f, (float)book.SelectedSheet.Size.Height / 2f);
+            g.Transform = pngTransform;
+            g.SmoothingMode = SmoothingMode.HighQuality;
+
+            // Draw objects
+            book.SelectedSheet.Sketch.Paint(g, new DrawAttributes(Pens.Black, 1f));
 
             using (SaveFileDialog dialog = new SaveFileDialog())
             {
