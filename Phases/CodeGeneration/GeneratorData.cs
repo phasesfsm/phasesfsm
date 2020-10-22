@@ -268,7 +268,8 @@ namespace Phases.CodeGeneration
                         }
                         if(ibindir == null && obindir == null)
                         {
-                            BasicRelation bindir = new BasicRelation(indir, input, new BasicOutput((OperationType) Enum.Parse(typeof(OperationType), indir.Action), output));
+                            BasicOutput action = indir.Action == null ? null : new BasicOutput((OperationType)Enum.Parse(typeof(OperationType), indir.Action), output);
+                            BasicRelation bindir = new BasicRelation(indir, input, action);
                             RelationsList.Add(bindir);
                         }
                     }

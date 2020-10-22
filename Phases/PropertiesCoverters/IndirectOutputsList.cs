@@ -18,8 +18,8 @@ namespace Phases.PropertiesCoverters
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            Relation relation = context.Instance as Relation;
-            DrawingSheet sheet = relation.OwnerDraw.OwnerSheet;
+            DrawableObject obj = context.Instance as DrawableObject;
+            DrawingSheet sheet = obj.OwnerDraw.OwnerSheet;
 
             return new StandardValuesCollection(VariableCollection.GetIndirectOutputsList(sheet));
         }

@@ -619,6 +619,7 @@ namespace Phases.CodeGeneration
                                     {
                                         RenderMacro(inputText, token, state.Name, ContextLevel.SuperState, contexts.First(), out RenderingContext newContext);
                                         newContext.Objects.State = state;
+                                        newContext.Objects.SuperState = state as BasicMachine;
                                         result.Add(newContext);
                                     }
                                 }
@@ -637,6 +638,7 @@ namespace Phases.CodeGeneration
                                 {
                                     RenderMacro(inputText, token, state.Name, ContextLevel.SuperState, contexts.First(), out RenderingContext newContext);
                                     newContext.Objects.State = state;
+                                    newContext.Objects.SuperState = state as BasicMachine;
                                     result.Add(newContext);
                                 }
                             }
